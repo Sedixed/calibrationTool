@@ -9,7 +9,7 @@ wxBEGIN_EVENT_TABLE(AppFrame, wxFrame)
 wxEND_EVENT_TABLE()
 
 
-wxSize getMaxSizeBtn(std::vector<wxButton>& btns);
+void getMaxSizeBtn(std::vector<wxButton*>& btns, wxSize *retSize);
 
 AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     : wxFrame(NULL, 0, title, pos, size) {
@@ -20,24 +20,23 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     wxButton* spherical = new wxButton(panel, ID_SPHERICAL, "Spherical camera");
     wxButton* help = new wxButton(panel, ID_HELP, "Help");
     wxButton* exit = new wxButton(panel, ID_EXIT, "Exit");
-    /*std::vector<wxButton> btns = new std::vector<wxButton>();
-    btns.add(perspective);
-    btns.add(spherical);
-    btns.add(help);
-    btns.add(exit);
-    wxSize actSize = getMaxSizeBtn(btns);
-    std::cout << actSize.GetWidth() << "\n";*/
+    std::vector<wxButton*> btns = {perspective, spherical, help, exit};
+    
+    wxSize* actSize = new wxSize();
+    getMaxSizeBtn(btns, actSize);
 
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
 
     vbox->AddStretchSpacer(1);
-    vbox->Add(perspective, 0, wxALIGN_CENTER | wxBOTTOM, 50);
-    vbox->Add(spherical, 0, wxALIGN_CENTER | wxBOTTOM, 50);
-    vbox->Add(help, 0, wxALIGN_CENTER | wxBOTTOM, 50);
-    vbox->Add(exit, 0, wxALIGN_CENTER);
+    for (wxButton* btn : btns) {
+        btn->SetSize(actSize->GetWidth(), btn->GetSize().GetHeight());
+        vbox->Add(btn, 0, wxEXPAND | wxLEFT | wxRIGHT, 70);
+        vbox->AddSpacer(40);
+    }
     vbox->AddStretchSpacer(1);
 
     panel->SetSizer(vbox);
+
     Centre();
 }
 
@@ -57,12 +56,13 @@ void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
     std::cout << "spher\n";
 }
 
-wxSize getMaxSizeBtn(std::vector<wxButton>& btns) {
-    wxSize max = btns.at(0).GetSize();
+// getMaxSizeBtn : puts into the wxSize pointed by retSize the button contained in btns
+//      that has the highest width
+void getMaxSizeBtn(std::vector<wxButton*>& btns, wxSize* retSize) {
+    *retSize = btns.at(0)->GetSize();
     for (int i = 1; i < btns.size(); ++i) {
-        if (max.GetWidth() < btns.at(i).GetSize().GetWidth()) {
-            max = btns.at(i).GetSize();
+        if (retSize->GetWidth() < btns.at(i)->GetSize().GetWidth()) {
+            *retSize = btns.at(i)->GetSize();
         }
     }
-    return max;
 }
