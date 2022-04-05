@@ -6,7 +6,6 @@ class App : public wxApp {
         virtual bool OnInit();
 };
 
-
 wxIMPLEMENT_APP(App);
 
 bool App::OnInit() {
