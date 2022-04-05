@@ -25,7 +25,7 @@ void getMaxSizeOfBtns(std::vector<wxButton*>& btns, wxSize *retSize);
 AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     : wxFrame(NULL, 0, title, pos, size) {
     
-    wxPanel* panel = new wxPanel(this);
+    panel = new wxPanel(this);
 
     // Base buttons declaration
     wxButton *perspective = Btn::btnFromId(Btn::ID_PERSPECTIVE, panel);
@@ -34,25 +34,9 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     wxButton* exit = Btn::btnFromId(Btn::ID_EXIT, panel);
     
     buttons = {perspective, spherical, help, exit};
-    
-    // get the largest button's size
-    wxSize* actSize = new wxSize();
-    getMaxSizeOfBtns(buttons, actSize);
 
-    // place components and resize buttons to match the largest's one
-    vbox = new wxBoxSizer(wxVERTICAL);
-
-    vbox->AddStretchSpacer(1);
-    for (wxButton* btn : buttons) {
-        btn->SetSize(actSize->GetWidth(), btn->GetSize().GetHeight());
-        vbox->Add(btn, 0, wxEXPAND | wxLEFT | wxRIGHT, 70);
-        if (btn != exit) {
-            vbox->AddSpacer(40);
-        }
-    }
-    vbox->AddStretchSpacer(1);
-
-    panel->SetSizer(vbox);
+    placeButtons(exit);
+    //panel->SetSizer(vbox);
 
     Centre();
 }
@@ -67,22 +51,60 @@ void AppFrame::OnHelp(wxCommandEvent& evt) {
     wxLogMessage("Camera calibration tool. Please first select either spherical or perspective camera to start.");
 }
 
-
+// todo : déclarer les boutons séparément
+// peut être créer des tableaux constants dans buttonsUtils.hpp/cpp
+// base / persp / spher
 void AppFrame::OnPerspectiveSelection(wxCommandEvent& evt) {
-    std::cout << "persp\n";
+    resetButtons();
 
-    for (wxButton *b : buttons) {
-        b->Destroy();
+    // Buttons replacement
+    for (int i = Btn::ID_LOAD_IMG; i <= Btn::ID_PREFERENCES; ++i) {
+        wxButton *b = Btn::btnFromId(static_cast<Btn::ButtonsId>(i), panel);
+        buttons.push_back(b);
     }
-    buttons.erase(buttons.begin(), buttons.end());
+    wxButton* exit = Btn::btnFromId(Btn::ID_EXIT, panel);
+    buttons.push_back(exit);
 
-
+    placeButtons(exit);
 }
 
 
 void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
     std::cout << "spher\n";
 }
+
+
+void AppFrame::resetButtons() {
+    for (wxButton *b : buttons) {
+        b->Destroy();
+    }
+    buttons.erase(buttons.begin(), buttons.end());
+}
+
+
+void AppFrame::placeButtons(wxButton* last) {
+    vbox = new wxBoxSizer(wxVERTICAL);
+
+    wxSize* actSize = new wxSize();
+    getMaxSizeOfBtns(buttons, actSize);
+
+    int i = 0;
+    vbox->AddStretchSpacer(1);
+    for (wxButton* btn : buttons) {
+        btn->SetSize(actSize->GetWidth(), btn->GetSize().GetHeight());
+        vbox->Add(btn, 0, wxEXPAND | wxLEFT | wxRIGHT, 70);
+        if (last != NULL && btn != last) {
+            vbox->AddSpacer(40);
+        }
+        ++i;
+    }
+    vbox->AddStretchSpacer(1);
+
+    panel->SetSizer(vbox);
+}
+
+
+// --- Utils ---
 
 
 void getMaxSizeOfBtns(std::vector<wxButton*>& btns, wxSize* retSize) {
@@ -93,3 +115,4 @@ void getMaxSizeOfBtns(std::vector<wxButton*>& btns, wxSize* retSize) {
         }
     }
 }
+

@@ -7,7 +7,7 @@
 
 
 namespace Btn {
-    enum ButtonsId {
+    enum ButtonsId : int {
         ID_PERSPECTIVE = 0,
         ID_SPHERICAL,
         ID_HELP,
