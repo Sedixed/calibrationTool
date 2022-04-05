@@ -18,5 +18,8 @@ $(NAME): $(OBJS)
 $(OBJS): $(SRCS)
 	$(CC) -c $(LIBSWX) $(LIBSOCV) -o $@ $<
 
+clean:
+	rm *.o $(NAME)
+
 
 
