@@ -2,9 +2,16 @@
 #include "ButtonsUtils.hpp"
 #include <iostream>
 
+// Spacing between two buttons in the base menu
 #define BASE_SPACING 40
+
+// Spacing between two buttons in the perspective menu
 #define PERSPECTIVE_SPACING 30
-#define SPHERICAL_SPACING 2
+
+// Spacing between two buttons in the spherical menu
+// à définir plus tard
+#define SPHERICAL_SPACING -1
+
 
 // Event table used by the frame.
 //  Makes each button corresponds its onclick function
@@ -13,6 +20,7 @@ wxBEGIN_EVENT_TABLE(AppFrame, wxFrame)
     EVT_BUTTON(Btn::ID_HELP,        AppFrame::OnHelp)
     EVT_BUTTON(Btn::ID_PERSPECTIVE, AppFrame::OnPerspectiveSelection)
     EVT_BUTTON(Btn::ID_SPHERICAL,   AppFrame::OnSphericalSelection)
+    EVT_BUTTON(Btn::ID_LOAD_IMG,    AppFrame::OnLoadImages)
 wxEND_EVENT_TABLE()
 
 
@@ -29,10 +37,8 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     : wxFrame(NULL, 0, title, pos, size, style) {
     
     panel = new wxPanel(this);
-
     buttons = Btn::baseButtons(panel);
     placeButtons(BASE_SPACING);
-    
     Centre();
 }
 
@@ -59,6 +65,11 @@ void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
     std::cout << "spher\n";
 }
 
+void AppFrame::OnLoadImages(wxCommandEvent& evt) {
+    //créer classe LoadImages
+    // faire new LoadImages ici
+}
+
 
 void AppFrame::resetButtons() {
     for (wxButton *b : buttons) {
@@ -69,11 +80,13 @@ void AppFrame::resetButtons() {
 
 
 void AppFrame::placeButtons(int spacing) {
+    // get the max size for buttons
     wxSize* actSize = new wxSize();
     getMaxSizeOfBtns(buttons, actSize);
 
     vbox = new wxBoxSizer(wxVERTICAL);
 
+    // placing buttons and spaces
     vbox->AddStretchSpacer(1);
     for (wxButton* btn : buttons) {
         btn->SetSize(actSize->GetWidth(), btn->GetSize().GetHeight());
@@ -85,6 +98,7 @@ void AppFrame::placeButtons(int spacing) {
         }
     }
     
+    // refreshing
     vbox->AddStretchSpacer(1);
     vbox->Layout();
 

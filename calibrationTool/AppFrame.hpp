@@ -30,6 +30,9 @@ class AppFrame : public wxFrame {
         // Called when a user clicks on the "Spherical camera" labeled button
         void OnSphericalSelection(wxCommandEvent& evt);
 
+        // Called when a user clicks on the "Load images" labeled button
+        void OnLoadImages(wxCommandEvent& evt);
+
         /**
         * Reset the attribute buttons and destroys every button displayed on the frame. 
         * 
@@ -38,9 +41,10 @@ class AppFrame : public wxFrame {
 
         /**
          * Resize the buttons contained in the attribute buttons to match the largest
-         * and display them in vbox. Puts some space under each button except 
-         * the button last if not null.
+         * and display them in vbox. Puts some space depending on spacing under each 
+         * button except the last one.
          * 
+         * @param spacing the space to put between two buttons
          */
         void placeButtons(int spacing);
 
