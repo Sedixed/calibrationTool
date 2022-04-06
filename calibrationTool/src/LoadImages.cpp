@@ -1,8 +1,9 @@
 #include "../headers/LoadImages.hpp"
+#include "../headers/Mosaic.hpp"
 #include <opencv2/opencv.hpp>
 
 int LoadImages(Calib* dataCalib) {
-    wxString wildcard("image files (*.bmp;*.tiff;*.jpg;*.pgm;*.png)|*.bmp;*.tiff;*.jpg;*.pgm;*.png");
+    wxString wildcard("Image files (*.bmp;*.tiff;*.jpg;*.pgm;*.png)|*.bmp;*.tiff;*.jpg;*.pgm;*.png");
 
 
     wxFileDialog* askImages = new wxFileDialog(NULL, "Load images", "", "", 
@@ -14,7 +15,7 @@ int LoadImages(Calib* dataCalib) {
 
         int max = (int)paths.GetCount();
         if (max > MAX_IMAGES) {
-            wxMessageDialog(NULL, _("An error ocurred : too many images were loaded"), 
+            wxMessageDialog(NULL, _("An error ocurred : too many images were loaded."), 
                             _(""), wxCENTER|wxICON_ERROR).ShowModal();
             return -1;
         }
@@ -37,7 +38,7 @@ int LoadImages(Calib* dataCalib) {
             }
         }
 
-        // Mosaic ? à voir
+        Mosaic(images, max, 800);
 
         for(int i = 0; i < max; ++i) {
 		    images[i].release();

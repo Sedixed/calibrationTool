@@ -4,7 +4,7 @@
 #ifndef WX_PRECOMP
     #include <wx/wx.h>
 #endif
-#include "../headers/structs.hpp"
+#include "structs.hpp"
 
 /**
  * Opens a wxFileDialog to choose multiple images.

@@ -66,6 +66,7 @@ void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
     std::cout << "spher\n";
 }
 
+
 void AppFrame::OnLoadImages(wxCommandEvent& evt) {
     LoadImages(&dataCalib);
 
