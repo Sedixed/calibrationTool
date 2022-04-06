@@ -15,7 +15,7 @@ class AppFrame : public wxFrame {
         static const int INITIAL_BTNS_NB = 4;
         static const int PERSPECTIVE_BTNS_NB = 8;
 
-        AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+        AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style);
 
     private:
         // Called when a user clicks on the "Exit" labeled button
@@ -42,7 +42,7 @@ class AppFrame : public wxFrame {
          * the button last if not null.
          * 
          */
-        void placeButtons(wxButton* last = NULL);
+        void placeButtons(int spacing);
 
         wxDECLARE_EVENT_TABLE();
 };

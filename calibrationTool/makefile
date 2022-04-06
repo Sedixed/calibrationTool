@@ -2,8 +2,8 @@ CC = g++
 RM = rm
 
 EXEC = app
-SRCS = buttonsUtils.cpp appFrame.cpp app.cpp
-OBJS = buttonsUtils.o appFrame.o app.o
+SRCS = ButtonsUtils.cpp AppFrame.cpp App.cpp
+OBJS = ButtonsUtils.o AppFrame.o App.o
 
 LIBSWX = `wx-config --cxxflags --libs`
 LIBSOCV = `pkg-config --cflags --libs opencv4`
@@ -14,13 +14,13 @@ all: $(EXEC)
 $(EXEC): $(OBJS)
 	$(CC) -o $(EXEC) $(OBJS) $(LIBSWX) $(LIBSOCV) $(LDFLAGS)
 
-buttonsUtils.o: buttonsUtils.cpp buttonsUtils.hpp
+ButtonsUtils.o: ButtonsUtils.cpp ButtonsUtils.hpp
 	$(CC) -c $(LIBSWX) $(LIBSOCV) -o $@ $<
 
-appFrame.o: appFrame.cpp appFrame.hpp buttonsUtils.hpp
+AppFrame.o: AppFrame.cpp AppFrame.hpp ButtonsUtils.hpp
 	$(CC) -c $(LIBSWX) $(LIBSOCV) -o $@ $<
 
-app.o: app.cpp appFrame.hpp
+App.o: App.cpp AppFrame.hpp
 	$(CC) -c $(LIBSWX) $(LIBSOCV) -o $@ $<
 
 clean:

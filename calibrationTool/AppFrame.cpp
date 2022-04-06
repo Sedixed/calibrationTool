@@ -1,7 +1,10 @@
-#include "appFrame.hpp"
-#include "buttonsUtils.hpp"
+#include "AppFrame.hpp"
+#include "ButtonsUtils.hpp"
 #include <iostream>
 
+#define BASE_SPACING 40
+#define PERSPECTIVE_SPACING 30
+#define SPHERICAL_SPACING 2
 
 // Event table used by the frame.
 //  Makes each button corresponds its onclick function
@@ -22,22 +25,14 @@ wxEND_EVENT_TABLE()
 void getMaxSizeOfBtns(std::vector<wxButton*>& btns, wxSize *retSize);
 
 
-AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
-    : wxFrame(NULL, 0, title, pos, size) {
+AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxFrame(NULL, 0, title, pos, size, style) {
     
     panel = new wxPanel(this);
 
-    // Base buttons declaration
-    wxButton *perspective = Btn::btnFromId(Btn::ID_PERSPECTIVE, panel);
-    wxButton* spherical = Btn::btnFromId(Btn::ID_SPHERICAL, panel);
-    wxButton* help = Btn::btnFromId(Btn::ID_HELP, panel);
-    wxButton* exit = Btn::btnFromId(Btn::ID_EXIT, panel);
+    buttons = Btn::baseButtons(panel);
+    placeButtons(BASE_SPACING);
     
-    buttons = {perspective, spherical, help, exit};
-
-    placeButtons(exit);
-    //panel->SetSizer(vbox);
-
     Centre();
 }
 
@@ -51,21 +46,12 @@ void AppFrame::OnHelp(wxCommandEvent& evt) {
     wxLogMessage("Camera calibration tool. Please first select either spherical or perspective camera to start.");
 }
 
-// todo : déclarer les boutons séparément
-// peut être créer des tableaux constants dans buttonsUtils.hpp/cpp
-// base / persp / spher
+
 void AppFrame::OnPerspectiveSelection(wxCommandEvent& evt) {
     resetButtons();
-
-    // Buttons replacement
-    for (int i = Btn::ID_LOAD_IMG; i <= Btn::ID_PREFERENCES; ++i) {
-        wxButton *b = Btn::btnFromId(static_cast<Btn::ButtonsId>(i), panel);
-        buttons.push_back(b);
-    }
-    wxButton* exit = Btn::btnFromId(Btn::ID_EXIT, panel);
-    buttons.push_back(exit);
-
-    placeButtons(exit);
+    buttons = Btn::perspectiveButtons(panel);
+    placeButtons(PERSPECTIVE_SPACING);
+    SetSize(wxSize(300, 600));
 }
 
 
@@ -76,31 +62,34 @@ void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
 
 void AppFrame::resetButtons() {
     for (wxButton *b : buttons) {
+        vbox->Detach(b);
         b->Destroy();
     }
-    buttons.erase(buttons.begin(), buttons.end());
 }
 
 
-void AppFrame::placeButtons(wxButton* last) {
-    vbox = new wxBoxSizer(wxVERTICAL);
-
+void AppFrame::placeButtons(int spacing) {
     wxSize* actSize = new wxSize();
     getMaxSizeOfBtns(buttons, actSize);
 
-    int i = 0;
+    vbox = new wxBoxSizer(wxVERTICAL);
+
     vbox->AddStretchSpacer(1);
     for (wxButton* btn : buttons) {
         btn->SetSize(actSize->GetWidth(), btn->GetSize().GetHeight());
-        vbox->Add(btn, 0, wxEXPAND | wxLEFT | wxRIGHT, 70);
-        if (last != NULL && btn != last) {
-            vbox->AddSpacer(40);
+        vbox->Add(btn, 0, wxEXPAND | wxLEFT | wxRIGHT, 60);
+        if (btn != buttons.back()) {
+            // au choix, à voir
+            vbox->AddSpacer(spacing);
+            //vbox->AddStretchSpacer(1);
         }
-        ++i;
     }
+    
     vbox->AddStretchSpacer(1);
+    vbox->Layout();
 
     panel->SetSizer(vbox);
+    panel->Layout();
 }
 
 
