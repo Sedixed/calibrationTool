@@ -1,4 +1,4 @@
-#include "AppFrame.hpp"
+#include "../headers/AppFrame.hpp"
 
 
 class App : public wxApp {

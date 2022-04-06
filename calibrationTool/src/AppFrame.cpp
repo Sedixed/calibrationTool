@@ -1,5 +1,6 @@
-#include "AppFrame.hpp"
-#include "ButtonsUtils.hpp"
+#include "../headers/AppFrame.hpp"
+#include "../headers/ButtonsUtils.hpp"
+#include "../headers/LoadImages.hpp"
 #include <iostream>
 
 // Spacing between two buttons in the base menu
@@ -66,8 +67,16 @@ void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
 }
 
 void AppFrame::OnLoadImages(wxCommandEvent& evt) {
-    //créer classe LoadImages
-    // faire new LoadImages ici
+    LoadImages(&dataCalib);
+
+    /* tests
+    for (IOCalibration ioc : dataCalib.IOcalib) {
+        if (ioc.image_name[0] == '\0') {
+            break;
+        }
+        std::cout << ioc.image_name << "\n";
+        std::cout << (ioc.active_image ? "active\n" : "not active\n");
+    }*/
 }
 
 

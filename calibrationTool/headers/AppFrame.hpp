@@ -4,12 +4,14 @@
 #ifndef WX_PRECOMP
     #include <wx/wx.h>
 #endif
+#include "../headers/structs.hpp"
 
 class AppFrame : public wxFrame {
     // Attributes
     std::vector<wxButton*> buttons;
     wxBoxSizer* vbox;
     wxPanel *panel;
+    Calib dataCalib;
 
     public:
         static const int INITIAL_BTNS_NB = 4;
