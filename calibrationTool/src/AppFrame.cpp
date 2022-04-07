@@ -57,8 +57,15 @@ void AppFrame::OnHelp(wxCommandEvent& evt) {
 void AppFrame::OnPerspectiveSelection(wxCommandEvent& evt) {
     resetButtons();
     buttons = Btn::perspectiveButtons(panel);
-    placeButtons(PERSPECTIVE_SPACING);
     SetSize(wxSize(300, 600));
+    // disabling buttons 
+    int base = Btn::ID_EXTRACT_GRID_CORNERS - Btn::ID_LOAD_IMG;
+    int borne =  Btn::ID_PREFERENCES - Btn::ID_EXTRACT_GRID_CORNERS + 1;
+    for (int i = base; i < borne; ++i) {
+        buttons[i]->Enable(false);
+    }
+
+    placeButtons(PERSPECTIVE_SPACING);
 }
 
 
@@ -68,7 +75,10 @@ void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
 
 
 void AppFrame::OnLoadImages(wxCommandEvent& evt) {
-    LoadImages(&dataCalib);
+    int r = LoadImages(&dataCalib);
+    if (r == 0) {
+        buttons[Btn::ID_EXTRACT_GRID_CORNERS - Btn::ID_LOAD_IMG]->Enable(true);
+    }
 
     /* tests
     for (IOCalibration ioc : dataCalib.IOcalib) {

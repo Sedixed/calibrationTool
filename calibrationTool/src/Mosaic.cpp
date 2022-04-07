@@ -18,6 +18,8 @@ int Mosaic(cv::Mat images[], int nbImages, int width) {
                         _(""), wxCENTER|wxICON_ERROR).ShowModal();
         return -1;
     }
+
+    //gérer pb de taille de la mosaïque
     int n_col = (int)(floor(sqrt((double)(nbImages * images[0].cols) / (double)(images[0].rows))));
     int n_row = (int)(ceil((double)(nbImages) / (double)(n_col)));
 
@@ -30,9 +32,12 @@ int Mosaic(cv::Mat images[], int nbImages, int width) {
                                 n_col * mosaicSize.width, 
                                 n_row * mosaicSize.height),
                                 CV_8UC1);
+
+    int effWidth = n_col * mosaicSize.width > width ? width : n_col * mosaicSize.width;
+
     cv::Mat render2 = cv::Mat(cv::Size(
-                                width,
-                                (int) ((mosaicSize.height * n_row) * ((double)(width) / (double)(n_col * mosaicSize.width)))),
+                                effWidth,
+                                (int) ((mosaicSize.height * n_row) * ((double)(effWidth) / (double)(n_col * mosaicSize.width)))),
                                 CV_8UC1);
 
     // writing data in the image
@@ -59,7 +64,7 @@ int Mosaic(cv::Mat images[], int nbImages, int width) {
 
     cv::resize(render1, render2, render2.size(), cv::INTER_LINEAR);
     imshow(MOSAIC_TITLE, render2);
-    std::cout << "width : " << render2.cols << " height : " << render2.rows << "\n";
+    std::cout << render2.cols << "\n";
     render1.release();
     render2.release();
 

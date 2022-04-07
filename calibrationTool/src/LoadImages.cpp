@@ -38,7 +38,7 @@ int LoadImages(Calib* dataCalib) {
             }
         }
 
-        Mosaic(images, max, 800);
+        Mosaic(images, max, 1152);
 
         for(int i = 0; i < max; ++i) {
 		    images[i].release();
