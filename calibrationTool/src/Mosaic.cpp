@@ -35,31 +35,33 @@ int Mosaic(cv::Mat images[], int nbImages, int width) {
                                 (int) ((mosaicSize.height * n_row) * ((double)(width) / (double)(n_col * mosaicSize.width)))),
                                 CV_8UC1);
 
-
     // writing data in the image
 
     cv::Mat tmp = cv::Mat(mosaicSize, CV_8UC1);
     // region of interest
-    cv::Rect ROI;
-    ROI.width = mosaicSize.width;
-    ROI.height = mosaicSize.height;
-
-
-    // TODO : revoir INTER_LINEAR, ROI, fonction image (eq to setImageROI)
+    int ROIwidth = mosaicSize.width;
+    int ROIheight = mosaicSize.height;
+    
     for (int j = 0; j < n_row; ++j) {
         for (int i = 0; i < n_col; ++i) {
             if (j * n_col + i < nbImages) {
-                ROI.x = i * mosaicSize.width;
-                ROI.y = j * mosaicSize.height;
-                cv::resize(images[j * n_col + i], tmp, cv::INTER_LINEAR);
-                render1 = cv::image(ROI);
+                int ROIx = i * mosaicSize.width;
+                int ROIy = j * mosaicSize.height;
+
+                cv::resize(images[j * n_col + i], tmp, tmp.size(), cv::INTER_LINEAR);
+                cv::Mat r = render1(cv::Rect(ROIx, ROIy, ROIwidth, ROIheight));
+                tmp.copyTo(r);
             } else {
                 break;
             }
         }
     }
 
-    cv::resize(render1, render2, cv::INTER_LINEAR);
+    cv::resize(render1, render2, render2.size(), cv::INTER_LINEAR);
+    imshow(MOSAIC_TITLE, render2);
+    std::cout << "width : " << render2.cols << " height : " << render2.rows << "\n";
+    render1.release();
+    render2.release();
 
     return 0;
 }
