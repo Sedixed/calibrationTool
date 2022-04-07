@@ -1,6 +1,7 @@
 #include "../headers/AppFrame.hpp"
 #include "../headers/ButtonsUtils.hpp"
 #include "../headers/LoadImages.hpp"
+#include "../headers/ExtractGridCorners.hpp"
 #include <iostream>
 
 // Spacing between two buttons in the base menu
@@ -13,15 +14,22 @@
 // à définir plus tard
 #define SPHERICAL_SPACING -1
 
+#define PREF_WIDTH 1152
+#define PREF_HEIGHT 864
+
+#define PREF_PPR 7
+#define PREF_PPC 5
+
 
 // Event table used by the frame.
 //  Makes each button corresponds its onclick function
 wxBEGIN_EVENT_TABLE(AppFrame, wxFrame)
-    EVT_BUTTON(Btn::ID_EXIT,        AppFrame::OnExit)
-    EVT_BUTTON(Btn::ID_HELP,        AppFrame::OnHelp)
-    EVT_BUTTON(Btn::ID_PERSPECTIVE, AppFrame::OnPerspectiveSelection)
-    EVT_BUTTON(Btn::ID_SPHERICAL,   AppFrame::OnSphericalSelection)
-    EVT_BUTTON(Btn::ID_LOAD_IMG,    AppFrame::OnLoadImages)
+    EVT_BUTTON(Btn::ID_EXIT,                 AppFrame::OnExit)
+    EVT_BUTTON(Btn::ID_HELP,                 AppFrame::OnHelp)
+    EVT_BUTTON(Btn::ID_PERSPECTIVE,          AppFrame::OnPerspectiveSelection)
+    EVT_BUTTON(Btn::ID_SPHERICAL,            AppFrame::OnSphericalSelection)
+    EVT_BUTTON(Btn::ID_LOAD_IMG,             AppFrame::OnLoadImages)
+    EVT_BUTTON(Btn::ID_EXTRACT_GRID_CORNERS, AppFrame::OnExtractGridCorners)
 wxEND_EVENT_TABLE()
 
 
@@ -36,6 +44,9 @@ void getMaxSizeOfBtns(std::vector<wxButton*>& btns, wxSize *retSize);
 
 AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style)
     : wxFrame(NULL, 0, title, pos, size, style) {
+
+    dataCalib.pref.render_size = cv::Size(PREF_WIDTH, PREF_HEIGHT);
+    dataCalib.pref.pattern_size = cv::Size(PREF_PPR, PREF_PPC);
     
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
@@ -78,6 +89,7 @@ void AppFrame::OnLoadImages(wxCommandEvent& evt) {
     int r = LoadImages(&dataCalib);
     if (r == 0) {
         buttons[Btn::ID_EXTRACT_GRID_CORNERS - Btn::ID_LOAD_IMG]->Enable(true);
+        
     }
 
     /* tests
@@ -88,6 +100,13 @@ void AppFrame::OnLoadImages(wxCommandEvent& evt) {
         std::cout << ioc.image_name << "\n";
         std::cout << (ioc.active_image ? "active\n" : "not active\n");
     }*/
+}
+
+void AppFrame::OnExtractGridCorners(wxCommandEvent& evt) {
+    int r = ExtractGridCorners(&dataCalib);
+    if (r == 0) {
+
+    }
 }
 
 

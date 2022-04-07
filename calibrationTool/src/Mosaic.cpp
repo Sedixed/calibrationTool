@@ -18,26 +18,29 @@ int Mosaic(cv::Mat images[], int nbImages, int width) {
                         _(""), wxCENTER|wxICON_ERROR).ShowModal();
         return -1;
     }
-
-    //gérer pb de taille de la mosaïque
+    if (nbImages < 3) {
+        wxMessageDialog(NULL, _("Please provide at least 3 images."), 
+                        _(""), wxCENTER|wxICON_ERROR).ShowModal();
+        return -1;
+    }
     int n_col = (int)(floor(sqrt((double)(nbImages * images[0].cols) / (double)(images[0].rows))));
     int n_row = (int)(ceil((double)(nbImages) / (double)(n_col)));
 
-    // Mosaic size
+    // Size of an element of the mosaic
     cv::Size mosaicSize;
     mosaicSize.width = images[0].cols / n_col;
 	mosaicSize.height = images[0].rows / n_row;
 
+    // Image that will be resized to fit in the final image
     cv::Mat render1 = cv::Mat(cv::Size(
                                 n_col * mosaicSize.width, 
                                 n_row * mosaicSize.height),
                                 CV_8UC1);
 
-    int effWidth = n_col * mosaicSize.width > width ? width : n_col * mosaicSize.width;
-
+    // Final image
     cv::Mat render2 = cv::Mat(cv::Size(
-                                effWidth,
-                                (int) ((mosaicSize.height * n_row) * ((double)(effWidth) / (double)(n_col * mosaicSize.width)))),
+                                width,
+                                (int) ((mosaicSize.height * n_row) * ((double)(width) / (double)(n_col * mosaicSize.width)))),
                                 CV_8UC1);
 
     // writing data in the image
@@ -63,8 +66,8 @@ int Mosaic(cv::Mat images[], int nbImages, int width) {
     }
 
     cv::resize(render1, render2, render2.size(), cv::INTER_LINEAR);
-    imshow(MOSAIC_TITLE, render2);
-    std::cout << render2.cols << "\n";
+    cv::imshow(MOSAIC_TITLE, render2);
+    tmp.release();
     render1.release();
     render2.release();
 

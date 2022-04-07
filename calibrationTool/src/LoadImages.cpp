@@ -3,7 +3,7 @@
 #include <opencv2/opencv.hpp>
 
 int LoadImages(Calib* dataCalib) {
-    wxString wildcard("Image files (*.bmp;*.tiff;*.jpg;*.pgm;*.png)|*.bmp;*.tiff;*.jpg;*.pgm;*.png");
+    wxString wildcard("Image files (*.bmp;*.tiff;*.jpg;*.jpeg;*.pgm;*.png)|*.bmp;*.tiff;*.jpg;*.jpeg;*.pgm;*.png");
 
 
     wxFileDialog* askImages = new wxFileDialog(NULL, "Load images", "", "", 
@@ -38,7 +38,7 @@ int LoadImages(Calib* dataCalib) {
             }
         }
 
-        Mosaic(images, max, 1152);
+        Mosaic(images, max, dataCalib->pref.render_size.width);
 
         for(int i = 0; i < max; ++i) {
 		    images[i].release();

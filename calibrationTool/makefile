@@ -2,10 +2,10 @@ CC = g++
 RM = rm
 
 EXEC = app
-SRCS = src/ButtonsUtils.cpp src/AppFrame.cpp src/App.cpp src/LoadImages.cpp src/Mosaic.cpp #src/ExtractGridCorners.cpp
-OBJS = ButtonsUtils.o AppFrame.o App.o LoadImages.o Mosaic.o #ExtractGridCorners.o
+SRCS = src/ButtonsUtils.cpp src/AppFrame.cpp src/App.cpp src/LoadImages.cpp src/Mosaic.cpp src/ExtractGridCorners.cpp
+OBJS = ButtonsUtils.o AppFrame.o App.o LoadImages.o Mosaic.o ExtractGridCorners.o
 # AppFrame headers required (there are a lot)
-AF_HDS = headers/AppFrame.hpp headers/ButtonsUtils.hpp headers/LoadImages.hpp #headers/ExtractGridCorners.hpp
+AF_HDS = headers/AppFrame.hpp headers/ButtonsUtils.hpp headers/LoadImages.hpp headers/ExtractGridCorners.hpp
 
 LIBSWX = `wx-config --cxxflags --libs`
 LIBSOCV = `pkg-config --cflags --libs opencv4`
@@ -31,7 +31,8 @@ App.o: src/App.cpp headers/AppFrame.hpp
 Mosaic.o: src/Mosaic.cpp headers/Mosaic.hpp
 	$(CC) -c $(LIBSWX) $(LIBSOCV) -o $@ $<
 
-#ExtractGridCorners.o: src/ExtractGridCorners.cpp headers/ExtractGridCorners.hpp
+ExtractGridCorners.o: src/ExtractGridCorners.cpp headers/ExtractGridCorners.hpp
+	$(CC) -c $(LIBSWX) $(LIBSOCV) -o $@ $<
 
 
 clean:

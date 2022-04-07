@@ -35,6 +35,9 @@ class AppFrame : public wxFrame {
         // Called when a user clicks on the "Load images" labeled button
         void OnLoadImages(wxCommandEvent& evt);
 
+        // Called when a user click on the "Extract grid corners" labeled button
+        void OnExtractGridCorners(wxCommandEvent& evt);
+
         /**
         * Reset the attribute buttons and destroys every button displayed on the frame. 
         * 
