@@ -17,8 +17,8 @@
 #define PREF_WIDTH 1152
 #define PREF_HEIGHT 864
 
-#define PREF_PPR 7
-#define PREF_PPC 5
+#define PREF_PPR 6
+#define PREF_PPC 4
 
 
 // Event table used by the frame.
@@ -89,23 +89,13 @@ void AppFrame::OnLoadImages(wxCommandEvent& evt) {
     int r = LoadImages(&dataCalib);
     if (r == 0) {
         buttons[Btn::ID_EXTRACT_GRID_CORNERS - Btn::ID_LOAD_IMG]->Enable(true);
-        
     }
-
-    /* tests
-    for (IOCalibration ioc : dataCalib.IOcalib) {
-        if (ioc.image_name[0] == '\0') {
-            break;
-        }
-        std::cout << ioc.image_name << "\n";
-        std::cout << (ioc.active_image ? "active\n" : "not active\n");
-    }*/
 }
 
 void AppFrame::OnExtractGridCorners(wxCommandEvent& evt) {
     int r = ExtractGridCorners(&dataCalib);
     if (r == 0) {
-
+        buttons[Btn::ID_CALIB - Btn::ID_LOAD_IMG]->Enable(true);
     }
 }
 

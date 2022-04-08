@@ -26,11 +26,10 @@ typedef struct iocalibration {
 	char image_name[MAX_FILE_NAME] {'\0'};		// Image path and name
 	bool active_image;		            // Is the image useful for calibration ? 0 -> don't use the image
 
-    /* Pas encore utilisé
 	// Output
-	CvMat		*CornersCoord2D;		// 2D coordinates of plane corners
-	CvMat		*extrinsics_plane;		// extrinsics parameters of each plane (pose)
-    */
+	cv::Mat		CornersCoord2D;		// 2D coordinates of plane corners
+	//CvMat		*extrinsics_plane;		// extrinsics parameters of each plane (pose)
+    
 
 } IOCalibration;
 

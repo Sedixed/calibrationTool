@@ -59,6 +59,7 @@ int Mosaic(cv::Mat images[], int nbImages, int width) {
                 cv::resize(images[j * n_col + i], tmp, tmp.size(), cv::INTER_LINEAR);
                 cv::Mat r = render1(cv::Rect(ROIx, ROIy, ROIwidth, ROIheight));
                 tmp.copyTo(r);
+                r.release();
             } else {
                 break;
             }
