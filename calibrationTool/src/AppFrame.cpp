@@ -2,6 +2,7 @@
 #include "../headers/ButtonsUtils.hpp"
 #include "../headers/LoadImages.hpp"
 #include "../headers/ExtractGridCorners.hpp"
+#include "../headers/Preferences.hpp"
 #include <iostream>
 
 // Spacing between two buttons in the base menu
@@ -17,9 +18,11 @@
 #define PREF_WIDTH 1152
 #define PREF_HEIGHT 864
 
-#define PREF_PPR 6
-#define PREF_PPC 4
-
+#define NB_SQUARE_Y 6
+#define NB_SQUARE_X 4
+#define SIZE_SQUARE_X 20
+#define SIZE_SQUARE_Y 20
+#define SEARCH_WINDOW_SIZE 5
 
 // Event table used by the frame.
 //  Makes each button corresponds its onclick function
@@ -30,6 +33,7 @@ wxBEGIN_EVENT_TABLE(AppFrame, wxFrame)
     EVT_BUTTON(Btn::ID_SPHERICAL,            AppFrame::OnSphericalSelection)
     EVT_BUTTON(Btn::ID_LOAD_IMG,             AppFrame::OnLoadImages)
     EVT_BUTTON(Btn::ID_EXTRACT_GRID_CORNERS, AppFrame::OnExtractGridCorners)
+    EVT_BUTTON(Btn::ID_PREFERENCES,          AppFrame::OnPreferences)
 wxEND_EVENT_TABLE()
 
 
@@ -46,7 +50,12 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     : wxFrame(NULL, 0, title, pos, size, style) {
 
     dataCalib.pref.render_size = cv::Size(PREF_WIDTH, PREF_HEIGHT);
-    dataCalib.pref.pattern_size = cv::Size(PREF_PPR, PREF_PPC);
+    dataCalib.calibPattern.nbSquareX = NB_SQUARE_X;
+    dataCalib.calibPattern.nbSquareY = NB_SQUARE_Y;
+    dataCalib.calibPattern.sizeSquareX = SIZE_SQUARE_X;
+    dataCalib.calibPattern.sizeSquareY = SIZE_SQUARE_Y;
+    dataCalib.pref.search_window_size = SEARCH_WINDOW_SIZE;
+
     
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
@@ -97,6 +106,16 @@ void AppFrame::OnExtractGridCorners(wxCommandEvent& evt) {
     if (r == 0) {
         buttons[Btn::ID_CALIB - Btn::ID_LOAD_IMG]->Enable(true);
     }
+}
+
+void AppFrame::OnCalibration(wxCommandEvent& evt) {
+
+}
+
+void AppFrame::OnPreferences(wxCommandEvent& evt) {
+    long style = wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX);
+    PreferencesFrame* frame = new PreferencesFrame("Preferences", wxPoint(-1, -1), wxSize(300, 500), style);
+    frame->Show(true);
 }
 
 

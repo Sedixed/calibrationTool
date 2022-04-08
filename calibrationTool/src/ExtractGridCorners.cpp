@@ -14,43 +14,57 @@ int ExtractGridCorners(Calib *dataCalib) {
         }
 
         cv::Mat src = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_COLOR);
-    
-        std::vector<cv::Point2f> pointBuf;
+
+        // corners detection
+
+        std::vector<cv::Point2f> corners;
         int chessBoardFlags = cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE;
 
-        bool found = cv::findChessboardCorners(src, dataCalib->pref.pattern_size, pointBuf, chessBoardFlags);
+        cv::Size patternSize = cv::Size(dataCalib->calibPattern.nbSquareX, dataCalib->calibPattern.nbSquareY);
+        bool found = cv::findChessboardCorners(src, patternSize, corners, chessBoardFlags);
 
-        if (found) {   
+        if (found) {
+            cv::TermCriteria criteria = cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 30, 0.0001);
             cv::Mat viewGray;
             cv::cvtColor(src, viewGray, cv::COLOR_BGR2GRAY);
-            cv::cornerSubPix(viewGray, pointBuf, cv::Size(5, 5),
-                                cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::EPS+cv::TermCriteria::COUNT, 30, 0.0001));
-            cv::drawChessboardCorners(src, dataCalib->pref.pattern_size, cv::Mat(pointBuf), found);
+            cv::cornerSubPix(viewGray, corners, cv::Size(dataCalib->pref.search_window_size, dataCalib->pref.search_window_size),
+                                cv::Size(-1,-1), criteria);
+            cv::drawChessboardCorners(src, patternSize, cv::Mat(corners), found);
             viewGray.release();
         }
 
-        
+        // 3d coordinates of the points
+        std::vector<cv::Point3f> corners3D;
+        for (int j = 0; j < dataCalib->calibPattern.nbSquareY; ++j) {
+            for (int k = 0; k < dataCalib->calibPattern.nbSquareX; ++k) {
+                corners3D.push_back(cv::Point3f(
+                                    k * dataCalib->calibPattern.sizeSquareX,
+                                    j * dataCalib->calibPattern.sizeSquareY, 
+                                    0));
+            }
+        }
+
         cv::imshow(IMG_NAME, src);
 
         int result = wxMessageBox("Was the extraction successful ?", "Corners extraction", wxYES_NO | wxICON_QUESTION);
         if (result == wxYES) {
             cv::destroyWindow(IMG_NAME);
             //save les corners
-            dataCalib->IOcalib[i].CornersCoord2D = cv::Mat(pointBuf);
+            dataCalib->IOcalib[i].CornersCoord2D = cv::Mat(corners);
             dataCalib->IOcalib[i].active_image = true;
             src.release();
         } else {
+            /*
             int sndResult = wxMessageBox("Do you want to try again ?", "Corners extraction", wxYES_NO | wxICON_QUESTION);
-
             if (sndResult == wxYES) {
                 --i;
                 cv::destroyWindow(IMG_NAME);
                 src.release();
-            } else {
+            } else {*/
                 cv::destroyWindow(IMG_NAME);
                 src.release();
                 dataCalib->IOcalib[i].active_image = false;
-            }
+            //}
         }
     }
     return 0;

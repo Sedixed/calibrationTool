@@ -8,7 +8,7 @@
 
 namespace Btn {
 
-    // IDs of the differents buttons of the main app
+    // IDs of the differents buttons of the app
     enum ButtonsId : int {
         ID_PERSPECTIVE = 0,
         ID_SPHERICAL,
@@ -20,12 +20,14 @@ namespace Btn {
         ID_SHOW_CORNERS_PROJ,
         ID_CALIB_RESULTS,
         ID_SAVE,
-        ID_PREFERENCES
+        ID_PREFERENCES,
+        ID_EXIT_OK,
+        ID_EXIT_CANCEL
     };
 
 
-    // Labels associated to the buttons of the main app
-    const std::string labels[] = {
+    // Labels associated to the buttons of the app
+    const std::string mainLabels[] = {
         "Perspective camera",
         "Spherical camera",
         "Help",
@@ -36,27 +38,38 @@ namespace Btn {
         "Show corners projection",
         "Calibration results",
         "Save",
-        "Preferences"
+        "Preferences",
+        "OK",
+        "Cancel"
     };
 
 
     /**
-     * Returns a vector of pointers of wxButtons that are the base buttons of the app.
+     * Returns a vector of pointers of wxButtons that are the base buttons of the main frame.
      * 
      * @param parent                        the wxWindow parent of the buttons.
-     * @return const std::vector<wxButton*> vector of pointers of wxButtons, base buttons of the app.
+     * @return const std::vector<wxButton*> vector of pointers of wxButtons, base buttons of the main frame.
      */
     const std::vector<wxButton*> baseButtons(wxWindow* parent);
 
     /**
-     * Returns a vector of pointers of wxButtons that are the buttons of the app when
-     * the button "Perspective camera" is clicked by the user.
+     * Returns a vector of pointers of wxButtons that are the buttons of the main frame, when
+     * the button "Perspective camera" has been clicked by the user.
      * 
      * @param parent                        the wxWindow parent of the buttons.
      * @return const std::vector<wxButton*> vector of pointers of wxButtons, buttons displayed
      *                                      when "Perspective camera" button is clicked.
      */
     const std::vector<wxButton*> perspectiveButtons(wxWindow* parent);
+
+    /**
+     * Returns a vector of pointers of wxButtons that are the buttons of the preferences frame.
+     * 
+     * @param parent                        the wxWindow parent of the buttons.
+     * @return const sd::vector<wxButton*>  vector of pointers of wxButtons, buttons displayed
+     *                                      on the preferences frame.
+     */
+    const std::vector<wxButton*> preferencesButtons(wxWindow* parent);
 
 
     /**

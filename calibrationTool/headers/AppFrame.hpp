@@ -14,9 +14,6 @@ class AppFrame : public wxFrame {
     Calib dataCalib;
 
     public:
-        static const int INITIAL_BTNS_NB = 4;
-        static const int PERSPECTIVE_BTNS_NB = 8;
-
         AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style);
 
     private:
@@ -37,6 +34,14 @@ class AppFrame : public wxFrame {
 
         // Called when a user click on the "Extract grid corners" labeled button
         void OnExtractGridCorners(wxCommandEvent& evt);
+
+        // Called when a user click on the "Calibration" labeled button
+        void OnCalibration(wxCommandEvent& evt);
+
+
+
+        // Called when a user click on the "Preferences" labeled button
+        void OnPreferences(wxCommandEvent& evt);
 
         /**
         * Reset the attribute buttons and destroys every button displayed on the frame. 
