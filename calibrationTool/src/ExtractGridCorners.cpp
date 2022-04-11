@@ -48,25 +48,15 @@ int ExtractGridCorners(Calib *dataCalib) {
 
         int result = wxMessageBox("Was the extraction successful ?", "Corners extraction", wxYES_NO | wxICON_QUESTION);
         if (result == wxYES) {
-            cv::destroyWindow(IMG_NAME);
-            //save les corners
+            // Saving corners positions in 2D and 3D
             dataCalib->IOcalib[i].CornersCoord3D = corners3D;
             dataCalib->IOcalib[i].CornersCoord2D = corners;
-            dataCalib->IOcalib[i].active_image = true;
-            src.release();
         } else {
-            /*
-            int sndResult = wxMessageBox("Do you want to try again ?", "Corners extraction", wxYES_NO | wxICON_QUESTION);
-            if (sndResult == wxYES) {
-                --i;
-                cv::destroyWindow(IMG_NAME);
-                src.release();
-            } else {*/
-                cv::destroyWindow(IMG_NAME);
-                src.release();
-                dataCalib->IOcalib[i].active_image = false;
-            //}
+            
+            dataCalib->IOcalib[i].active_image = false;
         }
+        cv::destroyWindow(IMG_NAME);
+        src.release();
     }
     return 0;
 }

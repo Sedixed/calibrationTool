@@ -6,15 +6,31 @@
     #include <wx/wx.h>
 #endif
 
+// Nombre minimal d'images valides
+#define MIN_VALID_IMAGES 3
+
 int Calibration(Calib* dataCalib) {
     std::vector<std::vector<cv::Point3f>> objectPoints;
     std::vector<std::vector<cv::Point2f>> imagePoints;
+    // First valid image
+    int firstRead = -1;
+    // Amount of valid images
+    int nbValid = 0;
     for (int i = 0; i < dataCalib->nb_images; ++i) {
         if (!dataCalib->IOcalib[i].active_image) {
             continue;
         }
+        if (firstRead == -1) {
+            firstRead = i;
+        }
+        ++nbValid;
         objectPoints.push_back(dataCalib->IOcalib[i].CornersCoord3D);
         imagePoints.push_back(dataCalib->IOcalib[i].CornersCoord2D);
+    }
+
+    if (nbValid < MIN_VALID_IMAGES) {
+        wxMessageBox("Calibration requires at least 3 valid images.", "Calibration", wxOK);
+        return -1;
     }
   
     cv::Mat K(3, 3, CV_64F);        // Intrinsics parameters 
@@ -23,7 +39,7 @@ int Calibration(Calib* dataCalib) {
     std::vector<cv::Mat> tVecs;     // Translation vectors
     int flags = 0;                  // Flags
     // Used to get the size on an image
-    cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
+    cv::Mat img = cv::imread(dataCalib->IOcalib[firstRead].image_name, cv::IMREAD_COLOR);
 
     double error = cv::calibrateCamera(objectPoints, imagePoints, img.size(), K, D, rVecs, tVecs, flags);
 
