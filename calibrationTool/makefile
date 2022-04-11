@@ -4,14 +4,14 @@ RM = rm
 EXEC = app
 # Source files
 SRCS = src/ButtonsUtils.cpp src/AppFrame.cpp src/App.cpp src/LoadImages.cpp src/Mosaic.cpp \
-	src/ExtractGridCorners.cpp src/Preferences.cpp
+	src/ExtractGridCorners.cpp src/Preferences.cpp src/Calibration.cpp
 
 # Objects to be created
-OBJS = ButtonsUtils.o AppFrame.o App.o LoadImages.o Mosaic.o ExtractGridCorners.o Preferences.o
+OBJS = ButtonsUtils.o AppFrame.o App.o LoadImages.o Mosaic.o ExtractGridCorners.o Preferences.o Calibration.o
 
 # AppFrame headers required (there are a lot)
 AF_HDS = headers/AppFrame.hpp headers/ButtonsUtils.hpp headers/LoadImages.hpp \
-	headers/ExtractGridCorners.hpp headers/Preferences.hpp
+	headers/ExtractGridCorners.hpp headers/Preferences.hpp headers/Calibration.hpp
 
 LIBSWX = `wx-config --cxxflags --libs`
 LIBSOCV = `pkg-config --cflags --libs opencv4`
@@ -41,6 +41,9 @@ ExtractGridCorners.o: src/ExtractGridCorners.cpp headers/ExtractGridCorners.hpp
 	$(CC) -c $(LIBSWX) $(LIBSOCV) -o $@ $<
 
 Preferences.o: src/Preferences.cpp headers/Preferences.hpp
+	$(CC) -c $(LIBSWX) $(LIBSOCV) -o $@ $<
+
+Calibration.o: src/Calibration.cpp headers/Calibration.hpp
 	$(CC) -c $(LIBSWX) $(LIBSOCV) -o $@ $<
 
 

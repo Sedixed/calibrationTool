@@ -44,9 +44,9 @@ class AppFrame : public wxFrame {
         void OnPreferences(wxCommandEvent& evt);
 
         /**
-        * Reset the attribute buttons and destroys every button displayed on the frame. 
-        * 
-        */
+         * Reset the attribute buttons and destroys every button displayed on the frame. 
+         * 
+         */
         void resetButtons();
 
         /**

@@ -3,6 +3,7 @@
 #include "../headers/LoadImages.hpp"
 #include "../headers/ExtractGridCorners.hpp"
 #include "../headers/Preferences.hpp"
+#include "../headers/Calibration.hpp"
 #include <iostream>
 
 // Spacing between two buttons in the base menu
@@ -33,6 +34,7 @@ wxBEGIN_EVENT_TABLE(AppFrame, wxFrame)
     EVT_BUTTON(Btn::ID_SPHERICAL,            AppFrame::OnSphericalSelection)
     EVT_BUTTON(Btn::ID_LOAD_IMG,             AppFrame::OnLoadImages)
     EVT_BUTTON(Btn::ID_EXTRACT_GRID_CORNERS, AppFrame::OnExtractGridCorners)
+    EVT_BUTTON(Btn::ID_CALIB,                AppFrame::OnCalibration)
     EVT_BUTTON(Btn::ID_PREFERENCES,          AppFrame::OnPreferences)
 wxEND_EVENT_TABLE()
 
@@ -56,6 +58,7 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     dataCalib.calibPattern.sizeSquareY = SIZE_SQUARE_Y;
     dataCalib.pref.search_window_size = SEARCH_WINDOW_SIZE;
 
+    // TODO: gérer fermeture alors que des images sont encore ouvertes (segfault)
     
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
@@ -109,7 +112,7 @@ void AppFrame::OnExtractGridCorners(wxCommandEvent& evt) {
 }
 
 void AppFrame::OnCalibration(wxCommandEvent& evt) {
-
+    int r = Calibration(&dataCalib);
 }
 
 void AppFrame::OnPreferences(wxCommandEvent& evt) {

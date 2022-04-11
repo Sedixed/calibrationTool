@@ -50,7 +50,8 @@ int ExtractGridCorners(Calib *dataCalib) {
         if (result == wxYES) {
             cv::destroyWindow(IMG_NAME);
             //save les corners
-            dataCalib->IOcalib[i].CornersCoord2D = cv::Mat(corners);
+            dataCalib->IOcalib[i].CornersCoord3D = corners3D;
+            dataCalib->IOcalib[i].CornersCoord2D = corners;
             dataCalib->IOcalib[i].active_image = true;
             src.release();
         } else {

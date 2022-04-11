@@ -19,8 +19,8 @@ typedef struct preferences {
 typedef struct mire {
 	int nbSquareX;					// number of squares along x					
 	int nbSquareY;					// number of squares along y
-	double sizeSquareX;				// size of a square along x
-	double sizeSquareY;				// size of a square along y
+	double sizeSquareX;				// size of a square along x (in mm)
+	double sizeSquareY;				// size of a square along y (in mm)
 } Mire;
 
 /**
@@ -34,8 +34,10 @@ typedef struct iocalibration {
 	bool active_image;		           			// Is the image useful for calibration ? 0 -> don't use the image
 
 	// Output
-	cv::Mat		CornersCoord2D;		// 2D coordinates of plane corners
-	cv::Mat		extrinsics_plane;	// extrinsics parameters of each plane (pose)
+	std::vector<cv::Point2f>		CornersCoord2D;		// 2D coordinates of plane corners
+	std::vector<cv::Point3f>        CornersCoord3D;		// 3D coordinates of plane corners
+	cv::Mat							rotationMat;	    // Rotation matrice (3 rows and 1 column)
+	cv::Mat							translationMat;		// Translation matrice (3 rows and 1 column)
 } IOCalibration;
 
 
@@ -48,5 +50,7 @@ typedef struct calib {
     IOCalibration IOcalib[MAX_IMAGES];	// images data used for the calibration
 	Mire	calibPattern;				// calibration pattern properties
 	Preferences pref;					// preferences
+	cv::Mat intrinsics;					// intrinsics parameters of the sensor
+	double error;						// error after calibration
     // à suivre..
 } Calib;
