@@ -20,7 +20,7 @@ int ExtractGridCorners(Calib *dataCalib) {
         std::vector<cv::Point2f> corners;
         int chessBoardFlags = cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE;
 
-        cv::Size patternSize = cv::Size(dataCalib->calibPattern.nbSquareX, dataCalib->calibPattern.nbSquareY);
+        cv::Size patternSize = cv::Size(dataCalib->calibPattern.nbSquareX - 1, dataCalib->calibPattern.nbSquareY - 1);
         bool found = cv::findChessboardCorners(src, patternSize, corners, chessBoardFlags);
 
         if (found) {

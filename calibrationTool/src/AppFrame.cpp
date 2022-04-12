@@ -16,15 +16,6 @@
 // à définir plus tard
 #define SPHERICAL_SPACING -1
 
-#define PREF_WIDTH 1152
-#define PREF_HEIGHT 864
-
-#define NB_SQUARE_Y 6
-#define NB_SQUARE_X 4
-#define SIZE_SQUARE_X 20
-#define SIZE_SQUARE_Y 20
-#define SEARCH_WINDOW_SIZE 5
-
 // Event table used by the frame.
 //  Makes each button corresponds its onclick function
 wxBEGIN_EVENT_TABLE(AppFrame, wxFrame)
@@ -50,15 +41,12 @@ void getMaxSizeOfBtns(std::vector<wxButton*>& btns, wxSize *retSize);
 
 AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style)
     : wxFrame(NULL, 0, title, pos, size, style) {
-
-    dataCalib.pref.render_size = cv::Size(PREF_WIDTH, PREF_HEIGHT);
-    dataCalib.calibPattern.nbSquareX = NB_SQUARE_X;
-    dataCalib.calibPattern.nbSquareY = NB_SQUARE_Y;
-    dataCalib.calibPattern.sizeSquareX = SIZE_SQUARE_X;
-    dataCalib.calibPattern.sizeSquareY = SIZE_SQUARE_Y;
-    dataCalib.pref.search_window_size = SEARCH_WINDOW_SIZE;
+    
+    SetDefaultPreferences();
 
     // TODO: gérer fermeture alors que des images sont encore ouvertes (segfault)
+    // reprendre des photos bien horizontales pour match le x7 y5
+    // gérer les flags côté préférence / structure / calibration
     
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
@@ -81,7 +69,7 @@ void AppFrame::OnPerspectiveSelection(wxCommandEvent& evt) {
     resetButtons();
     buttons = Btn::perspectiveButtons(panel);
     SetSize(wxSize(300, 600));
-    // disabling buttons 
+    // Disabling buttons 
     int base = Btn::ID_EXTRACT_GRID_CORNERS - Btn::ID_LOAD_IMG;
     int borne =  Btn::ID_PREFERENCES - Btn::ID_EXTRACT_GRID_CORNERS + 1;
     for (int i = base; i < borne; ++i) {
@@ -117,7 +105,7 @@ void AppFrame::OnCalibration(wxCommandEvent& evt) {
 
 void AppFrame::OnPreferences(wxCommandEvent& evt) {
     long style = wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX);
-    PreferencesFrame* frame = new PreferencesFrame("Preferences", wxPoint(-1, -1), wxSize(500, 600), style);
+    PreferencesFrame* frame = new PreferencesFrame("Preferences", wxPoint(-1, -1), wxSize(500, 650), style, &dataCalib);
     frame->Show(true);
 }
 
@@ -131,30 +119,37 @@ void AppFrame::resetButtons() {
 
 
 void AppFrame::placeButtons(int spacing) {
-    // get the max size for buttons
+    // Get the max size for buttons
     wxSize* actSize = new wxSize();
     getMaxSizeOfBtns(buttons, actSize);
 
     vbox = new wxBoxSizer(wxVERTICAL);
 
-    // placing buttons and spaces
+    // Placing buttons and spaces
     vbox->AddStretchSpacer(1);
     for (wxButton* btn : buttons) {
         btn->SetSize(actSize->GetWidth(), btn->GetSize().GetHeight());
         vbox->Add(btn, 0, wxEXPAND | wxLEFT | wxRIGHT, 60);
         if (btn != buttons.back()) {
-            // au choix, à voir
             vbox->AddSpacer(spacing);
-            //vbox->AddStretchSpacer(1);
         }
     }
     
-    // refreshing
+    // Refreshing
     vbox->AddStretchSpacer(1);
     vbox->Layout();
-
     panel->SetSizer(vbox);
     panel->Layout();
+}
+
+
+void AppFrame::SetDefaultPreferences() {
+    dataCalib.pref.render_size = Pref::renderSizes[Pref::DEFAULT_RENDER_INDEX]; 
+    dataCalib.calibPattern.nbSquareX = Pref::DEFAULT_NB_X;
+    dataCalib.calibPattern.nbSquareY = Pref::DEFAULT_NB_Y;
+    dataCalib.calibPattern.sizeSquareX = Pref::DEFAULT_SIZE_X;
+    dataCalib.calibPattern.sizeSquareY = Pref::DEFAULT_SIZE_Y;
+    dataCalib.pref.search_window_size = Pref::searchSizes[Pref::DEFAULT_SEARCH_INDEX];
 }
 
 

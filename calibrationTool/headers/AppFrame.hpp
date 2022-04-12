@@ -39,7 +39,6 @@ class AppFrame : public wxFrame {
         void OnCalibration(wxCommandEvent& evt);
 
 
-
         // Called when a user click on the "Preferences" labeled button
         void OnPreferences(wxCommandEvent& evt);
 
@@ -57,6 +56,13 @@ class AppFrame : public wxFrame {
          * @param spacing the space to put between two buttons
          */
         void placeButtons(int spacing);
+
+        /**
+         * Set the default values for the Preferences field associated to
+         * the Calib attribute of the frame.
+         * 
+         */
+        void SetDefaultPreferences();
 
         wxDECLARE_EVENT_TABLE();
 };
