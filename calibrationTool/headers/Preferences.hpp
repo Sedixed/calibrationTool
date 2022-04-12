@@ -10,16 +10,18 @@ namespace Pref {
 
     // IDs of the differents labels of the Preferences frame
     enum LabelsId : int {
-        ID_SEARCH_WINDOW_SIZE = 0,
+        ID_PARAMETERS = 0,
+        ID_SEARCH_WINDOW_SIZE,
         ID_RENDER_WINDOW_SIZE,
         ID_CALIB_PROPERTIES
     };
 
     // Labels of the Preferences frame
     const std::string labels[] = {
+        "Parameters to estimate :",
         "Size of the window for the corners detection :",
-        "Render window size",
-        "Calibration pattern properties"
+        "Render window size :",
+        "Calibration pattern properties :"
     };
 
     // Size of the window for the corners detection

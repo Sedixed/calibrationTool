@@ -117,7 +117,7 @@ void AppFrame::OnCalibration(wxCommandEvent& evt) {
 
 void AppFrame::OnPreferences(wxCommandEvent& evt) {
     long style = wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX);
-    PreferencesFrame* frame = new PreferencesFrame("Preferences", wxPoint(-1, -1), wxSize(300, 500), style);
+    PreferencesFrame* frame = new PreferencesFrame("Preferences", wxPoint(-1, -1), wxSize(500, 600), style);
     frame->Show(true);
 }
 
