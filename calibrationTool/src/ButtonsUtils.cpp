@@ -23,6 +23,7 @@ namespace Btn {
             new wxButton(parent, ID_SHOW_CORNERS_PROJ, mainLabels[ID_SHOW_CORNERS_PROJ]),
             new wxButton(parent, ID_CALIB_RESULTS, mainLabels[ID_CALIB_RESULTS]),
             new wxButton(parent, ID_SAVE, mainLabels[ID_SAVE]),
+            new wxButton(parent, ID_LOAD_FILE, mainLabels[ID_LOAD_FILE]),
             new wxButton(parent, ID_PREFERENCES, mainLabels[ID_PREFERENCES]),
             new wxButton(parent, ID_EXIT, mainLabels[ID_EXIT])
         };

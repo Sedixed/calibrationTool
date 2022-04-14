@@ -102,7 +102,10 @@ namespace Pref {
         ID_K4,
         ID_K5,
         ID_K6 // Not used at the moment
-    };
+    }; 
+
+    // ID of the button used to set calibration method used
+    const int CALIB_METHOD_ID = 100;
 }
 
 class PreferencesFrame : public wxFrame {
@@ -124,6 +127,8 @@ class PreferencesFrame : public wxFrame {
     cv::Size renderWindowSize;
     // The current flags for calibration
     int flags;
+    // 1 if we want to use the RO method, 0 otherwise
+    int iFixedPoint;
     // Calib structure associated to the running instance of the program using this frame
     Calib* dataCalib;
 
@@ -181,6 +186,14 @@ class PreferencesFrame : public wxFrame {
          * @param evt wxCommandEvent associated to the event.
          */
         void SetOkState(wxCommandEvent& evt);
+
+
+        /**
+         * Toggle the calibration method (basic / RO).
+         * 
+         * @param evt wxCommandEvent associated to the event.
+         */
+        void ToggleROMode(wxCommandEvent& evt);
 
 
         /**

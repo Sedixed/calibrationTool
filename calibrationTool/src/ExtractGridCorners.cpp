@@ -8,11 +8,9 @@
 #define IMG_NAME "Corners extraction"
 
 int ExtractGridCorners(Calib *dataCalib) {
+    std::vector<std::vector<cv::Point2f>> allCorners;
+    std::vector<std::vector<cv::Point3f>> allCorners3D;
     for (int i = 0; i < dataCalib->nb_images; ++i) {
-        /*if (!dataCalib->IOcalib[i].active_image) {
-            continue;
-        }*/
-
         cv::Mat src = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_COLOR);
 
         // Corners detection
@@ -43,19 +41,31 @@ int ExtractGridCorners(Calib *dataCalib) {
                                     0));
             }
         }
+        allCorners.push_back(corners);
+        allCorners3D.push_back(corners3D);
 
         cv::imshow(IMG_NAME, src);
+        cv::waitKey(2000);
 
-        int result = wxMessageBox("Was the extraction successful ?", "Corners extraction", wxYES_NO | wxICON_QUESTION);
+        
+        
+        //src.release();
+    }
+    cv::destroyAllWindows();
+
+    int result = wxMessageBox("Was the extraction successful ?", "Corners extraction", wxYES_NO | wxICON_QUESTION);
         if (result == wxYES) {
             // Saving corners positions in 2D and 3D
-            dataCalib->IOcalib[i].CornersCoord3D = corners3D;
-            dataCalib->IOcalib[i].CornersCoord2D = corners;
+            for (int i = 0; i < allCorners.size(); ++i) {
+                std::vector<cv::Point2f> corners = allCorners.at(i);
+                std::vector<cv::Point3f> corners3D = allCorners3D.at(i);
+                dataCalib->IOcalib[i].CornersCoord2D = corners;
+                dataCalib->IOcalib[i].CornersCoord3D = corners3D;
+            }
         } else {
-            dataCalib->IOcalib[i].active_image = false;
+            for (int i = 0; i < allCorners.size(); ++i) {
+                dataCalib->IOcalib[i].active_image = false;
+            }
         }
-        cv::destroyWindow(IMG_NAME);
-        src.release();
-    }
     return 0;
 }

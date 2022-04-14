@@ -43,6 +43,18 @@ class AppFrame : public wxFrame {
         // Called when a user click on the "Calibration" labeled button
         void OnCalibration(wxCommandEvent& evt);
 
+        // Called when a user click on the "Show corners projection" labeled button
+        void OnShowReprojection(wxCommandEvent& evt);
+
+        // Called when a user click on the "Calibration results" labeled button
+        void OnCalibResults(wxCommandEvent& evt);
+
+        // Called when a user click on the "Save" labeled button
+        void OnSave(wxCommandEvent& evt);
+
+        // Called when a user click on the "Load YML file" labeled button
+        void OnLoadFile(wxCommandEvent& evt);
+
         // Called when a user click on the "Preferences" labeled button
         void OnPreferences(wxCommandEvent& evt);
 

@@ -24,6 +24,7 @@
 wxBEGIN_EVENT_TABLE(PreferencesFrame, wxFrame)
     EVT_BUTTON(Btn::ID_EXIT_OK,                         PreferencesFrame::OnExitOk)
     EVT_BUTTON(Btn::ID_EXIT_CANCEL,                     PreferencesFrame::OnExitCancel)
+    EVT_BUTTON(Pref::CALIB_METHOD_ID,                   PreferencesFrame::ToggleROMode)
     EVT_COMMAND_RANGE(Pref::RENDER_MIN_ID, Pref::RENDER_MIN_ID + Pref::RENDER_NB_ID - 1,
             wxEVT_RADIOBUTTON, PreferencesFrame::SetLastRender)
     EVT_COMMAND_RANGE(Pref::SEARCH_MIN_ID, Pref::SEARCH_MIN_ID + Pref::SEARCH_NB_ID - 1,
@@ -32,6 +33,7 @@ wxBEGIN_EVENT_TABLE(PreferencesFrame, wxFrame)
             wxEVT_CHECKBOX, PreferencesFrame::UpdateFlags)
     EVT_COMMAND_RANGE(GU, V0, wxEVT_TEXT, PreferencesFrame::SetOkState)
     EVT_COMMAND_RANGE(NB_X, SIZE_SQUARE_Y, wxEVT_TEXT, PreferencesFrame::SetOkState)
+    
 wxEND_EVENT_TABLE()
 
 
@@ -40,6 +42,7 @@ PreferencesFrame::PreferencesFrame(const wxString& title, const wxPoint& pos, co
     
     // Setting the base values
     dataCalib = calib;
+    iFixedPoint = dataCalib->pref.fixed_point;
     flags = dataCalib->pref.parameters_flags;
     searchWindowSize = calib->pref.search_window_size;
     renderWindowSize = calib->pref.render_size;
@@ -84,6 +87,7 @@ void PreferencesFrame::OnExitOk(wxCommandEvent& evt) {
 
     dataCalib->pref.render_size = renderWindowSize;
     dataCalib->pref.search_window_size = searchWindowSize;
+    dataCalib->pref.fixed_point = iFixedPoint;
 
     // Saving user defined intrinsics parameters if provided
 
@@ -120,6 +124,7 @@ void PreferencesFrame::OnExitOk(wxCommandEvent& evt) {
         if (!v0->GetLineText(0).ToDouble(&cy)) {
             wxMessageBox("Couldn't save v0.", "Preferences saving", wxOK);
         }
+
         dataCalib->intrinsics.at<double>(0, 2) = cx;
         dataCalib->intrinsics.at<double>(1, 2) = cy;
     } else {
@@ -128,6 +133,11 @@ void PreferencesFrame::OnExitOk(wxCommandEvent& evt) {
     }
 
     // Calibration flags
+    if (ignorePoint && ignoreFocal) {
+        flags |= cv::CALIB_USE_INTRINSIC_GUESS;
+    } else {
+        flags &= ~(cv::CALIB_USE_INTRINSIC_GUESS);
+    }
     dataCalib->pref.parameters_flags = flags;
     Close(true);
 }
@@ -203,14 +213,27 @@ void PreferencesFrame::CreateAndPlaceComponents() {
 
     // Distorsions
     fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Distorsions :"),
-            wxGBPosition(2, 0), wxDefaultSpan, wxLEFT | wxBOTTOM, 10);
+            wxGBPosition(2, 0), wxDefaultSpan, wxLEFT, 10);
+    
+    const int KFixId[] = {cv::CALIB_FIX_K1,
+                          cv::CALIB_FIX_K2,
+                          cv::CALIB_FIX_K3,
+                          cv::CALIB_FIX_K4,
+                          cv::CALIB_FIX_K5};
     for (int i = 0; i < NB_OF_K_PARAM; ++i) {
         std::string label = "k" + std::to_string(i + 1);
         wxCheckBox* k = new wxCheckBox(parameters, Pref::ID_K1 + i, label);
-        k->SetValue(true);
+        k->SetValue(!(dataCalib->pref.parameters_flags & KFixId[i]));
         int flag = (i == 0) ? wxLEFT : 0;
-        fgboxParameters->Add(k, wxGBPosition(2, (i + 1)), wxDefaultSpan, wxBOTTOM | wxRIGHT | flag, 10);
+        fgboxParameters->Add(k, wxGBPosition(2, (i + 1)), wxDefaultSpan, wxRIGHT | flag, 10);
     }
+
+    // Calibration method
+    fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Calibration mehod :"),
+            wxGBPosition(3, 0), wxDefaultSpan, wxLEFT | wxBOTTOM, 10);
+    std::string label = (iFixedPoint == 0) ? "Default" : "RO";
+    wxButton* tgb = new wxButton(parameters, Pref::CALIB_METHOD_ID, _(label));
+    fgboxParameters->Add(tgb, wxGBPosition(3, 1), wxGBSpan(1, 2), wxLEFT | wxBOTTOM, 10);
 
     fgboxParameters->SetSizeHints(parameters);
     parameters->SetSizer(fgboxParameters);
@@ -422,6 +445,17 @@ void PreferencesFrame::SetOkState(wxCommandEvent& evt) {
         b->Enable(true);
     }
 }
+
+
+void PreferencesFrame::ToggleROMode(wxCommandEvent& evt) {
+    wxButton *b = (wxButton*) FindWindowById(Pref::CALIB_METHOD_ID);
+    iFixedPoint = 1 - iFixedPoint;
+    if (b != NULL) {
+        b->SetLabel(iFixedPoint == 0 ? "Default" : "RO");
+    }
+    
+}
+
 
 // --- Utils ---
 

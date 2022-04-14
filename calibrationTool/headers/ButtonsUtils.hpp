@@ -20,6 +20,7 @@ namespace Btn {
         ID_SHOW_CORNERS_PROJ,
         ID_CALIB_RESULTS,
         ID_SAVE,
+        ID_LOAD_FILE,
         ID_PREFERENCES,
         ID_EXIT_OK,
         ID_EXIT_CANCEL
@@ -38,6 +39,7 @@ namespace Btn {
         "Show corners projection",
         "Calibration results",
         "Save",
+        "Load YML file",
         "Preferences",
         "OK",
         "Cancel"

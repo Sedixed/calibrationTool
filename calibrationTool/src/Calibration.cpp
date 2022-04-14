@@ -29,44 +29,31 @@ int Calibration(Calib* dataCalib) {
         return -1;
     }
 
-
-    cv::Mat K;                                                     // Copy of the current 
-    dataCalib->intrinsics.copyTo(K);                               //   intrinsics parameters
-                                                                   //
+    std::vector<cv::Point3f> newObjPoints;                         // New object points
     cv::Mat D;                                                     // Distortion coefficients
     std::vector<cv::Mat> rVecs;                                    // Rotation vectors
     std::vector<cv::Mat> tVecs;                                    // Translation vectors
-    int flags = dataCalib->pref.parameters_flags;                  // Flags
+    int flags = dataCalib->pref.parameters_flags | cv::CALIB_RATIONAL_MODEL;                  // Flags
 
     // Used to get the size of an image
     cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
 
-    // tester les flags
-    if (flags & cv::CALIB_FIX_FOCAL_LENGTH) {
-        std::cout << "Focal length fixed\n";
-    }
-
-    if (flags & cv::CALIB_FIX_PRINCIPAL_POINT) {
-        std::cout << "Principal point fixed\n";
-    }
-
     // Calibration
-    double error = cv::calibrateCamera(objectPoints, imagePoints, img.size(), dataCalib->intrinsics, D, rVecs, tVecs, flags);
-
+    double error = cv::calibrateCameraRO(objectPoints, imagePoints, img.size(), 
+            dataCalib->pref.fixed_point == 1 ? dataCalib->calibPattern.nbSquareX - 1 : 0,
+            dataCalib->intrinsics, D, rVecs, tVecs, newObjPoints, flags);
  
     // Mean error
+    std::cout << "----------------------------------\n";
     std::cout << "Mean error : " << error << std::endl;
     // Focal length
-    double focalLengthX = K.at<double>(0, 0);
-    double focalLengthY = K.at<double>(1, 1);
+    double focalLengthX = dataCalib->intrinsics.at<double>(0, 0);
+    double focalLengthY = dataCalib->intrinsics.at<double>(1, 1);
     // Principal point
-    double prPointX = K.at<double>(0, 2);
-    double prPointY = K.at<double>(1, 2);
-    // Skew
-    double skew = K.at<double>(0, 1);
+    double prPointX = dataCalib->intrinsics.at<double>(0, 2);
+    double prPointY = dataCalib->intrinsics.at<double>(1, 2);
     std::cout << "focal length : " << focalLengthX << " " << focalLengthY << std::endl;
     std::cout << "principal point : " << prPointX << " " << prPointY << std::endl;
-    std::cout << "skew : " << skew << std::endl;
     // Distorsions
     std::cout << "Distorsions : ";
     for (int j = 0; j < D.cols; ++j) {
@@ -76,10 +63,6 @@ int Calibration(Calib* dataCalib) {
     
 
     // Save intrinsics parameters and mean error
-
-    // Car normalement ça ne devrait pas être écrasé..
-    //dataCalib->intrinsics = K;
-    
     dataCalib->error = error;
 
     // Save extrinsics parameters

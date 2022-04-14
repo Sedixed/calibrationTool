@@ -14,6 +14,7 @@ typedef struct preferences {
 	int	search_window_size;				// Size of the corners dectector window
 	cv::Size render_size;				// Size of the renderer
 	int parameters_flags;				// Flags to use for calibration
+	int fixed_point;					// Fixed point to determine calibration function
 } Preferences;
 
 
