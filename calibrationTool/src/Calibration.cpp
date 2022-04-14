@@ -53,7 +53,7 @@ int Calibration(Calib* dataCalib) {
     // Calibration
     double error = cv::calibrateCamera(objectPoints, imagePoints, img.size(), dataCalib->intrinsics, D, rVecs, tVecs, flags);
 
-    /* PRINTING RESULTS
+ 
     // Mean error
     std::cout << "Mean error : " << error << std::endl;
     // Focal length
@@ -73,7 +73,7 @@ int Calibration(Calib* dataCalib) {
         std::cout << D.at<double>(0, j) << " ";
     }
     std::cout << std::endl;
-    */
+    
 
     // Save intrinsics parameters and mean error
 

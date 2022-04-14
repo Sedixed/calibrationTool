@@ -212,7 +212,6 @@ void PreferencesFrame::CreateAndPlaceComponents() {
         fgboxParameters->Add(k, wxGBPosition(2, (i + 1)), wxDefaultSpan, wxBOTTOM | wxRIGHT | flag, 10);
     }
 
-    
     fgboxParameters->SetSizeHints(parameters);
     parameters->SetSizer(fgboxParameters);
     vbox->Add(parameters, wxEXPAND | wxLEFT | wxRIGHT, 5);

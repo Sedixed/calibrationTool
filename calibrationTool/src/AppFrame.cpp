@@ -45,7 +45,15 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     SetDefaultPreferences();
 
     // TODO: gérer fermeture alors que des images sont encore ouvertes (segfault parfois)
-    // reprendre des photos bien horizontales pour match le x=7 y=5
+    // enlever le spam click pour les images -> cooldown entre chaque et demander à la fin
+    // possibilité de load un fichier
+    // choisir calibrate / calibrateRO
+    // tester les distorsions / focal / point etc
+    // dans calibration results, afficher résultats (calculer erreur par mire avec des reprojections)
+    // adapter pour windows à un moment     // dans calibration results, afficher résultats 
+    //      (calculer erreur par mire avec des reprojections)
+
+
     
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
