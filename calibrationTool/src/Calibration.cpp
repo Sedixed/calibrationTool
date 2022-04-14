@@ -41,6 +41,15 @@ int Calibration(Calib* dataCalib) {
     // Used to get the size of an image
     cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
 
+    // tester les flags
+    if (flags & cv::CALIB_FIX_FOCAL_LENGTH) {
+        std::cout << "Focal length fixed\n";
+    }
+
+    if (flags & cv::CALIB_FIX_PRINCIPAL_POINT) {
+        std::cout << "Principal point fixed\n";
+    }
+
     // Calibration
     double error = cv::calibrateCamera(objectPoints, imagePoints, img.size(), dataCalib->intrinsics, D, rVecs, tVecs, flags);
 
@@ -70,6 +79,7 @@ int Calibration(Calib* dataCalib) {
 
     // Car normalement ça ne devrait pas être écrasé..
     //dataCalib->intrinsics = K;
+    
     dataCalib->error = error;
 
     // Save extrinsics parameters

@@ -5,6 +5,7 @@
     #include <wx/wx.h>
 #endif
 #include "structs.hpp"
+#include <wx/gbsizer.h>
 
 // Base ID for search radioButtons
 #define SEARCH_BASE_ID 20
@@ -116,7 +117,7 @@ class PreferencesFrame : public wxFrame {
     // The panel used for displaying intrinsics parameters
     wxPanel* parameters;
     // The Sizer used by parameters
-    wxFlexGridSizer *fgboxParameters;
+    wxGridBagSizer *fgboxParameters;
     // The size of the currently selected search window size
     int searchWindowSize;
     // The size of the currently selected render window size

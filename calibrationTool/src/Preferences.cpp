@@ -17,16 +17,6 @@
 #define NB_OF_K_PARAM 5
 
 
-/**
- * Fills a wx[Flex]GridSizer with n blanks added to sizer, disposed
- * on panel.
- * 
- * @param sizer The sizer to which we add the blank element.
- * @param panel The panel on which we create the blank element.
- * @param n     How many blanks are to put.
- */
-void fillWithVoid(wxSizer* sizer, wxPanel* panel, int n);
-
 
 // Event table used by the preferences frame.
 //  Makes each button corresponds its onclick function, and 
@@ -155,22 +145,21 @@ void PreferencesFrame::CreateAndPlaceComponents() {
 
     // Parameters
     parameters = new wxPanel(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_THEME);
-    vbox->Add(new wxStaticText(panel, Pref::ID_PARAMETERS, "\t" + Pref::labels[Pref::ID_PARAMETERS]), 
-            wxEXPAND | wxLEFT | wxRIGHT, 60);
+    vbox->Add(new wxStaticText(panel, Pref::ID_PARAMETERS, "\t" + Pref::labels[Pref::ID_PARAMETERS])); 
     vbox->AddSpacer(10);
 
     /* 1 + NB_OF_K_PARAM because there is 1 column for parameter name and 
      *   NB_OF_K_PARAM because that is at the moment the largest amount 
      *   of columns required.
      */
-    fgboxParameters = new wxFlexGridSizer(3, 1 + NB_OF_K_PARAM, 10, 10);
-    parameters->SetSizer(fgboxParameters);
+    fgboxParameters = new wxGridBagSizer(10, 10);
 
     // Focal length
-    fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Generalised focal length :"));
+    fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Generalised focal length :"),
+            wxGBPosition(0, 0), wxDefaultSpan, wxALL, 10);
     wxCheckBox* g = new wxCheckBox(parameters, Pref::ID_FOCAL, "G");
     g->SetValue(!ignoreFocal);
-    fgboxParameters->Add(g);
+    fgboxParameters->Add(g, wxGBPosition(0, 1), wxDefaultSpan, wxLEFT | wxTOP, 10);
 
     // Validator for focal length / principal point input
     wxFloatingPointValidator<float> valFocal(3, NULL, wxNUM_VAL_ZERO_AS_BLANK);
@@ -182,56 +171,59 @@ void PreferencesFrame::CreateAndPlaceComponents() {
             wxDefaultPosition, wxDefaultSize, 0, valFocal);
     gu->SetHint("Gu");
     gu->Show(ignoreFocal);
-    fgboxParameters->Add(gu);
+    fgboxParameters->Add(gu, wxGBPosition(0, 2), wxGBSpan(1, 2), wxTOP | wxRIGHT, 10);
+
     wxTextCtrl *gv = new wxTextCtrl(parameters, GV, 
             ignoreFocal ? _(std::to_string(dataCalib->intrinsics.at<double>(1, 1))) : _(""), 
             wxDefaultPosition, wxDefaultSize, 0, valFocal);
     gv->SetHint("Gv");
     gv->Show(ignoreFocal);
-    fgboxParameters->Add(gv);
+    fgboxParameters->Add(gv, wxGBPosition(0, 4), wxGBSpan(1, 2), wxTOP | wxRIGHT, 10);
 
-    fillWithVoid(fgboxParameters, parameters, 2);
 
     // Principal point 
-    fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Principal point :"));
+    fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Principal point :"),
+            wxGBPosition(1, 0), wxDefaultSpan, wxLEFT, 10);
     wxCheckBox* p = new wxCheckBox(parameters, Pref::ID_POINT, "P");
     p->SetValue(!ignorePoint);
-    fgboxParameters->Add(p);
+    fgboxParameters->Add(p, wxGBPosition(1, 1), wxDefaultSpan, wxLEFT, 10);
 
     wxTextCtrl *u0 = new wxTextCtrl(parameters, U0, 
             ignorePoint ? _(std::to_string(dataCalib->intrinsics.at<double>(0, 2))) : _(""),
             wxDefaultPosition, wxDefaultSize, 0, valFocal);
     u0->SetHint("u0");
     u0->Show(ignorePoint);
-    fgboxParameters->Add(u0);
+    fgboxParameters->Add(u0, wxGBPosition(1, 2), wxGBSpan(1, 2), wxRIGHT, 10);
     wxTextCtrl *v0 = new wxTextCtrl(parameters, V0,
             ignorePoint ? _(std::to_string(dataCalib->intrinsics.at<double>(1, 2))) : _(""),
             wxDefaultPosition, wxDefaultSize, 0, valFocal);
     v0->SetHint("v0");
     v0->Show(ignorePoint);
-    fgboxParameters->Add(v0);
-
-    fillWithVoid(fgboxParameters, parameters, 2);
+    fgboxParameters->Add(v0, wxGBPosition(1, 4), wxGBSpan(1, 2), wxRIGHT, 10);
 
     // Distorsions
-    fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Distorsions :"));
+    fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Distorsions :"),
+            wxGBPosition(2, 0), wxDefaultSpan, wxLEFT | wxBOTTOM, 10);
     for (int i = 0; i < NB_OF_K_PARAM; ++i) {
         std::string label = "k" + std::to_string(i + 1);
         wxCheckBox* k = new wxCheckBox(parameters, Pref::ID_K1 + i, label);
         k->SetValue(true);
-        fgboxParameters->Add(k);
+        int flag = (i == 0) ? wxLEFT : 0;
+        fgboxParameters->Add(k, wxGBPosition(2, (i + 1)), wxDefaultSpan, wxBOTTOM | wxRIGHT | flag, 10);
     }
-    vbox->Add(parameters, wxEXPAND | wxLEFT | wxRIGHT, 60);
+
+    
+    fgboxParameters->SetSizeHints(parameters);
+    parameters->SetSizer(fgboxParameters);
+    vbox->Add(parameters, wxEXPAND | wxLEFT | wxRIGHT, 5);
     vbox->AddSpacer(30);
     
     // Search window size
     wxPanel* search = new wxPanel(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_THEME);
-    vbox->Add(new wxStaticText(panel, Pref::ID_SEARCH_WINDOW_SIZE, "\t" + Pref::labels[Pref::ID_SEARCH_WINDOW_SIZE]),
-            wxEXPAND | wxLEFT | wxRIGHT, 60);
+    vbox->Add(new wxStaticText(panel, Pref::ID_SEARCH_WINDOW_SIZE, "\t" + Pref::labels[Pref::ID_SEARCH_WINDOW_SIZE]));
 
     vbox->AddSpacer(10);
     wxBoxSizer* hboxSearch = new wxBoxSizer(wxHORIZONTAL);
-    search->SetSizer(hboxSearch);
 
     // Getting the number of radioButtons to place
     int size = arrLength<const int>(Pref::searchSizes);
@@ -247,16 +239,16 @@ void PreferencesFrame::CreateAndPlaceComponents() {
         hboxSearch->Add(b);
         hboxSearch->AddStretchSpacer(1);
     }
-    vbox->Add(search, wxEXPAND | wxLEFT | wxRIGHT, 60);
+    hboxSearch->SetSizeHints(search);
+    search->SetSizer(hboxSearch);
+    vbox->Add(search, wxEXPAND | wxLEFT | wxRIGHT, 5);
     vbox->AddSpacer(30);
 
     // Render window size
     wxPanel* render = new wxPanel(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_THEME);
-    vbox->Add(new wxStaticText(panel, Pref::ID_RENDER_WINDOW_SIZE, "\t" + Pref::labels[Pref::ID_RENDER_WINDOW_SIZE]),
-            wxEXPAND | wxLEFT | wxRIGHT, 60);
+    vbox->Add(new wxStaticText(panel, Pref::ID_RENDER_WINDOW_SIZE, "\t" + Pref::labels[Pref::ID_RENDER_WINDOW_SIZE]));
     vbox->AddSpacer(10);
     wxBoxSizer* hboxRender = new wxBoxSizer(wxHORIZONTAL);
-    render->SetSizer(hboxRender);
     
     // Getting the number of radioButtons to place
     size = arrLength<const cv::Size>(Pref::renderSizes);
@@ -274,7 +266,9 @@ void PreferencesFrame::CreateAndPlaceComponents() {
         hboxRender->Add(b);
         hboxRender->AddStretchSpacer(1);
     }
-    vbox->Add(render, wxEXPAND | wxLEFT | wxRIGHT, 60);
+    hboxRender->SetSizeHints(render);
+    render->SetSizer(hboxRender);
+    vbox->Add(render, wxEXPAND | wxLEFT | wxRIGHT, 5);
     vbox->AddSpacer(30);
 
     // Calibration pattern properties
@@ -285,8 +279,7 @@ void PreferencesFrame::CreateAndPlaceComponents() {
     valInt.SetRange(0, 100);
 
     wxPanel* properties = new wxPanel(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_THEME);
-    vbox->Add(new wxStaticText(panel, Pref::ID_CALIB_PROPERTIES, "\t" + Pref::labels[Pref::ID_CALIB_PROPERTIES]),
-            wxEXPAND | wxLEFT | wxRIGHT, 60);
+    vbox->Add(new wxStaticText(panel, Pref::ID_CALIB_PROPERTIES, "\t" + Pref::labels[Pref::ID_CALIB_PROPERTIES]));
 
     vbox->AddSpacer(10);
     wxFlexGridSizer *fgboxProp = new wxFlexGridSizer(4, 2, 10, 10);
@@ -314,7 +307,7 @@ void PreferencesFrame::CreateAndPlaceComponents() {
     sizeY = new wxTextCtrl(properties, wxID_ANY, _(ssy), wxDefaultPosition, wxDefaultSize, 0, valFloat);
     fgboxProp->Add(sizeY);
 
-    vbox->Add(properties, wxEXPAND | wxLEFT | wxRIGHT, 60);
+    vbox->Add(properties, wxEXPAND | wxALL, 5);
     vbox->AddSpacer(30);
 
     // Exit buttons
@@ -324,7 +317,7 @@ void PreferencesFrame::CreateAndPlaceComponents() {
     hbox->Add(Btn::btnFromId(Btn::ID_EXIT_CANCEL, btns));
     hbox->AddSpacer(20);
     hbox->Add(Btn::btnFromId(Btn::ID_EXIT_OK, btns));
-    vbox->Add(btns, wxEXPAND | wxLEFT | wxRIGHT, 60);
+    vbox->Add(btns, wxEXPAND | wxALL, 5);
     vbox->AddSpacer(15);
 }
 
@@ -437,11 +430,4 @@ void PreferencesFrame::SetOkState(wxCommandEvent& evt) {
 template<typename T, int size>
 int arrLength(T(&)[size]) {
     return size;
-}
-
-
-void fillWithVoid(wxSizer* sizer, wxPanel* panel, int n) {
-    for (int i = 0; i < n; ++i) {
-        sizer->Add(new wxStaticText(panel, wxID_ANY, ""));
-    }
 }
