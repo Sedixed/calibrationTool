@@ -6,6 +6,22 @@
 #endif
 #include "structs.hpp"
 
+// Base ID for search radioButtons
+#define SEARCH_BASE_ID 20
+// Base ID for checkBoxes
+#define CHECKBOX_BASE_ID 60
+
+/**
+ * Calculates the number of elements of an array. 
+ * 
+ * @tparam T    Type of elements in the array.
+ * @tparam size Amount of elements of the array.
+ * @return int  The amount of elements in the array.
+ */
+template<typename T, int size>
+int arrLength(T(&)[size]);
+
+// Used for storing constants, enums and constant arrays.
 namespace Pref {
 
     // Index of the default search size in the searchSizes array below
@@ -37,11 +53,22 @@ namespace Pref {
         "Calibration pattern properties :"
     };
 
+    // Minimal ID for searching radiobuttons
+    const int SEARCH_MIN_ID = SEARCH_BASE_ID;
+
     // Size of the window for the corners detection
     const int searchSizes[] = {3, 5, 9, 15, 21};
 
-    // ID's corresponding to the window sizes above
-    const int searchId[] = {20, 21, 22, 23, 24};
+    // IDs corresponding to the window sizes above
+    const int searchId[] = {SEARCH_MIN_ID,
+                            SEARCH_MIN_ID + 1,
+                            SEARCH_MIN_ID + 2,
+                            SEARCH_MIN_ID + 3, 
+                            SEARCH_MIN_ID + 4
+                           };
+
+    // How many ID's there are for searching radiobuttons
+    const int SEARCH_NB_ID = arrLength<const int>(searchId);
 
     // Render window sizes
     const cv::Size renderSizes[] = {
@@ -51,18 +78,55 @@ namespace Pref {
         cv::Size(1280, 1024)
     };
 
-    //ID's corresponding to the render sizes above
-    const int renderId[] = {30, 31, 32, 33};
+    // Minimal ID for render radiobuttons
+    const int RENDER_MIN_ID = SEARCH_MIN_ID + SEARCH_NB_ID + 1;
 
+    //IDs corresponding to the render sizes above
+    const int renderId[] = {RENDER_MIN_ID,
+                            RENDER_MIN_ID + 1,
+                            RENDER_MIN_ID + 2,
+                            RENDER_MIN_ID + 3
+                           };
+
+    // How many ID's there are for render radiobuttons
+    const int RENDER_NB_ID = arrLength<const int>(renderId);
+
+    // IDs used by the different checkbox for parameters to estimate
+    enum CheckBoxId : int {
+        ID_FOCAL = CHECKBOX_BASE_ID,
+        ID_POINT,
+        ID_K1,
+        ID_K2,
+        ID_K3,
+        ID_K4,
+        ID_K5,
+        ID_K6 // Not used at the moment
+    };
 }
 
 class PreferencesFrame : public wxFrame {
     // Attributes
+
+    // Define if we provide the focal length
+    bool ignoreFocal;
+    // Define if we provide the principal point
+    bool ignorePoint;
+    // The main panel of the frame
     wxPanel* panel;
+    // The panel used for displaying intrinsics parameters
+    wxPanel* parameters;
+    // The Sizer used by parameters
+    wxFlexGridSizer *fgboxParameters;
+    // The size of the currently selected search window size
     int searchWindowSize;
+    // The size of the currently selected render window size
     cv::Size renderWindowSize;
+    // The current flags for calibration
+    int flags;
+    // Calib structure associated to the running instance of the program using this frame
     Calib* dataCalib;
 
+    // Text controllers for Mire input
     wxTextCtrl* nbX;
     wxTextCtrl* nbY;
     wxTextCtrl* sizeX;
@@ -75,8 +139,10 @@ class PreferencesFrame : public wxFrame {
         // Called when a user click on the "Cancel" labeled button.
         void OnExitCancel(wxCommandEvent& evt);
 
+
         // Called when a user click on the "OK" labeled button.
         void OnExitOk(wxCommandEvent& evt);
+
 
         /**
          * Set the value of searchWindowSize with the value associated to
@@ -87,6 +153,7 @@ class PreferencesFrame : public wxFrame {
          */
         void SetLastSearch(wxCommandEvent& evt);
 
+
          /**
          * Set the value of renderWindowSize with the value associated to
          * the wxRadioButton clicked whose ID equals evt.GetId().
@@ -95,6 +162,25 @@ class PreferencesFrame : public wxFrame {
          *  
          */
         void SetLastRender(wxCommandEvent& evt);
+
+
+        /**
+         * Update the value of flags according to the checkbox which have been
+         * clicked to toggle/untoggle the selected parameter.
+         * 
+         * @param evt wxCommandEvent associated to the event.
+         */
+        void UpdateFlags(wxCommandEvent& evt);
+
+
+        /**
+         * Toggles the "Ok" button with conditions. If one of the active wxTextCtrl
+         * is blank, button is not active, else it is.
+         * 
+         * @param evt wxCommandEvent associated to the event.
+         */
+        void SetOkState(wxCommandEvent& evt);
+
 
         /**
          * Create all the required components for the frame, and places them

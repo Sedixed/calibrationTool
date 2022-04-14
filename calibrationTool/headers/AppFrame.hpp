@@ -8,9 +8,14 @@
 
 class AppFrame : public wxFrame {
     // Attributes
+
+    // Vector used for storing the buttons of the frame
     std::vector<wxButton*> buttons;
+    // Sizer used inside panel
     wxBoxSizer* vbox;
+    // Panel of the frame
     wxPanel *panel;
+    // Calib structure associated to the running instance of the program using this frame
     Calib dataCalib;
 
     public:
@@ -37,7 +42,6 @@ class AppFrame : public wxFrame {
 
         // Called when a user click on the "Calibration" labeled button
         void OnCalibration(wxCommandEvent& evt);
-
 
         // Called when a user click on the "Preferences" labeled button
         void OnPreferences(wxCommandEvent& evt);

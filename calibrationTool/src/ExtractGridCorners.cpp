@@ -9,16 +9,16 @@
 
 int ExtractGridCorners(Calib *dataCalib) {
     for (int i = 0; i < dataCalib->nb_images; ++i) {
-        if (!dataCalib->IOcalib[i].active_image) {
+        /*if (!dataCalib->IOcalib[i].active_image) {
             continue;
-        }
+        }*/
 
         cv::Mat src = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_COLOR);
 
-        // corners detection
+        // Corners detection
 
         std::vector<cv::Point2f> corners;
-        int chessBoardFlags = cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE;
+        int chessBoardFlags = cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE | cv::CALIB_CB_FAST_CHECK;
 
         cv::Size patternSize = cv::Size(dataCalib->calibPattern.nbSquareX - 1, dataCalib->calibPattern.nbSquareY - 1);
         bool found = cv::findChessboardCorners(src, patternSize, corners, chessBoardFlags);
@@ -33,10 +33,10 @@ int ExtractGridCorners(Calib *dataCalib) {
             viewGray.release();
         }
 
-        // 3d coordinates of the points
+        // 3D coordinates of the points
         std::vector<cv::Point3f> corners3D;
-        for (int j = 0; j < dataCalib->calibPattern.nbSquareY; ++j) {
-            for (int k = 0; k < dataCalib->calibPattern.nbSquareX; ++k) {
+        for (int j = 0; j < dataCalib->calibPattern.nbSquareY - 1; ++j) {
+            for (int k = 0; k < dataCalib->calibPattern.nbSquareX - 1; ++k) {
                 corners3D.push_back(cv::Point3f(
                                     k * dataCalib->calibPattern.sizeSquareX,
                                     j * dataCalib->calibPattern.sizeSquareY, 
@@ -52,7 +52,6 @@ int ExtractGridCorners(Calib *dataCalib) {
             dataCalib->IOcalib[i].CornersCoord3D = corners3D;
             dataCalib->IOcalib[i].CornersCoord2D = corners;
         } else {
-            
             dataCalib->IOcalib[i].active_image = false;
         }
         cv::destroyWindow(IMG_NAME);

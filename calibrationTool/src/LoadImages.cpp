@@ -1,6 +1,10 @@
 #include "../headers/LoadImages.hpp"
 #include "../headers/Mosaic.hpp"
 #include <opencv2/opencv.hpp>
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+    #include <wx/wx.h>
+#endif
 
 int LoadImages(Calib* dataCalib) {
     wxString wildcard("Image files (*.bmp;*.tiff;*.jpg;*.jpeg;*.pgm;*.png)|*.bmp;*.tiff;*.jpg;*.jpeg;*.pgm;*.png");
@@ -13,6 +17,7 @@ int LoadImages(Calib* dataCalib) {
         wxArrayString paths;
         askImages->GetPaths(paths);
 
+        // Amount of images
         int max = (int)paths.GetCount();
         if (max > MAX_IMAGES) {
             wxMessageDialog(NULL, _("An error ocurred : too many images were loaded."), 
@@ -38,6 +43,7 @@ int LoadImages(Calib* dataCalib) {
             }
         }
 
+        // Show the mosaic
         Mosaic(images, max, dataCalib->pref.render_size.width);
 
         for(int i = 0; i < max; ++i) {

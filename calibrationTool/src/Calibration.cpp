@@ -12,36 +12,37 @@
 int Calibration(Calib* dataCalib) {
     std::vector<std::vector<cv::Point3f>> objectPoints;
     std::vector<std::vector<cv::Point2f>> imagePoints;
-    // First valid image
-    int firstRead = -1;
     // Amount of valid images
     int nbValid = 0;
     for (int i = 0; i < dataCalib->nb_images; ++i) {
         if (!dataCalib->IOcalib[i].active_image) {
             continue;
         }
-        if (firstRead == -1) {
-            firstRead = i;
-        }
         ++nbValid;
         objectPoints.push_back(dataCalib->IOcalib[i].CornersCoord3D);
         imagePoints.push_back(dataCalib->IOcalib[i].CornersCoord2D);
     }
 
+    // Error if not enough images
     if (nbValid < MIN_VALID_IMAGES) {
         wxMessageBox("Calibration requires at least 3 valid images.", "Calibration", wxOK);
         return -1;
     }
-  
-    cv::Mat K(3, 3, CV_64F);        // Intrinsics parameters 
-    cv::Mat D;                      // Distortion coefficients
-    std::vector<cv::Mat> rVecs;     // Rotation vectors
-    std::vector<cv::Mat> tVecs;     // Translation vectors
-    int flags = 0;                  // Flags
-    // Used to get the size on an image
-    cv::Mat img = cv::imread(dataCalib->IOcalib[firstRead].image_name, cv::IMREAD_COLOR);
 
-    double error = cv::calibrateCamera(objectPoints, imagePoints, img.size(), K, D, rVecs, tVecs, flags);
+
+    cv::Mat K;                                                     // Copy of the current 
+    dataCalib->intrinsics.copyTo(K);                               //   intrinsics parameters
+                                                                   //
+    cv::Mat D;                                                     // Distortion coefficients
+    std::vector<cv::Mat> rVecs;                                    // Rotation vectors
+    std::vector<cv::Mat> tVecs;                                    // Translation vectors
+    int flags = dataCalib->pref.parameters_flags;                  // Flags
+
+    // Used to get the size of an image
+    cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
+
+    // Calibration
+    double error = cv::calibrateCamera(objectPoints, imagePoints, img.size(), dataCalib->intrinsics, D, rVecs, tVecs, flags);
 
     /* PRINTING RESULTS
     // Mean error
@@ -65,8 +66,10 @@ int Calibration(Calib* dataCalib) {
     std::cout << std::endl;
     */
 
-    // Save intrinsics parameters and mean error 
-    dataCalib->intrinsics = K;
+    // Save intrinsics parameters and mean error
+
+    // Car normalement ça ne devrait pas être écrasé..
+    //dataCalib->intrinsics = K;
     dataCalib->error = error;
 
     // Save extrinsics parameters

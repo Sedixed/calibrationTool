@@ -34,5 +34,4 @@ namespace Btn {
             new wxButton(parent, ID_EXIT_OK, mainLabels[ID_EXIT_OK])
         };
     }
-
 }

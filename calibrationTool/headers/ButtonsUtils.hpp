@@ -52,6 +52,7 @@ namespace Btn {
      */
     const std::vector<wxButton*> baseButtons(wxWindow* parent);
 
+
     /**
      * Returns a vector of pointers of wxButtons that are the buttons of the main frame, when
      * the button "Perspective camera" has been clicked by the user.
@@ -61,6 +62,7 @@ namespace Btn {
      *                                      when "Perspective camera" button is clicked.
      */
     const std::vector<wxButton*> perspectiveButtons(wxWindow* parent);
+
 
     /**
      * Returns a vector of pointers of wxButtons that are the buttons of the preferences frame.

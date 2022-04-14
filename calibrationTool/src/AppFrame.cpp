@@ -44,9 +44,8 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     
     SetDefaultPreferences();
 
-    // TODO: gérer fermeture alors que des images sont encore ouvertes (segfault)
-    // reprendre des photos bien horizontales pour match le x7 y5
-    // gérer les flags côté préférence / structure / calibration
+    // TODO: gérer fermeture alors que des images sont encore ouvertes (segfault parfois)
+    // reprendre des photos bien horizontales pour match le x=7 y=5
     
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
@@ -81,7 +80,7 @@ void AppFrame::OnPerspectiveSelection(wxCommandEvent& evt) {
 
 
 void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
-    std::cout << "spher\n";
+    std::cout << "TODO\n";
 }
 
 
@@ -105,7 +104,7 @@ void AppFrame::OnCalibration(wxCommandEvent& evt) {
 
 void AppFrame::OnPreferences(wxCommandEvent& evt) {
     long style = wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX);
-    PreferencesFrame* frame = new PreferencesFrame("Preferences", wxPoint(-1, -1), wxSize(500, 650), style, &dataCalib);
+    PreferencesFrame* frame = new PreferencesFrame("Preferences", wxPoint(-1, -1), wxSize(550, 700), style, &dataCalib);
     frame->Show(true);
 }
 
@@ -150,6 +149,8 @@ void AppFrame::SetDefaultPreferences() {
     dataCalib.calibPattern.sizeSquareX = Pref::DEFAULT_SIZE_X;
     dataCalib.calibPattern.sizeSquareY = Pref::DEFAULT_SIZE_Y;
     dataCalib.pref.search_window_size = Pref::searchSizes[Pref::DEFAULT_SEARCH_INDEX];
+    dataCalib.pref.parameters_flags = 0;
+    dataCalib.intrinsics = cv::Mat::zeros(3, 3, CV_64F);
 }
 
 

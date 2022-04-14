@@ -11,16 +11,17 @@
  * 
  */
 typedef struct preferences {
-	int	search_window_size;				// size of the corners dectector window
-	cv::Size render_size;				// size of the renderer
+	int	search_window_size;				// Size of the corners dectector window
+	cv::Size render_size;				// Size of the renderer
+	int parameters_flags;				// Flags to use for calibration
 } Preferences;
 
 
 typedef struct mire {
-	int nbSquareX;					// number of squares along x					
-	int nbSquareY;					// number of squares along y
-	double sizeSquareX;				// size of a square along x (in mm)
-	double sizeSquareY;				// size of a square along y (in mm)
+	int nbSquareX;					// Number of squares along x					
+	int nbSquareY;					// Number of squares along y
+	double sizeSquareX;				// Size of a square along x (in mm)
+	double sizeSquareY;				// Size of a square along y (in mm)
 } Mire;
 
 /**
@@ -42,15 +43,15 @@ typedef struct iocalibration {
 
 
 /**
- * @brief 
+ * Calib : structure used for storing every information needed for perspective 
+ * camera calibration.
  * 
  */
 typedef struct calib {
-    int nb_images;                      // number of loaded images
-    IOCalibration IOcalib[MAX_IMAGES];	// images data used for the calibration
-	Mire	calibPattern;				// calibration pattern properties
-	Preferences pref;					// preferences
-	cv::Mat intrinsics;					// intrinsics parameters of the sensor
-	double error;						// error after calibration
-    // à suivre..
+    int nb_images;                      // Number of loaded images
+    IOCalibration IOcalib[MAX_IMAGES];	// Images data used for the calibration
+	Mire	calibPattern;				// Calibration pattern properties
+	Preferences pref;					// Preferences
+	cv::Mat intrinsics;					// Intrinsics parameters of the sensor
+	double error;						// Mean error after calibration
 } Calib;
