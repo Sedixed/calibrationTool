@@ -5,7 +5,7 @@
     #include <wx/wx.h>
 #endif
 
-#define IMG_NAME "Corners extraction"
+#define IMG_NAME "Corners extraction : "
 
 int ExtractGridCorners(Calib *dataCalib) {
     std::vector<std::vector<cv::Point2f>> allCorners;
@@ -14,7 +14,6 @@ int ExtractGridCorners(Calib *dataCalib) {
         cv::Mat src = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_COLOR);
 
         // Corners detection
-
         std::vector<cv::Point2f> corners;
         int chessBoardFlags = cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE | cv::CALIB_CB_FAST_CHECK;
 
@@ -43,15 +42,10 @@ int ExtractGridCorners(Calib *dataCalib) {
         }
         allCorners.push_back(corners);
         allCorners3D.push_back(corners3D);
-
-        cv::imshow(IMG_NAME, src);
-        cv::waitKey(2000);
-
-        
-        
-        //src.release();
+        std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);
+        cv::imshow(title, src);
+        src.release();
     }
-    cv::destroyAllWindows();
 
     int result = wxMessageBox("Was the extraction successful ?", "Corners extraction", wxYES_NO | wxICON_QUESTION);
         if (result == wxYES) {
@@ -66,6 +60,9 @@ int ExtractGridCorners(Calib *dataCalib) {
             for (int i = 0; i < allCorners.size(); ++i) {
                 dataCalib->IOcalib[i].active_image = false;
             }
+        }
+        for (int i = 1; i <= dataCalib->nb_images; ++i) {
+            cv::destroyWindow(std::string(IMG_NAME) + " " + std::to_string(i));
         }
     return 0;
 }

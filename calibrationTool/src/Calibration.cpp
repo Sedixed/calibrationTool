@@ -25,23 +25,31 @@ int Calibration(Calib* dataCalib) {
 
     // Error if not enough images
     if (nbValid < MIN_VALID_IMAGES) {
-        wxMessageBox("Calibration requires at least 3 valid images.", "Calibration", wxOK);
+        wxMessageBox("Calibration requires at least 3 valid images.", "Calibration", wxICON_ERROR);
         return -1;
     }
 
     std::vector<cv::Point3f> newObjPoints;                         // New object points
-    cv::Mat D;                                                     // Distortion coefficients
     std::vector<cv::Mat> rVecs;                                    // Rotation vectors
     std::vector<cv::Mat> tVecs;                                    // Translation vectors
-    int flags = dataCalib->pref.parameters_flags | cv::CALIB_RATIONAL_MODEL;                  // Flags
+    int flags = dataCalib->pref.parameters_flags;                  // Flags
+    if (!(flags & cv::CALIB_FIX_K3 && flags & cv::CALIB_FIX_K4 && flags & cv::CALIB_FIX_K5)) {
+        flags |= cv::CALIB_RATIONAL_MODEL; 
+    }                  
 
     // Used to get the size of an image
     cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
 
     // Calibration
-    double error = cv::calibrateCameraRO(objectPoints, imagePoints, img.size(), 
+
+    double error;
+    try {
+        error = cv::calibrateCameraRO(objectPoints, imagePoints, img.size(), 
             dataCalib->pref.fixed_point == 1 ? dataCalib->calibPattern.nbSquareX - 1 : 0,
-            dataCalib->intrinsics, D, rVecs, tVecs, newObjPoints, flags);
+            dataCalib->intrinsics, dataCalib->distCoeffs, rVecs, tVecs, newObjPoints, flags);
+    } catch (std::exception& e) {
+        std::cout << e.what() << std::endl;
+    }
  
     // Mean error
     std::cout << "----------------------------------\n";
@@ -56,8 +64,10 @@ int Calibration(Calib* dataCalib) {
     std::cout << "principal point : " << prPointX << " " << prPointY << std::endl;
     // Distorsions
     std::cout << "Distorsions : ";
-    for (int j = 0; j < D.cols; ++j) {
-        std::cout << D.at<double>(0, j) << " ";
+    for (int j = 0; j < dataCalib->distCoeffs.cols; ++j) {
+        if (j == 0 ||j == 1 || j == 4 || j == 5 || j == 6) {
+            std::cout << dataCalib->distCoeffs.at<double>(0, j) << " ";
+        }
     }
     std::cout << std::endl;
     

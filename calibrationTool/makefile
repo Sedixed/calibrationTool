@@ -4,10 +4,11 @@ RM = rm
 EXEC = app
 # Source files
 SRCS = src/ButtonsUtils.cpp src/AppFrame.cpp src/App.cpp src/LoadImages.cpp src/Mosaic.cpp \
-	src/ExtractGridCorners.cpp src/Preferences.cpp src/Calibration.cpp
+	src/ExtractGridCorners.cpp src/Preferences.cpp src/Calibration.cpp src/CornersReprojection.cpp
 
 # Objects to be created
-OBJS = ButtonsUtils.o AppFrame.o App.o LoadImages.o Mosaic.o ExtractGridCorners.o Preferences.o Calibration.o
+OBJS = ButtonsUtils.o AppFrame.o App.o LoadImages.o Mosaic.o ExtractGridCorners.o Preferences.o \
+	Calibration.o CornersReprojection.o
 
 # AppFrame headers required (there are a lot)
 AF_HDS = headers/AppFrame.hpp headers/ButtonsUtils.hpp headers/LoadImages.hpp \
@@ -46,6 +47,8 @@ Preferences.o: src/Preferences.cpp headers/Preferences.hpp
 Calibration.o: src/Calibration.cpp headers/Calibration.hpp
 	$(CC) -c $(LIBSWX) $(LIBSOCV) -o $@ $<
 
+CornersReprojection.o: src/CornersReprojection.cpp headers/CornersReprojection.hpp
+	$(CC) -c $(LIBSWX) $(LIBSOCV) -o $@ $<
 
 clean:
 	$(RM) *.o $(EXEC)

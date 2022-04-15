@@ -10,17 +10,17 @@
 int Mosaic(cv::Mat images[], int nbImages, int width) {
     if (nbImages <= 0 || images == NULL) {
         wxMessageDialog(NULL, _("An error ocurred : not any images were loaded."), 
-                        _(""), wxCENTER|wxICON_ERROR).ShowModal();
+                        _(""), wxCENTER | wxICON_ERROR).ShowModal();
         return -1;
     }
     if (width <= 0) {
         wxMessageDialog(NULL, _("An error ocurred : width too low."), 
-                        _(""), wxCENTER|wxICON_ERROR).ShowModal();
+                        _(""), wxCENTER | wxICON_ERROR).ShowModal();
         return -1;
     }
     if (nbImages < 3) {
         wxMessageDialog(NULL, _("Please provide at least 3 images."), 
-                        _(""), wxCENTER|wxICON_ERROR).ShowModal();
+                        _(""), wxCENTER | wxICON_ERROR).ShowModal();
         return -1;
     }
     int n_col = (int)(floor(sqrt((double)(nbImages * images[0].cols) / (double)(images[0].rows))));

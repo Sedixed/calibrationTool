@@ -4,6 +4,7 @@
 #include "../headers/ExtractGridCorners.hpp"
 #include "../headers/Preferences.hpp"
 #include "../headers/Calibration.hpp"
+#include "../headers/CornersReprojection.hpp"
 #include <iostream>
 
 // Spacing between two buttons in the base menu
@@ -51,10 +52,13 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     // TODO: gérer fermeture alors que des images sont encore ouvertes (segfault parfois)
     // enlever le spam click pour les images -> cooldown entre chaque et demander à la fin (en cours)
-    //      tout afficher e le laisser fermer 
+    //      tout afficher et le laisser fermer : marche pas
+
+
+    // peut être supprimer le active_image (refaire toutes les images donc, à voir)
     // possibilité de load un fichier (btn ajouté)
-    // choisir calibrate / calibrateRO (côté calib à faire, pltôt bien géré avec intrinsic guess aussi
-    //      mais change tjr les valeurs "fixées"
+    // choisir calibrate / calibrateRO (change tjr les valeurs "fixées", pb avec use_inrinsic_guess)
+    //  si point pas fixé (0, 0) c'est ok de l'utiliser, mais si focal length pas fixé (0, 0) ça pose pb
     // tester les distorsions / focal / point etc
     // dans calibration results, afficher résultats (calculer erreur par mire avec des reprojections)
     // adapter pour windows à un moment     // dans calibration results, afficher résultats 
@@ -70,6 +74,7 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
 
 void AppFrame::OnExit(wxCommandEvent& evt) {
+    cv::destroyAllWindows();
     Close(true);
 }
 
@@ -127,12 +132,18 @@ void AppFrame::OnCalibration(wxCommandEvent& evt) {
 
 
 void AppFrame::OnShowReprojection(wxCommandEvent& evt) {
-    std::cout << "reproj\n";
+    int r = CornersReprojection(&dataCalib, 1);
+    if (r == 0) {
+        std::cout << "ok\n";
+    }
 }
 
 
 void AppFrame::OnCalibResults(wxCommandEvent& evt) {
-    std::cout << "results\n";
+    int r = CornersReprojection(&dataCalib, 0);
+    if (r == 0) {
+        std::cout << "ok\n";
+    }
 }
 
 
@@ -148,7 +159,7 @@ void AppFrame::OnLoadFile(wxCommandEvent& evt) {
 
 void AppFrame::OnPreferences(wxCommandEvent& evt) {
     long style = wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX);
-    PreferencesFrame* frame = new PreferencesFrame("Preferences", wxPoint(-1, -1), wxSize(550, 730), style, &dataCalib);
+    PreferencesFrame* frame = new PreferencesFrame("Preferences", wxPoint(-1, -1), wxSize(550, 710), style, &dataCalib);
     frame->Show(true);
 }
 

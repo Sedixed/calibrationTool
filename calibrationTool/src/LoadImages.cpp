@@ -11,7 +11,7 @@ int LoadImages(Calib* dataCalib) {
 
 
     wxFileDialog* askImages = new wxFileDialog(NULL, "Load images", "", "", 
-                                wildcard, wxFD_OPEN|wxFD_MULTIPLE);
+                                wildcard, wxFD_OPEN | wxFD_MULTIPLE);
 
     if (askImages->ShowModal() == wxID_OK) {
         wxArrayString paths;
@@ -21,7 +21,7 @@ int LoadImages(Calib* dataCalib) {
         int max = (int)paths.GetCount();
         if (max > MAX_IMAGES) {
             wxMessageDialog(NULL, _("An error ocurred : too many images were loaded."), 
-                            _(""), wxCENTER|wxICON_ERROR).ShowModal();
+                            _(""), wxCENTER | wxICON_ERROR).ShowModal();
             return -1;
         }
 

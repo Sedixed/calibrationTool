@@ -40,6 +40,7 @@ typedef struct iocalibration {
 	std::vector<cv::Point3f>        CornersCoord3D;		// 3D coordinates of plane corners
 	cv::Mat							rotationMat;	    // Rotation matrice (3 rows and 1 column)
 	cv::Mat							translationMat;		// Translation matrice (3 rows and 1 column)
+	float							errorView;			// Error rate of the view after calibration (px)
 } IOCalibration;
 
 
@@ -54,5 +55,6 @@ typedef struct calib {
 	Mire	calibPattern;				// Calibration pattern properties
 	Preferences pref;					// Preferences
 	cv::Mat intrinsics;					// Intrinsics parameters of the sensor
-	double error;						// Mean error after calibration
+	cv::Mat distCoeffs;					// Distorsion coefficients
+	double error;						// Mean error after calibration (px)
 } Calib;
