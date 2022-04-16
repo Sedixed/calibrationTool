@@ -44,8 +44,11 @@ int LoadImages(Calib* dataCalib) {
         }
 
         // Show the mosaic
-        Mosaic(images, max, dataCalib->pref.render_size.width);
-
+        int r = Mosaic(images, max, dataCalib->pref.render_size.width);
+        if (r != 0) {
+            return -1;
+        }
+        
         for(int i = 0; i < max; ++i) {
 		    images[i].release();
 		}
