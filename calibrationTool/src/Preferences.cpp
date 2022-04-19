@@ -33,12 +33,11 @@ wxBEGIN_EVENT_TABLE(PreferencesFrame, wxFrame)
             wxEVT_CHECKBOX, PreferencesFrame::UpdateFlags)
     EVT_COMMAND_RANGE(GU, V0, wxEVT_TEXT, PreferencesFrame::SetOkState)
     EVT_COMMAND_RANGE(NB_X, SIZE_SQUARE_Y, wxEVT_TEXT, PreferencesFrame::SetOkState)
-    
 wxEND_EVENT_TABLE()
 
 
-PreferencesFrame::PreferencesFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib)
-    : wxFrame(NULL, 0, title, pos, size, style) {
+PreferencesFrame::PreferencesFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, AppFrame* parent)
+    : wxFrame(parent, 0, title, pos, size, style) {
     
     // Setting the base values
     dataCalib = calib;

@@ -1,12 +1,8 @@
 #include "../headers/LoadImages.hpp"
 #include "../headers/Mosaic.hpp"
 #include <opencv2/opencv.hpp>
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
 
-int LoadImages(Calib* dataCalib) {
+int LoadImages(Calib* dataCalib, wxWindow* parent) {
     wxString wildcard("Image files (*.bmp;*.tiff;*.jpg;*.jpeg;*.pgm;*.png)|*.bmp;*.tiff;*.jpg;*.jpeg;*.pgm;*.png");
 
 
@@ -48,6 +44,7 @@ int LoadImages(Calib* dataCalib) {
         if (r != 0) {
             return -1;
         }
+        parent->SetFocus();
         
         for(int i = 0; i < max; ++i) {
 		    images[i].release();

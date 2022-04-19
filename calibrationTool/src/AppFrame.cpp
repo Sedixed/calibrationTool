@@ -4,7 +4,9 @@
 #include "../headers/ExtractGridCorners.hpp"
 #include "../headers/Preferences.hpp"
 #include "../headers/Calibration.hpp"
-#include "../headers/CornersReprojection.hpp"
+#include "../headers/ComputeViewsError.hpp"
+#include "../headers/Save.hpp"
+#include "../headers/LoadFile.hpp"
 #include <iostream>
 
 // Spacing between two buttons in the base menu
@@ -50,19 +52,29 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     
     SetDefaultPreferences();
 
-    // TODO: gérer fermeture alors que des images sont encore ouvertes (segfault parfois)
+    // FAIT
+    // gérer fermeture alors que des images sont encore ouvertes (segfault parfois) -> on met
+    //  la appframe comme parent de la preferencesframe
+
+    // EN COURS 
     // enlever le spam click pour les images -> cooldown entre chaque et demander à la fin (en cours)
     //      tout afficher et le laisser fermer : marche pas
 
-
+    // A VOIR
     // peut être supprimer le active_image (refaire toutes les images donc, à voir)
-    // possibilité de load un fichier (btn ajouté)
-    // choisir calibrate / calibrateRO (change tjr les valeurs "fixées", pb avec use_inrinsic_guess)
+
+    // EN COURS
+    // choisir calibrate / calibrateRO (change tjr les valeurs "fixées", pb avec use_intrinsic_guess)
     //  si point pas fixé (0, 0) c'est ok de l'utiliser, mais si focal length pas fixé (0, 0) ça pose pb
+
+    // A FAIRE
     // tester les distorsions / focal / point etc
-    // dans calibration results, afficher résultats (calculer erreur par mire avec des reprojections)
-    // adapter pour windows à un moment     // dans calibration results, afficher résultats 
-    //      (calculer erreur par mire avec des reprojections)
+
+    //  A FAIRE
+    // adapter pour windows à un moment
+
+    // IDEE
+    // Ajouter btn pour fermer toutes les images opencv ouvertes
 
 
     
@@ -107,12 +119,13 @@ void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
 
 
 void AppFrame::OnLoadImages(wxCommandEvent& evt) {
-    int r = LoadImages(&dataCalib);
+    int r = LoadImages(&dataCalib, this);
     if (r == 0) {
         buttons[Btn::ID_EXTRACT_GRID_CORNERS - Btn::ID_LOAD_IMG]->Enable(true);
         buttons[Btn::ID_PREFERENCES - Btn::ID_LOAD_IMG]->Enable(true);
     }
 }
+
 
 void AppFrame::OnExtractGridCorners(wxCommandEvent& evt) {
     int r = ExtractGridCorners(&dataCalib);
@@ -121,45 +134,51 @@ void AppFrame::OnExtractGridCorners(wxCommandEvent& evt) {
     }
 }
 
+
 void AppFrame::OnCalibration(wxCommandEvent& evt) {
     int r = Calibration(&dataCalib);
     if (r == 0) {
         buttons[Btn::ID_SHOW_CORNERS_PROJ - Btn::ID_LOAD_IMG]->Enable(true);
         buttons[Btn::ID_CALIB_RESULTS - Btn::ID_LOAD_IMG]->Enable(true);
-        buttons[Btn::ID_SAVE - Btn::ID_LOAD_IMG]->Enable(true);
     }
 }
 
 
 void AppFrame::OnShowReprojection(wxCommandEvent& evt) {
-    int r = CornersReprojection(&dataCalib, 1);
-    if (r == 0) {
-        std::cout << "ok\n";
-    }
+    ComputeViewsError(&dataCalib, this, 1);
 }
 
 
 void AppFrame::OnCalibResults(wxCommandEvent& evt) {
-    int r = CornersReprojection(&dataCalib, 0);
+    int r = ComputeViewsError(&dataCalib);
     if (r == 0) {
-        std::cout << "ok\n";
+        // à voir, peut-être remettre dans OnCalibration et gérer à part les view error
+        buttons[Btn::ID_SAVE - Btn::ID_LOAD_IMG]->Enable(true);
     }
 }
 
 
 void AppFrame::OnSave(wxCommandEvent& evt) {
-    std::cout << "save\n";
+    Save(&dataCalib);
 }
 
 
 void AppFrame::OnLoadFile(wxCommandEvent& evt) {
-    std::cout << "load file\n";
+    int r = LoadFile(&dataCalib);
+    if (r == 0) {
+        buttons[Btn::ID_EXTRACT_GRID_CORNERS - Btn::ID_LOAD_IMG]->Enable(true);
+        buttons[Btn::ID_CALIB - Btn::ID_LOAD_IMG]->Enable(true);
+        buttons[Btn::ID_SHOW_CORNERS_PROJ - Btn::ID_LOAD_IMG]->Enable(true);
+        buttons[Btn::ID_CALIB_RESULTS - Btn::ID_LOAD_IMG]->Enable(true);
+        buttons[Btn::ID_SAVE - Btn::ID_LOAD_IMG]->Enable(true);
+        buttons[Btn::ID_PREFERENCES - Btn::ID_LOAD_IMG]->Enable(true);
+    }
 }
 
 
 void AppFrame::OnPreferences(wxCommandEvent& evt) {
     long style = wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX);
-    PreferencesFrame* frame = new PreferencesFrame("Preferences", wxPoint(-1, -1), wxSize(550, 710), style, &dataCalib);
+    PreferencesFrame* frame = new PreferencesFrame("Preferences", wxPoint(-1, -1), wxSize(550, 710), style, &dataCalib, this);
     frame->Show(true);
 }
 

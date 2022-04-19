@@ -5,6 +5,7 @@
     #include <wx/wx.h>
 #endif
 #include "structs.hpp"
+#include "../headers/AppFrame.hpp"
 #include <wx/gbsizer.h>
 
 // Base ID for search radioButtons
@@ -139,7 +140,7 @@ class PreferencesFrame : public wxFrame {
     wxTextCtrl* sizeY;
 
     public:
-        PreferencesFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib);
+        PreferencesFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, AppFrame *parent);
 
     private:
         // Called when a user click on the "Cancel" labeled button.
