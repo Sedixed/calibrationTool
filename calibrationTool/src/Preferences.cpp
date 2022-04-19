@@ -92,7 +92,7 @@ void PreferencesFrame::OnExitOk(wxCommandEvent& evt) {
 
     // Focal Length
     if (ignoreFocal) {
-        flags ^= cv::CALIB_FIX_FOCAL_LENGTH;
+        flags |= cv::CALIB_FIX_FOCAL_LENGTH;
         wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
         wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
         double fx;
@@ -106,13 +106,14 @@ void PreferencesFrame::OnExitOk(wxCommandEvent& evt) {
         dataCalib->intrinsics.at<double>(0, 0) = fx;
         dataCalib->intrinsics.at<double>(1, 1) = fy;
     } else {
+        flags &= ~(cv::CALIB_FIX_FOCAL_LENGTH);
         dataCalib->intrinsics.at<double>(0, 0) = 0.0;
         dataCalib->intrinsics.at<double>(1, 1) = 0.0;
     }
 
     // Principal point
     if (ignorePoint) {
-        flags ^= cv::CALIB_FIX_PRINCIPAL_POINT;
+        flags |= cv::CALIB_FIX_PRINCIPAL_POINT;
         wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
         wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
         double cx;
@@ -127,10 +128,12 @@ void PreferencesFrame::OnExitOk(wxCommandEvent& evt) {
         dataCalib->intrinsics.at<double>(0, 2) = cx;
         dataCalib->intrinsics.at<double>(1, 2) = cy;
     } else {
-        //cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
-        dataCalib->intrinsics.at<double>(0, 2) = 0;//img.size().width / 2;
-        dataCalib->intrinsics.at<double>(1, 2) = 0;//img.size().height / 2;
-        //img.release();
+        // Center of the image
+        cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
+        flags &= ~(cv::CALIB_FIX_PRINCIPAL_POINT);
+        dataCalib->intrinsics.at<double>(0, 2) = img.size().width / 2;
+        dataCalib->intrinsics.at<double>(1, 2) = img.size().height / 2;
+        img.release();
     }
 
     // Calibration flags
@@ -230,7 +233,11 @@ void PreferencesFrame::CreateAndPlaceComponents() {
             wxGBPosition(3, 0), wxDefaultSpan, wxLEFT | wxBOTTOM | wxALIGN_CENTER_VERTICAL, 8);
     std::string label = (iFixedPoint == 0) ? "Default" : "RO";
     wxButton* tgb = new wxButton(parameters, Pref::CALIB_METHOD_ID, _(label));
-    fgboxParameters->Add(tgb, wxGBPosition(3, 1), wxGBSpan(1, 2), wxLEFT | wxBOTTOM, 8);
+    fgboxParameters->Add(tgb, wxGBPosition(3, 1), wxGBSpan(1, 2), wxSHAPED | wxLEFT | wxBOTTOM, 8);
+    // More spacing below if needed
+    if (!ignoreFocal && !ignorePoint) {
+        fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, ""), wxGBPosition(4, 0), wxDefaultSpan, wxALL, 0);
+    }
 
     fgboxParameters->SetSizeHints(parameters);
     parameters->SetSizer(fgboxParameters);

@@ -56,6 +56,15 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // gérer fermeture alors que des images sont encore ouvertes (segfault parfois) -> on met
     //  la appframe comme parent de la preferencesframe
 
+    // UPDATE
+    // On a le choix entre un vecteur dans calibrateCameraRO et les reprojections via projectCorners
+    //  pour obtenir les erreurs par image : lequel est le meilleur ? jsp
+    // si celui de la fonction, revoir tout le code de computeviewserror
+    // De même, on a le choix entre les coordonnées brutes en 3D et celles recalculées par RO (pareil)
+
+    // A VOIR
+    // Gestion des flags pour import/export
+
     // EN COURS 
     // enlever le spam click pour les images -> cooldown entre chaque et demander à la fin (en cours)
     //      tout afficher et le laisser fermer : marche pas
@@ -69,14 +78,13 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     // A FAIRE
     // tester les distorsions / focal / point etc
+    // ce soir pour le rapport
 
     //  A FAIRE
     // adapter pour windows à un moment
 
     // IDEE
     // Ajouter btn pour fermer toutes les images opencv ouvertes
-
-
     
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
@@ -170,7 +178,6 @@ void AppFrame::OnLoadFile(wxCommandEvent& evt) {
         buttons[Btn::ID_CALIB - Btn::ID_LOAD_IMG]->Enable(true);
         buttons[Btn::ID_SHOW_CORNERS_PROJ - Btn::ID_LOAD_IMG]->Enable(true);
         buttons[Btn::ID_CALIB_RESULTS - Btn::ID_LOAD_IMG]->Enable(true);
-        buttons[Btn::ID_SAVE - Btn::ID_LOAD_IMG]->Enable(true);
         buttons[Btn::ID_PREFERENCES - Btn::ID_LOAD_IMG]->Enable(true);
     }
 }

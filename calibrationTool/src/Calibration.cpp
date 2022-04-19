@@ -30,51 +30,44 @@ int Calibration(Calib* dataCalib) {
     }
 
     std::vector<cv::Point3f> newObjPoints;                         // New object points
+    std::vector<double> perViewError;                              // Error per view vector
     std::vector<cv::Mat> rVecs;                                    // Rotation vectors
     std::vector<cv::Mat> tVecs;                                    // Translation vectors
     int flags = dataCalib->pref.parameters_flags;                  // Flags
     if (!(flags & cv::CALIB_FIX_K3 && flags & cv::CALIB_FIX_K4 && flags & cv::CALIB_FIX_K5)) {
         flags |= cv::CALIB_RATIONAL_MODEL; 
-    }                  
+    } 
 
     // Used to get the size of an image
     cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
 
     // Calibration
-
-    double error;
-    try {
-        error = cv::calibrateCameraRO(objectPoints, imagePoints, img.size(), 
+    double error = cv::calibrateCameraRO(objectPoints, imagePoints, img.size(), 
             dataCalib->pref.fixed_point == 1 ? dataCalib->calibPattern.nbSquareX - 1 : 0,
-            dataCalib->intrinsics, dataCalib->distCoeffs, rVecs, tVecs, newObjPoints, flags);
-    } catch (std::exception& e) {
-        std::cout << e.what() << std::endl;
+            dataCalib->intrinsics, dataCalib->distCoeffs, rVecs, tVecs, newObjPoints, 
+            cv::noArray(), cv::noArray(), cv::noArray(), perViewError, flags);
+
+    /*
+    // Approximativement égal à ObjectPoints
+    std::cout << "\n--new (ro only) --\n";
+    for (int i = 0; i < newObjPoints.size(); ++i) {
+        std::cout << newObjPoints[i].x << " " << newObjPoints[i].y << " " << newObjPoints[i].z << std::endl;
     }
- 
-    // Mean error
-    std::cout << "----------------------------------\n";
-    std::cout << "Mean error : " << error << std::endl;
-    // Focal length
-    double focalLengthX = dataCalib->intrinsics.at<double>(0, 0);
-    double focalLengthY = dataCalib->intrinsics.at<double>(1, 1);
-    // Principal point
-    double prPointX = dataCalib->intrinsics.at<double>(0, 2);
-    double prPointY = dataCalib->intrinsics.at<double>(1, 2);
-    std::cout << "focal length : " << focalLengthX << " " << focalLengthY << std::endl;
-    std::cout << "principal point : " << prPointX << " " << prPointY << std::endl;
-    // Distorsions
-    std::cout << "Distorsions : ";
-    for (int j = 0; j < dataCalib->distCoeffs.cols; ++j) {
-        if (j == 0 ||j == 1 || j == 4 || j == 5 || j == 6) {
-            std::cout << dataCalib->distCoeffs.at<double>(0, j) << " ";
-        }
-    }
-    std::cout << std::endl;
     
+    // Différent de ceux calculés par reprojection (via norm)
+    double sum = 0.;
+    std::cout << "\n--per view error--\n";
+    for (int i = 0; i < perViewError.size(); ++i) {
+        std::cout << perViewError[i] << std::endl;
+        sum += perViewError[i];
+    }
+    std::cout << "total : " << sum / dataCalib->nb_images << std::endl;
+    */
 
-    // Save intrinsics parameters and mean error
+    img.release();
+ 
+    // Save mean error
     dataCalib->error = error;
-
     // Save extrinsics parameters
     for (int i = 0; i < dataCalib->nb_images; ++i) {
         if (!dataCalib->IOcalib[i].active_image) {
@@ -85,7 +78,5 @@ int Calibration(Calib* dataCalib) {
     }
 
     wxMessageBox("Calibration succeeded !", "Calibration", wxOK);
-
-    img.release();
     return 0;
 }

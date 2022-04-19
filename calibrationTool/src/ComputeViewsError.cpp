@@ -38,13 +38,13 @@ int ComputeViewsError(Calib *dataCalib, wxWindow* parent, int show) {
             img.release();
         // Saving current result
         } else {
-            
             int n = (int)objPoints.size();
             dataCalib->IOcalib[i].errorView = (float) std::sqrt(err * err / n);
-            //std::cout << "Erreur image " << (i + 1) << " : " <<  dataCalib->IOcalib[i].errorView << std::endl;
             //totalErr += err * err;
             //totalPoints += n;
         }
+        // Reprojection error
+        // std::to_string(std::sqrt(totalErr/totalPoints))
     }
     if (show == 1) {
         parent->Raise();
@@ -77,15 +77,11 @@ int ComputeViewsError(Calib *dataCalib, wxWindow* parent, int show) {
         res += streamObj.str() + "\n";
         streamObj.str("");
 
-        // Reprojection error
-        // std::to_string(std::sqrt(totalErr/totalPoints))
         // Method used
-
         res += "Method used : \t\t\t\t";
         res += std::string(dataCalib->pref.fixed_point == 0 ? "calibrateCamera\n" : "calibrateCameraRO\n");
         res += "\nMean error : \t\t\t\t" + std::to_string(dataCalib->error) + "\n";
         wxMessageBox(res, "Calibration results", wxOK | wxICON_INFORMATION);
-
     }
     return 0;
 }

@@ -14,6 +14,8 @@ int LoadFile(Calib* dataCalib) {
         return -1;
     }
     cv::FileStorage fs(std::string(dialog.GetPath().mb_str()), cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML);
+    // Traiter selon type, pour l'instant que Perspective
+
     fs["Number of images"] >> dataCalib->nb_images;
     // Mire data
     fs["Mire used"]["Number of squares along X"] >> dataCalib->calibPattern.nbSquareX;
