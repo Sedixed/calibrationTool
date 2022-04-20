@@ -29,6 +29,20 @@ namespace Btn {
         };
     }
 
+    const std::vector<wxButton*> sphericalButtons(wxWindow* parent) {
+        return std::vector<wxButton*> {
+            new wxButton(parent, ID_LOAD_IMG, mainLabels[ID_LOAD_IMG]),
+            new wxButton(parent, ID_EXTRACT_GRID_CORNERS, mainLabels[ID_EXTRACT_GRID_CORNERS]),
+            new wxButton(parent, ID_CALIB, mainLabels[ID_CALIB]),
+            new wxButton(parent, ID_SHOW_CORNERS_PROJ, mainLabels[ID_SHOW_CORNERS_PROJ]),
+            new wxButton(parent, ID_CALIB_RESULTS, mainLabels[ID_CALIB_RESULTS]),
+            new wxButton(parent, ID_SAVE, mainLabels[ID_SAVE]),
+            new wxButton(parent, ID_LOAD_FILE, mainLabels[ID_LOAD_FILE]),
+            new wxButton(parent, ID_PREFERENCES, mainLabels[ID_PREFERENCES]),
+            new wxButton(parent, ID_EXIT, mainLabels[ID_EXIT])
+        };
+    }
+
     const std::vector<wxButton*> preferencesButtons(wxWindow* parent) {
         return std::vector<wxButton*> {
             new wxButton(parent, ID_EXIT_CANCEL, mainLabels[ID_EXIT_CANCEL]),

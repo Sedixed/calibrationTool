@@ -14,7 +14,28 @@ int LoadFile(Calib* dataCalib) {
         return -1;
     }
     cv::FileStorage fs(std::string(dialog.GetPath().mb_str()), cv::FileStorage::READ | cv::FileStorage::FORMAT_YAML);
-    // Traiter selon type, pour l'instant que Perspective
+
+    // Type check
+    std::string type;
+    fs["Type"] >> type;
+    if (!IsValidType(type, dataCalib)) {
+        std::string curType;
+        switch(dataCalib->type) {
+            case SPHERICAL_TYPE:
+                curType = "Spherical";
+                break;
+            case PERSPECTIVE_TYPE:
+                curType = "Perspective";
+                break;
+            default:
+                curType = "Another";
+                break;
+        }
+        wxMessageBox("Incompatible type of calibration for this file.\nYou have currently selected the \"" +
+                    curType + "\" calibration type, and the YML file has the \"" + type + "\" calibration type.\n", "Load YML file", wxICON_ERROR);
+        fs.release();
+        return -1;
+    }
 
     fs["Number of images"] >> dataCalib->nb_images;
     // Mire data
@@ -53,12 +74,9 @@ int LoadFile(Calib* dataCalib) {
         cv::Mat corners3D;
         view["Object points"] >> corners3D;
         dataCalib->IOcalib[i].CornersCoord3D = MatToVecPoint3F(corners3D);
-        //MatToVecPoint3F(view["Object points"]) >> dataCalib->IOcalib[i].CornersCoord3D;
         // dégagera probablement
         dataCalib->IOcalib[i].active_image = true;
     }
-
-
 
     fs.release();
     return 0;
@@ -87,4 +105,12 @@ std::vector<cv::Point3f> MatToVecPoint3F(cv::Mat& m) {
         v.push_back(p);
     }
     return v;
+}
+
+
+bool IsValidType(std::string& type, Calib* dataCalib) {
+    return (
+        (type.compare("Perspective") == 0 && dataCalib->type == PERSPECTIVE_TYPE) ||
+        (type.compare("Spherical") == 0 && dataCalib->type == SPHERICAL_TYPE)
+    );
 }

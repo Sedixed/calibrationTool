@@ -109,7 +109,7 @@ namespace Pref {
     const int CALIB_METHOD_ID = 100;
 }
 
-class PreferencesFrame : public wxFrame {
+class PreferencesPerspectiveFrame : public wxFrame {
     // Attributes
 
     // Define if we provide the focal length
@@ -140,7 +140,7 @@ class PreferencesFrame : public wxFrame {
     wxTextCtrl* sizeY;
 
     public:
-        PreferencesFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, AppFrame *parent);
+        PreferencesPerspectiveFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, AppFrame *parent);
 
     private:
         // Called when a user click on the "Cancel" labeled button.

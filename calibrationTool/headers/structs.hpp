@@ -6,6 +6,9 @@
 #define MAX_FILE_NAME 200
 #define MAX_IMAGES 200
 
+#define SPHERICAL_TYPE 1
+#define PERSPECTIVE_TYPE 0
+
 /**
  * Preferences : structure used to define the preferences for calibration.
  * 
@@ -50,6 +53,7 @@ typedef struct iocalibration {
  * 
  */
 typedef struct calib {
+	int type;							// Calibration type (spherical / perspective)
     int nb_images;                      // Number of loaded images
     IOCalibration IOcalib[MAX_IMAGES];	// Images data used for the calibration
 	Mire	calibPattern;				// Calibration pattern properties

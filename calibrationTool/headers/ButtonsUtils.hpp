@@ -67,6 +67,17 @@ namespace Btn {
 
 
     /**
+     * Returns a vector of pointers of wxButtons that are the buttons of the main frame, when
+     * the button "Spherical camera" has been clicked by the user.
+     * 
+     * @param parent                        the wxWindow parent of the buttons.
+     * @return const std::vector<wxButton*> vector of pointers of wxButtons, buttons displayed
+     *                                      when "Spherical camera" button is clicked.
+     */
+    const std::vector<wxButton*> sphericalButtons(wxWindow* parent);
+
+
+    /**
      * Returns a vector of pointers of wxButtons that are the buttons of the preferences frame.
      * 
      * @param parent                        the wxWindow parent of the buttons.

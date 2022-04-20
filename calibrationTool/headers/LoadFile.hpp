@@ -30,3 +30,14 @@ std::vector<cv::Point2f> MatToVecPoint2F(cv::Mat& m);
  * @return cv::Mat Vector of Point3f, containing m data.
  */
 std::vector<cv::Point3f> MatToVecPoint3F(cv::Mat& m);
+
+
+/**
+ * Tests if the type stored as a string in a YML file is valid, depending
+ * on the current calibration type (spherical / perspective).
+ * 
+ * @param type      The type of calibration stored as a string in a YML file.
+ * @param dataCalib pointer of Calib used to read the calibration type.
+ * @return int      Returns true if the types are matching.
+ */
+bool IsValidType(std::string& type, Calib* dataCalib);

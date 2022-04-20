@@ -1,4 +1,4 @@
-#include "../headers/Preferences.hpp"
+#include "../headers/PreferencesPerspective.hpp"
 #include "../headers/ButtonsUtils.hpp"
 #include <opencv2/opencv.hpp>
 #include <wx/valnum.h>
@@ -21,22 +21,22 @@
 // Event table used by the preferences frame.
 //  Makes each button corresponds its onclick function, and 
 //  same for radioButtons and text updates.
-wxBEGIN_EVENT_TABLE(PreferencesFrame, wxFrame)
-    EVT_BUTTON(Btn::ID_EXIT_OK,                         PreferencesFrame::OnExitOk)
-    EVT_BUTTON(Btn::ID_EXIT_CANCEL,                     PreferencesFrame::OnExitCancel)
-    EVT_BUTTON(Pref::CALIB_METHOD_ID,                   PreferencesFrame::ToggleROMode)
+wxBEGIN_EVENT_TABLE(PreferencesPerspectiveFrame, wxFrame)
+    EVT_BUTTON(Btn::ID_EXIT_OK,                         PreferencesPerspectiveFrame::OnExitOk)
+    EVT_BUTTON(Btn::ID_EXIT_CANCEL,                     PreferencesPerspectiveFrame::OnExitCancel)
+    EVT_BUTTON(Pref::CALIB_METHOD_ID,                   PreferencesPerspectiveFrame::ToggleROMode)
     EVT_COMMAND_RANGE(Pref::RENDER_MIN_ID, Pref::RENDER_MIN_ID + Pref::RENDER_NB_ID - 1,
-            wxEVT_RADIOBUTTON, PreferencesFrame::SetLastRender)
+            wxEVT_RADIOBUTTON, PreferencesPerspectiveFrame::SetLastRender)
     EVT_COMMAND_RANGE(Pref::SEARCH_MIN_ID, Pref::SEARCH_MIN_ID + Pref::SEARCH_NB_ID - 1,
-            wxEVT_RADIOBUTTON, PreferencesFrame::SetLastSearch)
+            wxEVT_RADIOBUTTON, PreferencesPerspectiveFrame::SetLastSearch)
     EVT_COMMAND_RANGE(Pref::ID_FOCAL, Pref::ID_K1 + NB_OF_K_PARAM - 1,
-            wxEVT_CHECKBOX, PreferencesFrame::UpdateFlags)
-    EVT_COMMAND_RANGE(GU, V0, wxEVT_TEXT, PreferencesFrame::SetOkState)
-    EVT_COMMAND_RANGE(NB_X, SIZE_SQUARE_Y, wxEVT_TEXT, PreferencesFrame::SetOkState)
+            wxEVT_CHECKBOX, PreferencesPerspectiveFrame::UpdateFlags)
+    EVT_COMMAND_RANGE(GU, V0, wxEVT_TEXT, PreferencesPerspectiveFrame::SetOkState)
+    EVT_COMMAND_RANGE(NB_X, SIZE_SQUARE_Y, wxEVT_TEXT, PreferencesPerspectiveFrame::SetOkState)
 wxEND_EVENT_TABLE()
 
 
-PreferencesFrame::PreferencesFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, AppFrame* parent)
+PreferencesPerspectiveFrame::PreferencesPerspectiveFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, AppFrame* parent)
     : wxFrame(parent, 0, title, pos, size, style) {
     
     // Setting the base values
@@ -52,7 +52,7 @@ PreferencesFrame::PreferencesFrame(const wxString& title, const wxPoint& pos, co
 }
 
 
-void PreferencesFrame::OnExitOk(wxCommandEvent& evt) {
+void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
     // Saving
     long n;
     double m;
@@ -149,12 +149,12 @@ void PreferencesFrame::OnExitOk(wxCommandEvent& evt) {
 }
 
 
-void PreferencesFrame::OnExitCancel(wxCommandEvent& evt) {
+void PreferencesPerspectiveFrame::OnExitCancel(wxCommandEvent& evt) {
     Close(true);
 }
 
 
-void PreferencesFrame::CreateAndPlaceComponents() {
+void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     wxGridBagSizer* box = new wxGridBagSizer(10, 10);
 
     // Parameters
@@ -349,7 +349,7 @@ void PreferencesFrame::CreateAndPlaceComponents() {
 }
 
 
-void PreferencesFrame::SetLastSearch(wxCommandEvent& evt) {
+void PreferencesPerspectiveFrame::SetLastSearch(wxCommandEvent& evt) {
     for (int i = 0; i < arrLength<const int>(Pref::searchSizes); ++i) {
         if (Pref::searchId[i] == evt.GetId()) {
             searchWindowSize = Pref::searchSizes[i];
@@ -359,7 +359,7 @@ void PreferencesFrame::SetLastSearch(wxCommandEvent& evt) {
 }
 
 
-void PreferencesFrame::SetLastRender(wxCommandEvent& evt) {
+void PreferencesPerspectiveFrame::SetLastRender(wxCommandEvent& evt) {
     for (int i = 0; i < arrLength<const cv::Size>(Pref::renderSizes); ++i) {
         if (Pref::renderId[i] == evt.GetId()) {
             renderWindowSize = Pref::renderSizes[i];
@@ -369,7 +369,7 @@ void PreferencesFrame::SetLastRender(wxCommandEvent& evt) {
 }
 
 
-void PreferencesFrame::UpdateFlags(wxCommandEvent& evt) {
+void PreferencesPerspectiveFrame::UpdateFlags(wxCommandEvent& evt) {
     switch(evt.GetId()) {
         case Pref::ID_FOCAL:
             {   
@@ -423,7 +423,7 @@ void PreferencesFrame::UpdateFlags(wxCommandEvent& evt) {
 }
 
 
-void PreferencesFrame::SetOkState(wxCommandEvent& evt) {
+void PreferencesPerspectiveFrame::SetOkState(wxCommandEvent& evt) {
     wxButton *b = (wxButton*) FindWindowById(Btn::ID_EXIT_OK);
     if (ignorePoint) {
         wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
@@ -452,7 +452,7 @@ void PreferencesFrame::SetOkState(wxCommandEvent& evt) {
 }
 
 
-void PreferencesFrame::ToggleROMode(wxCommandEvent& evt) {
+void PreferencesPerspectiveFrame::ToggleROMode(wxCommandEvent& evt) {
     wxButton *b = (wxButton*) FindWindowById(Pref::CALIB_METHOD_ID);
     iFixedPoint = 1 - iFixedPoint;
     if (b != NULL) {

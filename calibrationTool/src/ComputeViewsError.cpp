@@ -38,6 +38,8 @@ int ComputeViewsError(Calib *dataCalib, wxWindow* parent, int show) {
             std::string errText = "View error : " + std::to_string(err);
             cv::putText(img, errText, cv::Point(15, img.rows - 15), cv::FONT_HERSHEY_DUPLEX, 0.8, cv::Scalar(0, 0, 255), 1, 8, false);
             cv::imshow(title, img);
+            while(cv::waitKey(1) == -1);
+            cv::destroyWindow(title);
             img.release();
         // Saving current result
         } else {

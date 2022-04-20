@@ -44,6 +44,9 @@ int ExtractGridCorners(Calib *dataCalib) {
         allCorners3D.push_back(corners3D);
         std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);
         cv::imshow(title, src);
+        // Wait for any key input
+        while(cv::waitKey(1) == -1);
+        cv::destroyWindow(title);
         src.release();
     }
 
@@ -61,8 +64,10 @@ int ExtractGridCorners(Calib *dataCalib) {
                 dataCalib->IOcalib[i].active_image = false;
             }
         }
+        /*
         for (int i = 1; i <= dataCalib->nb_images; ++i) {
             cv::destroyWindow(std::string(IMG_NAME) + " " + std::to_string(i));
         }
+        */
     return 0;
 }

@@ -2,7 +2,7 @@
 #include "../headers/ButtonsUtils.hpp"
 #include "../headers/LoadImages.hpp"
 #include "../headers/ExtractGridCorners.hpp"
-#include "../headers/Preferences.hpp"
+#include "../headers/PreferencesPerspective.hpp"
 #include "../headers/Calibration.hpp"
 #include "../headers/ComputeViewsError.hpp"
 #include "../headers/Save.hpp"
@@ -17,7 +17,7 @@
 
 // Spacing between two buttons in the spherical menu
 // à définir plus tard
-#define SPHERICAL_SPACING -1
+#define SPHERICAL_SPACING 30
 
 // Event table used by the frame.
 //  Makes each button corresponds its onclick function
@@ -61,9 +61,10 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // FAIT
     // Gestion des flags pour import/export et on remet le btn save au loadfile
 
-    // EN COURS 
+    // +- FAIT
     // enlever le spam click pour les images -> cooldown entre chaque et demander à la fin (en cours)
-    //      tout afficher et le laisser fermer : marche pas
+    //      while waitkey dégueu -> nécessite entrée de key à chaque fois
+    //      pas fou car si on ferme via la croix, les autres images s'affichent pas
 
     // A VOIR
     // peut être supprimer le active_image (refaire toutes les images donc, à voir)
@@ -74,8 +75,10 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // +- FAIT
     // tester les distorsions / focal / point etc
 
-    //  A FAIRE
+    //  EN COURS
     // adapter pour windows à un moment
+    // horrible d'installer wxwidgets j'ai pas réussi, toute la matinée dessus ptn
+    // commencé spherical mais jsuis perdu
 
     // IDEE
     // Ajouter btn pour fermer toutes les images opencv ouvertes
@@ -100,6 +103,7 @@ void AppFrame::OnHelp(wxCommandEvent& evt) {
 
 void AppFrame::OnPerspectiveSelection(wxCommandEvent& evt) {
     resetButtons();
+    dataCalib.type = PERSPECTIVE_TYPE;
     buttons = Btn::perspectiveButtons(panel);
     SetSize(wxSize(300, 650));
     // Disabling buttons 
@@ -116,7 +120,20 @@ void AppFrame::OnPerspectiveSelection(wxCommandEvent& evt) {
 
 
 void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
-    std::cout << "TODO\n";
+    resetButtons();
+    dataCalib.type = SPHERICAL_TYPE;
+    buttons = Btn::sphericalButtons(panel);
+    SetSize(wxSize(300, 650));
+    // Disabling buttons 
+    int borne =  Btn::ID_PREFERENCES + 1 - Btn::ID_EXTRACT_GRID_CORNERS + 1;
+    // 1 because we keep the first button active
+    for (int i = 1; i < borne; ++i) {
+        if (i != Btn::ID_LOAD_FILE - Btn::ID_LOAD_IMG) {
+            buttons[i]->Enable(false);
+        }
+    }
+
+    placeButtons(SPHERICAL_SPACING);
 }
 
 
@@ -179,7 +196,7 @@ void AppFrame::OnLoadFile(wxCommandEvent& evt) {
 
 void AppFrame::OnPreferences(wxCommandEvent& evt) {
     long style = wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX);
-    PreferencesFrame* frame = new PreferencesFrame("Preferences", wxPoint(-1, -1), wxSize(550, 710), style, &dataCalib, this);
+    PreferencesPerspectiveFrame* frame = new PreferencesPerspectiveFrame("Preferences", wxPoint(-1, -1), wxSize(550, 710), style, &dataCalib, this);
     frame->Show(true);
 }
 

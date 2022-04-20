@@ -4,15 +4,15 @@ RM = rm
 EXEC = app
 # Source files
 SRCS = src/ButtonsUtils.cpp src/AppFrame.cpp src/App.cpp src/LoadImages.cpp src/Mosaic.cpp \
-	src/ExtractGridCorners.cpp src/Preferences.cpp src/Calibration.cpp src/CornersReprojection.cpp
+	src/ExtractGridCorners.cpp src/PreferencesPerspective.cpp src/Calibration.cpp src/CornersReprojection.cpp
 
 # Objects to be created
-OBJS = ButtonsUtils.o AppFrame.o App.o LoadImages.o Mosaic.o ExtractGridCorners.o Preferences.o \
+OBJS = ButtonsUtils.o AppFrame.o App.o LoadImages.o Mosaic.o ExtractGridCorners.o PreferencesPerspective.o \
 	Calibration.o ComputeViewsError.o Save.o LoadFile.o
 
 # AppFrame headers required (there are a lot)
 AF_HDS = headers/AppFrame.hpp headers/ButtonsUtils.hpp headers/LoadImages.hpp \
-	headers/ExtractGridCorners.hpp headers/Preferences.hpp headers/Calibration.hpp
+	headers/ExtractGridCorners.hpp headers/PreferencesPerspective.hpp headers/Calibration.hpp
 
 LIBSWXBUILD = `wx-config --cxxflags`
 LIBSWXLINK = `wx-config --libs`

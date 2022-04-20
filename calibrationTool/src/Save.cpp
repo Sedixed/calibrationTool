@@ -16,7 +16,7 @@ int Save(Calib* dataCalib) {
 
     cv::FileStorage fs(std::string(dialog.GetPath().mb_str()), cv::FileStorage::WRITE | cv::FileStorage::FORMAT_YAML);
     fs << "Title" << "Calibration results";
-    fs << "Type" << "Perspective";
+    fs << "Type" << (dataCalib->type == PERSPECTIVE_TYPE ? "Perspective" : "Spherical");
     fs << "Number of images" << dataCalib->nb_images;
     // Mire data
     fs << "Mire used";
