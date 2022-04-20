@@ -52,18 +52,14 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     
     SetDefaultPreferences();
 
-    // FAIT
-    // gérer fermeture alors que des images sont encore ouvertes (segfault parfois) -> on met
-    //  la appframe comme parent de la preferencesframe
-
     // UPDATE
     // On a le choix entre un vecteur dans calibrateCameraRO et les reprojections via projectCorners
     //  pour obtenir les erreurs par image : lequel est le meilleur ? jsp
     // si celui de la fonction, revoir tout le code de computeviewserror
     // De même, on a le choix entre les coordonnées brutes en 3D et celles recalculées par RO (pareil)
 
-    // A VOIR
-    // Gestion des flags pour import/export
+    // FAIT
+    // Gestion des flags pour import/export et on remet le btn save au loadfile
 
     // EN COURS 
     // enlever le spam click pour les images -> cooldown entre chaque et demander à la fin (en cours)
@@ -73,12 +69,10 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // peut être supprimer le active_image (refaire toutes les images donc, à voir)
 
     // EN COURS
-    // choisir calibrate / calibrateRO (change tjr les valeurs "fixées", pb avec use_intrinsic_guess)
-    //  si point pas fixé (0, 0) c'est ok de l'utiliser, mais si focal length pas fixé (0, 0) ça pose pb
+    // pb du flac CALIB_USE_INTRINSIC_GUESS : si point défini par user mais pas la focal length, problème
 
-    // A FAIRE
+    // +- FAIT
     // tester les distorsions / focal / point etc
-    // ce soir pour le rapport
 
     //  A FAIRE
     // adapter pour windows à un moment
@@ -160,7 +154,6 @@ void AppFrame::OnShowReprojection(wxCommandEvent& evt) {
 void AppFrame::OnCalibResults(wxCommandEvent& evt) {
     int r = ComputeViewsError(&dataCalib);
     if (r == 0) {
-        // à voir, peut-être remettre dans OnCalibration et gérer à part les view error
         buttons[Btn::ID_SAVE - Btn::ID_LOAD_IMG]->Enable(true);
     }
 }
@@ -178,6 +171,7 @@ void AppFrame::OnLoadFile(wxCommandEvent& evt) {
         buttons[Btn::ID_CALIB - Btn::ID_LOAD_IMG]->Enable(true);
         buttons[Btn::ID_SHOW_CORNERS_PROJ - Btn::ID_LOAD_IMG]->Enable(true);
         buttons[Btn::ID_CALIB_RESULTS - Btn::ID_LOAD_IMG]->Enable(true);
+        buttons[Btn::ID_SAVE - Btn::ID_LOAD_IMG]->Enable(true);
         buttons[Btn::ID_PREFERENCES - Btn::ID_LOAD_IMG]->Enable(true);
     }
 }

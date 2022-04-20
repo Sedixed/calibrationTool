@@ -36,7 +36,7 @@ int LoadFile(Calib* dataCalib) {
     // Distorsions
     fs["Distorsion coefficients"] >> dataCalib->distCoeffs;
     // Flags
-    // TODO peut-être
+    fs["Flags"] >> dataCalib->pref.parameters_flags;
 
     // Views
     for (int i = 0; i < dataCalib->nb_images; ++i) {

@@ -25,7 +25,10 @@ int ComputeViewsError(Calib *dataCalib, wxWindow* parent, int show) {
 
         cv::projectPoints(objPoints, rVec, tVec, cameraMatrix, distCoeffs, imgPointsOutput);
 
-        double err = cv::norm(cv::Mat(dataCalib->IOcalib[i].CornersCoord2D), cv::Mat(imgPointsOutput), cv::NORM_L2);
+        // Manual error
+        // double err = cv::norm(cv::Mat(dataCalib->IOcalib[i].CornersCoord2D), cv::Mat(imgPointsOutput), cv::NORM_L2);
+        // Auto error
+        double err = dataCalib->IOcalib[i].errorView;
 
         // Showing image
         if (show == 1) {
@@ -38,8 +41,8 @@ int ComputeViewsError(Calib *dataCalib, wxWindow* parent, int show) {
             img.release();
         // Saving current result
         } else {
-            int n = (int)objPoints.size();
-            dataCalib->IOcalib[i].errorView = (float) std::sqrt(err * err / n);
+            //int n = (int)objPoints.size();
+            //dataCalib->IOcalib[i].errorView = (float) std::sqrt(err * err / n);
             //totalErr += err * err;
             //totalPoints += n;
         }

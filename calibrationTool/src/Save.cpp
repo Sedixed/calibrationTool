@@ -37,7 +37,7 @@ int Save(Calib* dataCalib) {
     // Distorsions
     fs << "Distorsion coefficients" << dataCalib->distCoeffs;
     // Flags
-    // TODO peut-être
+    fs << "Flags" << dataCalib->pref.parameters_flags;
 
     // Views
     fs << "Views data" << "{";

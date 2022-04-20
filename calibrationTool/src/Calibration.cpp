@@ -42,10 +42,17 @@ int Calibration(Calib* dataCalib) {
     cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
 
     // Calibration
-    double error = cv::calibrateCameraRO(objectPoints, imagePoints, img.size(), 
+    double error;
+    try {
+
+    error = cv::calibrateCameraRO(objectPoints, imagePoints, img.size(), 
             dataCalib->pref.fixed_point == 1 ? dataCalib->calibPattern.nbSquareX - 1 : 0,
             dataCalib->intrinsics, dataCalib->distCoeffs, rVecs, tVecs, newObjPoints, 
             cv::noArray(), cv::noArray(), cv::noArray(), perViewError, flags);
+    } catch (std::exception& e) {
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
 
     /*
     // Approximativement égal à ObjectPoints
@@ -53,15 +60,6 @@ int Calibration(Calib* dataCalib) {
     for (int i = 0; i < newObjPoints.size(); ++i) {
         std::cout << newObjPoints[i].x << " " << newObjPoints[i].y << " " << newObjPoints[i].z << std::endl;
     }
-    
-    // Différent de ceux calculés par reprojection (via norm)
-    double sum = 0.;
-    std::cout << "\n--per view error--\n";
-    for (int i = 0; i < perViewError.size(); ++i) {
-        std::cout << perViewError[i] << std::endl;
-        sum += perViewError[i];
-    }
-    std::cout << "total : " << sum / dataCalib->nb_images << std::endl;
     */
 
     img.release();
@@ -75,6 +73,8 @@ int Calibration(Calib* dataCalib) {
         }
         dataCalib->IOcalib[i].rotationMat = rVecs[i];
         dataCalib->IOcalib[i].translationMat = tVecs[i];
+        // pour le moment on va garder l'erreur par vue calculée
+        dataCalib->IOcalib[i].errorView = perViewError[i];
     }
 
     wxMessageBox("Calibration succeeded !", "Calibration", wxOK);
