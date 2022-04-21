@@ -58,27 +58,19 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // si celui de la fonction, revoir tout le code de computeviewserror
     // De même, on a le choix entre les coordonnées brutes en 3D et celles recalculées par RO (pareil)
 
-    // FAIT
-    // Gestion des flags pour import/export et on remet le btn save au loadfile
-
-    // +- FAIT
-    // enlever le spam click pour les images -> cooldown entre chaque et demander à la fin (en cours)
-    //      while waitkey dégueu -> nécessite entrée de key à chaque fois
-    //      pas fou car si on ferme via la croix, les autres images s'affichent pas
-
     // A VOIR
     // peut être supprimer le active_image (refaire toutes les images donc, à voir)
 
     // EN COURS
     // pb du flac CALIB_USE_INTRINSIC_GUESS : si point défini par user mais pas la focal length, problème
 
-    // +- FAIT
-    // tester les distorsions / focal / point etc
-
     //  EN COURS
     // adapter pour windows à un moment
-    // horrible d'installer wxwidgets j'ai pas réussi, toute la matinée dessus ptn
-    // commencé spherical mais jsuis perdu
+    // installé mais linkage marche pas
+
+    // commencé spherical : calib fix (pas de pb de taille de matrice mais de findchessboard,
+    //      flag cb_fast à désactiver -> donne un résultat
+    //      pas besoin de redimensionner en passant par des vecs chelou
 
     // IDEE
     // Ajouter btn pour fermer toutes les images opencv ouvertes

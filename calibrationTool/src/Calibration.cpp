@@ -97,7 +97,7 @@ int Calibration(Calib* dataCalib) {
         case SPHERICAL_TYPE:
         {
             cv::Mat Xi;     // Xi parameter for CMei's model (mirror shape)
-        
+
             // Calibration
             cv::TermCriteria crit(cv::TermCriteria::COUNT + cv::TermCriteria::EPS, 300, 0.0001);
 

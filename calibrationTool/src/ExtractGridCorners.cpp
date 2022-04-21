@@ -15,7 +15,12 @@ int ExtractGridCorners(Calib *dataCalib) {
 
         // Corners detection
         std::vector<cv::Point2f> corners;
-        int chessBoardFlags = cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE | cv::CALIB_CB_FAST_CHECK;
+        int chessBoardFlags = cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE;
+        // For spherical calibration, it doesn't detect corners as it runs a fast check on the image 
+        // and shortcut the call if none is found.
+        if (dataCalib->type == PERSPECTIVE_TYPE) {
+            chessBoardFlags |= cv::CALIB_CB_FAST_CHECK;
+        }
 
         cv::Size patternSize = cv::Size(dataCalib->calibPattern.nbSquareX - 1, dataCalib->calibPattern.nbSquareY - 1);
         bool found = cv::findChessboardCorners(src, patternSize, corners, chessBoardFlags);
