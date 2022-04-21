@@ -23,6 +23,15 @@ int Calibration(Calib* dataCalib) {
         if (!dataCalib->IOcalib[i].active_image) {
             continue;
         }
+        // If the user declared extraction successful but it wasn't 
+        // (not all corners detected on at least one view)
+        if (dataCalib->IOcalib[i].CornersCoord3D.size() != dataCalib->IOcalib[i].CornersCoord2D.size()) {
+            wxMessageBox(std::string("There is at least one image whose corners weren't all extracted.\n") +
+                    std::string("Error detected on image :\n") + 
+                    std::string(dataCalib->IOcalib[i].image_name),
+                    "Extraction error", wxICON_ERROR);
+            return -1;
+        }
         ++nbValid;
         objectPoints.push_back(dataCalib->IOcalib[i].CornersCoord3D);
         imagePoints.push_back(dataCalib->IOcalib[i].CornersCoord2D);
@@ -95,12 +104,11 @@ int Calibration(Calib* dataCalib) {
         // --- Spherical calibration case ---
         // ----------------------------------
         case SPHERICAL_TYPE:
-        {
-            cv::Mat Xi;     // Xi parameter for CMei's model (mirror shape)
-
-            // Calibration
+        {   
+            cv::Mat Xi;
             cv::TermCriteria crit(cv::TermCriteria::COUNT + cv::TermCriteria::EPS, 300, 0.0001);
 
+            // Calibration
             try {
                 error = cv::omnidir::calibrate(objectPoints, imagePoints, img.size(),
                     dataCalib->intrinsics, Xi, dataCalib->distCoeffs, rVecs, tVecs,
@@ -110,10 +118,23 @@ int Calibration(Calib* dataCalib) {
                 return -1;
             }
 
-            std::cout << error << std::endl;
+            // Save mean error and Xi
+            dataCalib->Xi = Xi.at<double>(0, 0);
+            dataCalib->error = error;
+            // Save extrinsics parameters
+            for (int i = 0; i < dataCalib->nb_images; ++i) {
+                if (!dataCalib->IOcalib[i].active_image) {
+                    continue;
+                }
+                dataCalib->IOcalib[i].rotationMat = rVecs[i];
+                dataCalib->IOcalib[i].translationMat = tVecs[i];
+            }
+            wxMessageBox("Calibration succeeded !", "Calibration", wxOK);
+            break;
         }
 
-        
+        default:
+            std::cout << "Error : unknown calibration\n";
     }
 
 

@@ -4,12 +4,16 @@
 #define IMG_NAME "Corners Reprojection :"
 
 int ComputeViewsError(Calib *dataCalib, wxWindow* parent, int show) {
+    // ---------------------------------------
+    // --- Common to all calibration types ---
+    // ---------------------------------------
+
     cv::Mat cameraMatrix = dataCalib->intrinsics;
     cv::Mat distCoeffs = dataCalib->distCoeffs;
+
     // For results
     //int totalPoints = 0;
     //double totalErr = 0;
-
 
     // Used for showing images
     cv::Size patternSize = cv::Size(dataCalib->calibPattern.nbSquareX - 1, dataCalib->calibPattern.nbSquareY - 1);
@@ -22,6 +26,18 @@ int ComputeViewsError(Calib *dataCalib, wxWindow* parent, int show) {
         cv::Mat rVec = dataCalib->IOcalib[i].rotationMat;                          // Rotation matrix          
         cv::Mat tVec = dataCalib->IOcalib[i].translationMat;                       // Translation matrix
         std::vector<cv::Point2f> imgPointsOutput;                                  // Output 2D points
+
+        switch (dataCalib->type) {
+            case PERSPECTIVE_TYPE:
+            {
+                break;
+            }
+
+            case SPHERICAL_TYPE:
+            {
+                break;
+            }
+        }
 
         cv::projectPoints(objPoints, rVec, tVec, cameraMatrix, distCoeffs, imgPointsOutput);
 

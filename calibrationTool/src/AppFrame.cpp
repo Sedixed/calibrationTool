@@ -47,6 +47,15 @@ wxEND_EVENT_TABLE()
 void getMaxSizeOfBtns(std::vector<wxButton*>& btns, wxSize *retSize);
 
 
+/**
+ * Change the state of the buttons whose IDs are in ids.
+ * 
+ * @param ids   Vector of button IDs used to change its buttons state.
+ * @param state true if we want the button enabled, false otherwise.
+ */
+void setButtonsState(std::vector<Btn::ButtonsId> ids, bool state);
+
+
 AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style)
     : wxFrame(NULL, 0, title, pos, size, style) {
     
@@ -58,11 +67,17 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // si celui de la fonction, revoir tout le code de computeviewserror
     // De même, on a le choix entre les coordonnées brutes en 3D et celles recalculées par RO (pareil)
 
+
+
     // A VOIR
     // peut être supprimer le active_image (refaire toutes les images donc, à voir)
 
+
+
     // EN COURS
     // pb du flac CALIB_USE_INTRINSIC_GUESS : si point défini par user mais pas la focal length, problème
+
+
 
     //  EN COURS
     // adapter pour windows à un moment
@@ -71,6 +86,15 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // commencé spherical : calib fix (pas de pb de taille de matrice mais de findchessboard,
     //      flag cb_fast à désactiver -> donne un résultat
     //      pas besoin de redimensionner en passant par des vecs chelou
+
+    // amélioration des boutons -> setButtonsState et gestion du cas ou on enchaine les calib
+    //  et erreurs de calib (pas tous les coins détectés etc, pas même taille 2d et 3d,
+    //  voir calibration et extractgrid  (active_image sert en fin de compte))
+    // amélioration de extractgrid : vérif que tout a été fait jusqu'au bout sinon fail (msg erreur)
+
+    // AJOUTER LA STRUCTURE MIRROR POUR OMNIDIR (peut-être) double Xi atm, voir si besoin de mirror
+
+
 
     // IDEE
     // Ajouter btn pour fermer toutes les images opencv ouvertes
@@ -98,15 +122,16 @@ void AppFrame::OnPerspectiveSelection(wxCommandEvent& evt) {
     dataCalib.type = PERSPECTIVE_TYPE;
     buttons = Btn::perspectiveButtons(panel);
     SetSize(wxSize(300, 650));
+    SetTitle("Perspective calibration");
     // Disabling buttons 
-    int borne =  Btn::ID_PREFERENCES + 1 - Btn::ID_EXTRACT_GRID_CORNERS + 1;
-    // 1 because we keep the first button active
-    for (int i = 1; i < borne; ++i) {
-        if (i != Btn::ID_LOAD_FILE - Btn::ID_LOAD_IMG) {
-            buttons[i]->Enable(false);
-        }
-    }
-
+    setButtonsState(std::vector<Btn::ButtonsId> {
+        Btn::ID_EXTRACT_GRID_CORNERS,
+        Btn::ID_CALIB, 
+        Btn::ID_SHOW_CORNERS_PROJ, 
+        Btn::ID_CALIB_RESULTS,
+        Btn::ID_SAVE,
+        Btn::ID_PREFERENCES}, false
+    );
     placeButtons(PERSPECTIVE_SPACING);
 }
 
@@ -116,15 +141,16 @@ void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
     dataCalib.type = SPHERICAL_TYPE;
     buttons = Btn::sphericalButtons(panel);
     SetSize(wxSize(300, 650));
+    SetTitle("Spherical calibration");
     // Disabling buttons 
-    int borne =  Btn::ID_PREFERENCES + 1 - Btn::ID_EXTRACT_GRID_CORNERS + 1;
-    // 1 because we keep the first button active
-    for (int i = 1; i < borne; ++i) {
-        if (i != Btn::ID_LOAD_FILE - Btn::ID_LOAD_IMG) {
-            buttons[i]->Enable(false);
-        }
-    }
-
+    setButtonsState(std::vector<Btn::ButtonsId> {
+        Btn::ID_EXTRACT_GRID_CORNERS,
+        Btn::ID_CALIB, 
+        Btn::ID_SHOW_CORNERS_PROJ, 
+        Btn::ID_CALIB_RESULTS,
+        Btn::ID_SAVE,
+        Btn::ID_PREFERENCES}, false
+    );
     placeButtons(SPHERICAL_SPACING);
 }
 
@@ -132,8 +158,17 @@ void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
 void AppFrame::OnLoadImages(wxCommandEvent& evt) {
     int r = LoadImages(&dataCalib, this);
     if (r == 0) {
-        buttons[Btn::ID_EXTRACT_GRID_CORNERS - Btn::ID_LOAD_IMG]->Enable(true);
-        buttons[Btn::ID_PREFERENCES - Btn::ID_LOAD_IMG]->Enable(true);
+        setButtonsState(std::vector<Btn::ButtonsId> {
+            Btn::ID_EXTRACT_GRID_CORNERS,
+            Btn::ID_PREFERENCES}, true
+        );
+        // In case it is not the first calibration during execution
+        setButtonsState(std::vector<Btn::ButtonsId> {
+            Btn::ID_CALIB, 
+            Btn::ID_SHOW_CORNERS_PROJ, 
+            Btn::ID_CALIB_RESULTS,
+            Btn::ID_SAVE}, false
+        );
     }
 }
 
@@ -141,16 +176,28 @@ void AppFrame::OnLoadImages(wxCommandEvent& evt) {
 void AppFrame::OnExtractGridCorners(wxCommandEvent& evt) {
     int r = ExtractGridCorners(&dataCalib);
     if (r == 0) {
-        buttons[Btn::ID_CALIB - Btn::ID_LOAD_IMG]->Enable(true);
+        setButtonsState(std::vector<Btn::ButtonsId> {
+            Btn::ID_CALIB}, true
+        );
+    } else {
+        setButtonsState(std::vector<Btn::ButtonsId> {
+            Btn::ID_CALIB, 
+            Btn::ID_SHOW_CORNERS_PROJ, 
+            Btn::ID_CALIB_RESULTS,
+            Btn::ID_SAVE}, false
+        );
     }
+
 }
 
 
 void AppFrame::OnCalibration(wxCommandEvent& evt) {
     int r = Calibration(&dataCalib);
     if (r == 0) {
-        buttons[Btn::ID_SHOW_CORNERS_PROJ - Btn::ID_LOAD_IMG]->Enable(true);
-        buttons[Btn::ID_CALIB_RESULTS - Btn::ID_LOAD_IMG]->Enable(true);
+        setButtonsState(std::vector<Btn::ButtonsId> {
+            Btn::ID_SHOW_CORNERS_PROJ,
+            Btn::ID_CALIB_RESULTS}, true
+        );
     }
 }
 
@@ -163,7 +210,9 @@ void AppFrame::OnShowReprojection(wxCommandEvent& evt) {
 void AppFrame::OnCalibResults(wxCommandEvent& evt) {
     int r = ComputeViewsError(&dataCalib);
     if (r == 0) {
-        buttons[Btn::ID_SAVE - Btn::ID_LOAD_IMG]->Enable(true);
+        setButtonsState(std::vector<Btn::ButtonsId> {
+            Btn::ID_SAVE}, true
+        );
     }
 }
 
@@ -176,12 +225,14 @@ void AppFrame::OnSave(wxCommandEvent& evt) {
 void AppFrame::OnLoadFile(wxCommandEvent& evt) {
     int r = LoadFile(&dataCalib);
     if (r == 0) {
-        buttons[Btn::ID_EXTRACT_GRID_CORNERS - Btn::ID_LOAD_IMG]->Enable(true);
-        buttons[Btn::ID_CALIB - Btn::ID_LOAD_IMG]->Enable(true);
-        buttons[Btn::ID_SHOW_CORNERS_PROJ - Btn::ID_LOAD_IMG]->Enable(true);
-        buttons[Btn::ID_CALIB_RESULTS - Btn::ID_LOAD_IMG]->Enable(true);
-        buttons[Btn::ID_SAVE - Btn::ID_LOAD_IMG]->Enable(true);
-        buttons[Btn::ID_PREFERENCES - Btn::ID_LOAD_IMG]->Enable(true);
+        setButtonsState(std::vector<Btn::ButtonsId> {
+            Btn::ID_EXTRACT_GRID_CORNERS,
+            Btn::ID_CALIB,
+            Btn::ID_SHOW_CORNERS_PROJ,
+            Btn::ID_CALIB_RESULTS,
+            Btn::ID_SAVE,
+            Btn::ID_PREFERENCES}, true
+        );
     }
 }
 
@@ -252,3 +303,10 @@ void getMaxSizeOfBtns(std::vector<wxButton*>& btns, wxSize* retSize) {
     }
 }
 
+
+void setButtonsState(std::vector<Btn::ButtonsId> ids, bool state) {
+    for (Btn::ButtonsId id : ids) {
+        wxButton* b = (wxButton*) wxWindow::FindWindowById(id);
+        b->Enable(state);
+    }
+}

@@ -66,6 +66,14 @@ int Mosaic(cv::Mat images[], int nbImages, int width) {
         }
     }
 
+    // To ensure the new images will be displayed if it isn't
+    // the first calibration on this execution
+    try {
+        cv::destroyWindow(MOSAIC_TITLE);
+    } catch (std::exception& e) {
+        //
+    }
+
     cv::resize(render1, render2, render2.size(), cv::INTER_LINEAR);
     cv::imshow(MOSAIC_TITLE, render2);
     tmp.release();

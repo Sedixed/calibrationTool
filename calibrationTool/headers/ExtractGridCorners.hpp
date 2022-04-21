@@ -9,6 +9,6 @@
  * extraction was successful. If not, the image is no longer active for calibration.
  * 
  * @param dataCalib pointer of Calib used to read and set its parameters.
- * @return int      0 in case of success, -1 otherwise (but should not fail).
+ * @return int      0 in case of success, -1 if the extraction failed.
  */
 int ExtractGridCorners(Calib *dataCalib);

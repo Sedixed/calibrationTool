@@ -49,17 +49,31 @@ int ExtractGridCorners(Calib *dataCalib) {
         allCorners3D.push_back(corners3D);
         std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);
         cv::imshow(title, src);
-        // Wait for any key input
-        while(cv::waitKey(1) == -1);
-        cv::destroyWindow(title);
         src.release();
+        // Wait for any key input or for user to close image himself.
+        // If the user closes the image, followings won't be displayed
+        // and he will not be able to perform calibration.
+        while (1) {
+            if (cv::waitKey(1) != -1) {
+                break;
+            };
+            if (cv::getWindowProperty(title, cv::WND_PROP_AUTOSIZE) == -1) {
+                wxMessageBox("All corners weren't extracted properly : you won't be able to perform calibration.",
+                "Corners extraction", wxICON_ERROR);
+                return -1;
+            }
+        }
+        // try/catch not necessary : if we reached this part, the window
+        // is active
+        cv::destroyWindow(title);
     }
 
     int result = wxMessageBox("Was the extraction successful ?", "Corners extraction", wxYES_NO | wxICON_QUESTION);
         if (result == wxYES) {
             // Saving corners positions in 2D and 3D
             for (int i = 0; i < allCorners.size(); ++i) {
-                std::vector<cv::Point2f> corners = allCorners.at(i);
+                dataCalib->IOcalib[i].active_image = true;
+                std::vector<cv::Point2f> corners = allCorners.at(i);               
                 std::vector<cv::Point3f> corners3D = allCorners3D.at(i);
                 dataCalib->IOcalib[i].CornersCoord2D = corners;
                 dataCalib->IOcalib[i].CornersCoord3D = corners3D;
@@ -68,6 +82,7 @@ int ExtractGridCorners(Calib *dataCalib) {
             for (int i = 0; i < allCorners.size(); ++i) {
                 dataCalib->IOcalib[i].active_image = false;
             }
+            return -1;
         }
         /*
         for (int i = 1; i <= dataCalib->nb_images; ++i) {

@@ -60,5 +60,6 @@ typedef struct calib {
 	Preferences pref;					// Preferences
 	cv::Mat intrinsics;					// Intrinsics parameters of the sensor
 	cv::Mat distCoeffs;					// Distorsion coefficients
+	double Xi;							// CMei's model coefficient, spherical only
 	double error;						// Mean error after calibration (px)
 } Calib;
