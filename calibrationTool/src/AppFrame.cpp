@@ -3,6 +3,7 @@
 #include "../headers/LoadImages.hpp"
 #include "../headers/ExtractGridCorners.hpp"
 #include "../headers/PreferencesPerspective.hpp"
+#include "../headers/PreferencesSpherical.hpp"
 #include "../headers/Calibration.hpp"
 #include "../headers/ComputeViewsError.hpp"
 #include "../headers/Save.hpp"
@@ -98,6 +99,12 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     // IDEE
     // Ajouter btn pour fermer toutes les images opencv ouvertes
+
+
+    // FAIT
+    // remplacer try catch par if windowgetproperty
+
+
     
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
@@ -239,8 +246,27 @@ void AppFrame::OnLoadFile(wxCommandEvent& evt) {
 
 void AppFrame::OnPreferences(wxCommandEvent& evt) {
     long style = wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX);
-    PreferencesPerspectiveFrame* frame = new PreferencesPerspectiveFrame("Preferences", wxPoint(-1, -1), wxSize(550, 710), style, &dataCalib, this);
-    frame->Show(true);
+    switch(dataCalib.type) {
+        case PERSPECTIVE_TYPE:
+        {
+            PreferencesPerspectiveFrame* frame = new PreferencesPerspectiveFrame("Preferences", wxPoint(-1, -1), 
+                    wxSize(550, 710), style, &dataCalib, this);
+            frame->Show(true);
+            break;
+        }
+        case SPHERICAL_TYPE:
+        {
+            PreferencesSphericalFrame* frame = new PreferencesSphericalFrame("Preferences", wxPoint(-1, -1), 
+                    wxSize(550, 710), style, &dataCalib, this);
+            frame->Show(true);
+            break;
+        }
+        default:
+        {
+            std::cout << "Unknown type\n";
+        }
+    }
+    
 }
 
 

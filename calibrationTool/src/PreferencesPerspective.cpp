@@ -27,26 +27,26 @@ wxBEGIN_EVENT_TABLE(PreferencesPerspectiveFrame, wxFrame)
     EVT_BUTTON(Pref::CALIB_METHOD_ID,                   PreferencesPerspectiveFrame::ToggleROMode)
     EVT_COMMAND_RANGE(Pref::RENDER_MIN_ID, Pref::RENDER_MIN_ID + Pref::RENDER_NB_ID - 1,
             wxEVT_RADIOBUTTON, PreferencesPerspectiveFrame::SetLastRender)
+
     EVT_COMMAND_RANGE(Pref::SEARCH_MIN_ID, Pref::SEARCH_MIN_ID + Pref::SEARCH_NB_ID - 1,
             wxEVT_RADIOBUTTON, PreferencesPerspectiveFrame::SetLastSearch)
-    EVT_COMMAND_RANGE(Pref::ID_FOCAL, Pref::ID_K1 + NB_OF_K_PARAM - 1,
+
+    EVT_COMMAND_RANGE(Pref::Perspective::ID_FOCAL, Pref::Perspective::ID_K1 + NB_OF_K_PARAM - 1,
             wxEVT_CHECKBOX, PreferencesPerspectiveFrame::UpdateFlags)
+
     EVT_COMMAND_RANGE(GU, V0, wxEVT_TEXT, PreferencesPerspectiveFrame::SetOkState)
     EVT_COMMAND_RANGE(NB_X, SIZE_SQUARE_Y, wxEVT_TEXT, PreferencesPerspectiveFrame::SetOkState)
 wxEND_EVENT_TABLE()
 
 
 PreferencesPerspectiveFrame::PreferencesPerspectiveFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, AppFrame* parent)
-    : wxFrame(parent, 0, title, pos, size, style) {
+    : AbstractPreferences(title, pos, size, style, calib, parent) {
     
     // Setting the base values
-    dataCalib = calib;
     iFixedPoint = dataCalib->pref.fixed_point;
-    flags = dataCalib->pref.parameters_flags;
-    searchWindowSize = calib->pref.search_window_size;
-    renderWindowSize = calib->pref.render_size;
+    // peut être faire comme en dessous
     ignoreFocal = calib->intrinsics.at<double>(0, 0) > 0. || calib->intrinsics.at<double>(1, 1) > 0.;
-    ignorePoint = calib->intrinsics.at<double>(0, 2) > 0. || calib->intrinsics.at<double>(1, 2) > 0.;
+    ignorePoint = (calib->pref.parameters_flags & cv::CALIB_FIX_PRINCIPAL_POINT);
     panel = new wxPanel(this);
     CreateAndPlaceComponents();
 }
@@ -149,11 +149,6 @@ void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
 }
 
 
-void PreferencesPerspectiveFrame::OnExitCancel(wxCommandEvent& evt) {
-    Close(true);
-}
-
-
 void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     wxGridBagSizer* box = new wxGridBagSizer(10, 10);
 
@@ -167,25 +162,25 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     // Focal length
     fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Generalised focal length :"),
             wxGBPosition(0, 0), wxDefaultSpan, wxALL | wxALIGN_CENTER_VERTICAL, 8);
-    wxCheckBox* g = new wxCheckBox(parameters, Pref::ID_FOCAL, "G");
+    wxCheckBox* g = new wxCheckBox(parameters, Pref::Perspective::ID_FOCAL, "G");
     g->SetValue(!ignoreFocal);
     fgboxParameters->Add(g, wxGBPosition(0, 1), wxDefaultSpan, wxLEFT | wxTOP, 8);
 
     // Validator for focal length / principal point input
-    wxFloatingPointValidator<float> valFocal(3, NULL, wxNUM_VAL_ZERO_AS_BLANK);
-    valFocal.SetMin(0);
+    wxFloatingPointValidator<float> valParam(3, NULL, wxNUM_VAL_ZERO_AS_BLANK);
+    valParam.SetMin(0);
 
 
     wxTextCtrl *gu = new wxTextCtrl(parameters, GU, 
             ignoreFocal ? _(std::to_string(dataCalib->intrinsics.at<double>(0, 0))) : _(""), 
-            wxDefaultPosition, wxDefaultSize, 0, valFocal);
+            wxDefaultPosition, wxDefaultSize, 0, valParam);
     gu->SetHint("Gu");
     gu->Show(ignoreFocal);
     fgboxParameters->Add(gu, wxGBPosition(0, 2), wxGBSpan(1, 2), wxTOP | wxRIGHT, 8);
 
     wxTextCtrl *gv = new wxTextCtrl(parameters, GV, 
             ignoreFocal ? _(std::to_string(dataCalib->intrinsics.at<double>(1, 1))) : _(""), 
-            wxDefaultPosition, wxDefaultSize, 0, valFocal);
+            wxDefaultPosition, wxDefaultSize, 0, valParam);
     gv->SetHint("Gv");
     gv->Show(ignoreFocal);
     fgboxParameters->Add(gv, wxGBPosition(0, 4), wxGBSpan(1, 2), wxTOP | wxRIGHT, 8);
@@ -194,19 +189,19 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     // Principal point 
     fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Principal point :"),
             wxGBPosition(1, 0), wxDefaultSpan, wxLEFT | wxALIGN_CENTER_VERTICAL, 8);
-    wxCheckBox* p = new wxCheckBox(parameters, Pref::ID_POINT, "P");
+    wxCheckBox* p = new wxCheckBox(parameters, Pref::Perspective::ID_POINT, "P");
     p->SetValue(!ignorePoint);
     fgboxParameters->Add(p, wxGBPosition(1, 1), wxDefaultSpan, wxLEFT, 8);
 
     wxTextCtrl *u0 = new wxTextCtrl(parameters, U0, 
             ignorePoint ? _(std::to_string(dataCalib->intrinsics.at<double>(0, 2))) : _(""),
-            wxDefaultPosition, wxDefaultSize, 0, valFocal);
+            wxDefaultPosition, wxDefaultSize, 0, valParam);
     u0->SetHint("u0");
     u0->Show(ignorePoint);
     fgboxParameters->Add(u0, wxGBPosition(1, 2), wxGBSpan(1, 2), wxRIGHT, 8);
     wxTextCtrl *v0 = new wxTextCtrl(parameters, V0,
             ignorePoint ? _(std::to_string(dataCalib->intrinsics.at<double>(1, 2))) : _(""),
-            wxDefaultPosition, wxDefaultSize, 0, valFocal);
+            wxDefaultPosition, wxDefaultSize, 0, valParam);
     v0->SetHint("v0");
     v0->Show(ignorePoint);
     fgboxParameters->Add(v0, wxGBPosition(1, 4), wxGBSpan(1, 2), wxRIGHT, 8);
@@ -222,7 +217,7 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
                           cv::CALIB_FIX_K5};
     for (int i = 0; i < NB_OF_K_PARAM; ++i) {
         std::string label = "k" + std::to_string(i + 1);
-        wxCheckBox* k = new wxCheckBox(parameters, Pref::ID_K1 + i, label);
+        wxCheckBox* k = new wxCheckBox(parameters, Pref::Perspective::ID_K1 + i, label);
         k->SetValue(!(dataCalib->pref.parameters_flags & KFixId[i]));
         int flag = (i == 0) ? wxLEFT : 0;
         fgboxParameters->Add(k, wxGBPosition(2, (i + 1)), wxDefaultSpan, wxRIGHT | flag, 8);
@@ -349,29 +344,9 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
 }
 
 
-void PreferencesPerspectiveFrame::SetLastSearch(wxCommandEvent& evt) {
-    for (int i = 0; i < arrLength<const int>(Pref::searchSizes); ++i) {
-        if (Pref::searchId[i] == evt.GetId()) {
-            searchWindowSize = Pref::searchSizes[i];
-            break;
-        }
-    }
-}
-
-
-void PreferencesPerspectiveFrame::SetLastRender(wxCommandEvent& evt) {
-    for (int i = 0; i < arrLength<const cv::Size>(Pref::renderSizes); ++i) {
-        if (Pref::renderId[i] == evt.GetId()) {
-            renderWindowSize = Pref::renderSizes[i];
-            break;
-        }
-    }
-}
-
-
 void PreferencesPerspectiveFrame::UpdateFlags(wxCommandEvent& evt) {
     switch(evt.GetId()) {
-        case Pref::ID_FOCAL:
+        case Pref::Perspective::ID_FOCAL:
             {   
                 ignoreFocal = !ignoreFocal;
                 SetOkState(evt);
@@ -385,8 +360,8 @@ void PreferencesPerspectiveFrame::UpdateFlags(wxCommandEvent& evt) {
                 Layout();
                 break;
             }
-        case Pref::ID_POINT:
-            {
+        case Pref::Perspective::ID_POINT:
+            {   
                 ignorePoint = !ignorePoint;
                 SetOkState(evt);
                 wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
@@ -399,22 +374,22 @@ void PreferencesPerspectiveFrame::UpdateFlags(wxCommandEvent& evt) {
                 Layout();
                 break;
             }
-        case Pref::ID_K1:
+        case Pref::Perspective::ID_K1:
             flags ^= cv::CALIB_FIX_K1;
             break;
-        case Pref::ID_K2:
+        case Pref::Perspective::ID_K2:
             flags ^= cv::CALIB_FIX_K2;
             break;
-        case Pref::ID_K3:
+        case Pref::Perspective::ID_K3:
             flags ^= cv::CALIB_FIX_K3;
             break;
-        case Pref::ID_K4:
+        case Pref::Perspective::ID_K4:
             flags ^= cv::CALIB_FIX_K4;
             break;
-        case Pref::ID_K5:
+        case Pref::Perspective::ID_K5:
             flags ^= cv::CALIB_FIX_K5;
             break;
-        case Pref::ID_K6:
+        case Pref::Perspective::ID_K6:
             flags ^= cv::CALIB_FIX_K6;
             break;
         default:
@@ -458,14 +433,6 @@ void PreferencesPerspectiveFrame::ToggleROMode(wxCommandEvent& evt) {
     if (b != NULL) {
         b->SetLabel(iFixedPoint == 0 ? "Default" : "RO");
     }
-    
 }
 
 
-// --- Utils ---
-
-
-template<typename T, int size>
-int arrLength(T(&)[size]) {
-    return size;
-}

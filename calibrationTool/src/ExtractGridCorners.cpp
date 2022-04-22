@@ -63,8 +63,6 @@ int ExtractGridCorners(Calib *dataCalib) {
                 return -1;
             }
         }
-        // try/catch not necessary : if we reached this part, the window
-        // is active
         cv::destroyWindow(title);
     }
 
