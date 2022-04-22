@@ -25,17 +25,19 @@ wxBEGIN_EVENT_TABLE(PreferencesPerspectiveFrame, wxFrame)
     EVT_BUTTON(Btn::ID_EXIT_OK,                         PreferencesPerspectiveFrame::OnExitOk)
     EVT_BUTTON(Btn::ID_EXIT_CANCEL,                     PreferencesPerspectiveFrame::OnExitCancel)
     EVT_BUTTON(Pref::CALIB_METHOD_ID,                   PreferencesPerspectiveFrame::ToggleROMode)
+    EVT_COMMAND_RANGE(GU, V0, wxEVT_TEXT,               PreferencesPerspectiveFrame::SetOkState)
+    EVT_COMMAND_RANGE(NB_X, SIZE_SQUARE_Y, wxEVT_TEXT,  PreferencesPerspectiveFrame::SetOkState)
+
     EVT_COMMAND_RANGE(Pref::RENDER_MIN_ID, Pref::RENDER_MIN_ID + Pref::RENDER_NB_ID - 1,
-            wxEVT_RADIOBUTTON, PreferencesPerspectiveFrame::SetLastRender)
+        wxEVT_RADIOBUTTON, PreferencesPerspectiveFrame::SetLastRender)
 
     EVT_COMMAND_RANGE(Pref::SEARCH_MIN_ID, Pref::SEARCH_MIN_ID + Pref::SEARCH_NB_ID - 1,
-            wxEVT_RADIOBUTTON, PreferencesPerspectiveFrame::SetLastSearch)
+        wxEVT_RADIOBUTTON, PreferencesPerspectiveFrame::SetLastSearch)
 
     EVT_COMMAND_RANGE(Pref::Perspective::ID_FOCAL, Pref::Perspective::ID_K1 + NB_OF_K_PARAM - 1,
-            wxEVT_CHECKBOX, PreferencesPerspectiveFrame::UpdateFlags)
+        wxEVT_CHECKBOX, PreferencesPerspectiveFrame::UpdateFlags)
 
-    EVT_COMMAND_RANGE(GU, V0, wxEVT_TEXT, PreferencesPerspectiveFrame::SetOkState)
-    EVT_COMMAND_RANGE(NB_X, SIZE_SQUARE_Y, wxEVT_TEXT, PreferencesPerspectiveFrame::SetOkState)
+    
 wxEND_EVENT_TABLE()
 
 
@@ -44,9 +46,6 @@ PreferencesPerspectiveFrame::PreferencesPerspectiveFrame(const wxString& title, 
     
     // Setting the base values
     iFixedPoint = dataCalib->pref.fixed_point;
-    // peut être faire comme en dessous
-    ignoreFocal = calib->intrinsics.at<double>(0, 0) > 0. || calib->intrinsics.at<double>(1, 1) > 0.;
-    ignorePoint = (calib->pref.parameters_flags & cv::CALIB_FIX_PRINCIPAL_POINT);
     panel = new wxPanel(this);
     CreateAndPlaceComponents();
 }
@@ -58,29 +57,33 @@ void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
     double m;
     // Number of squares along X
     wxString text = nbX->GetValue();
-    if (!text.ToLong(&n)) {
-        wxMessageBox("Couldn't save number of squares along X.", "Preferences saving", wxOK);
+    if (!text.ToLong(&n) || n <= 3) {
+        wxMessageBox("Invalid number of squares along X.", "Preferences saving", wxICON_ERROR);
+        return;
     }
     dataCalib->calibPattern.nbSquareX = (int) n;
 
     // Number of squares along Y
     text = nbY->GetValue();
-    if (!text.ToLong(&n)) {
-        wxMessageBox("Couldn't save number of squares along Y.", "Preferences saving", wxOK);
+    if (!text.ToLong(&n) || n <= 3) {
+        wxMessageBox("Invalid number of squares along Y.", "Preferences saving", wxICON_ERROR);
+        return;
     }
     dataCalib->calibPattern.nbSquareY = (int) n;
 
     // Size of each square along X
     text = sizeX->GetValue();
     if (!text.ToDouble(&m)) {
-        wxMessageBox("Couldn't save size of each square along X.", "Preferences saving", wxOK);
+        wxMessageBox("Invalid size of each square along X.", "Preferences saving", wxICON_ERROR);
+        return;
     }
     dataCalib->calibPattern.sizeSquareX = m;
 
     // Size of each square along Y
     text = sizeY->GetValue();
     if (!text.ToDouble(&m)) {
-        wxMessageBox("Couldn't save size of each square along Y.", "Preferences saving", wxOK);
+        wxMessageBox("Invalid size of each square along Y.", "Preferences saving", wxICON_ERROR);
+        return;
     }
     dataCalib->calibPattern.sizeSquareY = m;
 
@@ -97,11 +100,13 @@ void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
         wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
         double fx;
         if (!gu->GetLineText(0).ToDouble(&fx)) {
-            wxMessageBox("Couldn't save Gu.", "Preferences saving", wxOK);
+            wxMessageBox("Couldn't save Gu.", "Preferences saving", wxICON_ERROR);
+            return;
         }
         double fy;
         if (!gv->GetLineText(0).ToDouble(&fy)) {
-            wxMessageBox("Couldn't save Gv.", "Preferences saving", wxOK);
+            wxMessageBox("Couldn't save Gv.", "Preferences saving", wxICON_ERROR);
+            return;
         }
         dataCalib->intrinsics.at<double>(0, 0) = fx;
         dataCalib->intrinsics.at<double>(1, 1) = fy;
@@ -118,11 +123,13 @@ void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
         wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
         double cx;
         if (!u0->GetLineText(0).ToDouble(&cx)) {
-            wxMessageBox("Couldn't save u0.", "Preferences saving", wxOK);
+            wxMessageBox("Couldn't save u0.", "Preferences saving", wxICON_ERROR);
+            return;
         }
         double cy;
         if (!v0->GetLineText(0).ToDouble(&cy)) {
-            wxMessageBox("Couldn't save v0.", "Preferences saving", wxOK);
+            wxMessageBox("Couldn't save v0.", "Preferences saving", wxICON_ERROR);
+            return;
         }
 
         dataCalib->intrinsics.at<double>(0, 2) = cx;
@@ -229,10 +236,6 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     std::string label = (iFixedPoint == 0) ? "Default" : "RO";
     wxButton* tgb = new wxButton(parameters, Pref::CALIB_METHOD_ID, _(label));
     fgboxParameters->Add(tgb, wxGBPosition(3, 1), wxGBSpan(1, 2), wxSHAPED | wxLEFT | wxBOTTOM, 8);
-    // More spacing below if needed
-    if (!ignoreFocal && !ignorePoint) {
-        fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, ""), wxGBPosition(4, 0), wxDefaultSpan, wxALL, 0);
-    }
 
     fgboxParameters->SetSizeHints(parameters);
     parameters->SetSizer(fgboxParameters);
@@ -289,8 +292,8 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     wxFloatingPointValidator<float> valFloat(2, NULL, wxNUM_VAL_ZERO_AS_BLANK);
     valFloat.SetRange(0, 100);
 
-    wxIntegerValidator<int> valInt(NULL);
-    valInt.SetRange(0, 100);
+    wxIntegerValidator<int> valInt(NULL, wxNUM_VAL_ZERO_AS_BLANK);
+    valInt.SetRange(1, 100);
 
     wxPanel* properties = new wxPanel(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_THEME);
     box->Add(new wxStaticText(panel, Pref::ID_CALIB_PROPERTIES, Pref::labels[Pref::ID_CALIB_PROPERTIES]),
@@ -354,10 +357,8 @@ void PreferencesPerspectiveFrame::UpdateFlags(wxCommandEvent& evt) {
                 gu->Show(ignoreFocal);
                 wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
                 gv->Show(ignoreFocal);
-                fgboxParameters->Layout();
-                parameters->Layout();
+                fgboxParameters->SetSizeHints(parameters);
                 panel->Layout();
-                Layout();
                 break;
             }
         case Pref::Perspective::ID_POINT:
@@ -368,10 +369,8 @@ void PreferencesPerspectiveFrame::UpdateFlags(wxCommandEvent& evt) {
                 u0->Show(ignorePoint);
                 wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
                 v0->Show(ignorePoint);
-                fgboxParameters->Layout();
-                parameters->Layout();
+                fgboxParameters->SetSizeHints(parameters);
                 panel->Layout();
-                Layout();
                 break;
             }
         case Pref::Perspective::ID_K1:
@@ -403,7 +402,7 @@ void PreferencesPerspectiveFrame::SetOkState(wxCommandEvent& evt) {
     if (ignorePoint) {
         wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
         wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
-        if (u0->GetLineText(0).Len() == 0 || v0->GetLineText(0).Len() == 0) {
+        if (u0->GetLineLength(0) == 0 || v0->GetLineLength(0) == 0) {
             b->Enable(false);
             return;
         }
@@ -411,16 +410,17 @@ void PreferencesPerspectiveFrame::SetOkState(wxCommandEvent& evt) {
     if (ignoreFocal) {
         wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
         wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
-        if (gu->GetLineText(0).Len() == 0 || gv->GetLineText(0).Len() == 0) {
+        if (gu->GetLineLength(0) == 0 || gv->GetLineLength(0) == 0) {
             b->Enable(false);
             return;
         }
     }
-    if (nbX->GetLineText(0).Len() == 0 || nbY->GetLineText(0).Len() == 0 ||
-        sizeX->GetLineText(0).Len() == 0 || sizeY->GetLineText(0).Len() == 0) {
+    if (nbX->GetLineLength(0) == 0 || nbY->GetLineLength(0) == 0 ||
+        sizeX->GetLineLength(0) == 0 || sizeY->GetLineLength(0) == 0) {
         b->Enable(false);
             return;
     }
+
     if (!b->IsEnabled()) {
         b->Enable(true);
     }

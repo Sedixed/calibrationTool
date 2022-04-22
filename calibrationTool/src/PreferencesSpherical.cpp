@@ -1,6 +1,7 @@
 #include "../headers/PreferencesSpherical.hpp"
 #include "../headers/ButtonsUtils.hpp"
 #include <opencv2/opencv.hpp>
+#include <opencv2/ccalib/omnidir.hpp>
 #include <wx/valnum.h>
 
 
@@ -26,6 +27,17 @@
 wxBEGIN_EVENT_TABLE(PreferencesSphericalFrame, wxFrame)
     EVT_BUTTON(Btn::ID_EXIT_OK,                         PreferencesSphericalFrame::OnExitOk)
     EVT_BUTTON(Btn::ID_EXIT_CANCEL,                     PreferencesSphericalFrame::OnExitCancel)
+    EVT_COMMAND_RANGE(GU, XI, wxEVT_TEXT,               PreferencesSphericalFrame::SetOkState)
+    EVT_COMMAND_RANGE(NB_X, SIZE_SQUARE_Y, wxEVT_TEXT,  PreferencesSphericalFrame::SetOkState)
+
+    EVT_COMMAND_RANGE(Pref::RENDER_MIN_ID, Pref::RENDER_MIN_ID + Pref::RENDER_NB_ID - 1,
+        wxEVT_RADIOBUTTON, PreferencesSphericalFrame::SetLastRender)
+
+    EVT_COMMAND_RANGE(Pref::SEARCH_MIN_ID, Pref::SEARCH_MIN_ID + Pref::SEARCH_NB_ID - 1,
+        wxEVT_RADIOBUTTON, PreferencesSphericalFrame::SetLastSearch)
+
+    EVT_COMMAND_RANGE(Pref::Spherical::ID_FOCAL, Pref::Spherical::ID_K1 + NB_OF_K_PARAM - 1,
+        wxEVT_CHECKBOX, PreferencesSphericalFrame::UpdateFlags)
 wxEND_EVENT_TABLE()
 
 
@@ -33,14 +45,143 @@ PreferencesSphericalFrame::PreferencesSphericalFrame(const wxString& title, cons
     : AbstractPreferences(title, pos, size, style, calib, parent) {
     
     // Setting the base values
-    ignoreSkew = dataCalib->intrinsics.at<double>(0, 1) > 0;
-
+    ignoreSkew = (flags & cv::omnidir::CALIB_FIX_SKEW);
+    ignoreXi = (flags & cv::omnidir::CALIB_FIX_XI);
     panel = new wxPanel(this);
     CreateAndPlaceComponents();
 }
 
 
 void PreferencesSphericalFrame::OnExitOk(wxCommandEvent& evt) {
+    // Saving
+    long n;
+    double m;
+    // Number of squares along X
+    wxString text = nbX->GetValue();
+    if (!text.ToLong(&n) || n <= 3) {
+        wxMessageBox("Invalid number of squares along X.", "Preferences saving", wxICON_ERROR);
+        return;
+    }
+    dataCalib->calibPattern.nbSquareX = (int) n;
+
+    // Number of squares along Y
+    text = nbY->GetValue();
+    if (!text.ToLong(&n) || n <= 3) {
+        wxMessageBox("Invalid number of squares along Y.", "Preferences saving", wxICON_ERROR);
+        return;
+    }
+    dataCalib->calibPattern.nbSquareY = (int) n;
+
+    // Size of each square along X
+    text = sizeX->GetValue();
+    if (!text.ToDouble(&m)) {
+        wxMessageBox("Invalid size of each square along X.", "Preferences saving", wxICON_ERROR);
+        return;
+    }
+    dataCalib->calibPattern.sizeSquareX = m;
+
+    // Size of each square along Y
+    text = sizeY->GetValue();
+    if (!text.ToDouble(&m)) {
+        wxMessageBox("Invalid size of each square along Y.", "Preferences saving", wxICON_ERROR);
+        return;
+    }
+    dataCalib->calibPattern.sizeSquareY = m;
+
+    dataCalib->pref.render_size = renderWindowSize;
+    dataCalib->pref.search_window_size = searchWindowSize;
+
+    // Saving user defined intrinsics parameters if provided
+
+    // Focal Length
+    if (ignoreFocal) {
+        flags |= cv::CALIB_FIX_FOCAL_LENGTH;
+        wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
+        wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
+        double fx;
+        if (!gu->GetLineText(0).ToDouble(&fx)) {
+            wxMessageBox("Couldn't save Gu.", "Preferences saving", wxICON_ERROR);
+            return;
+        }
+        double fy;
+        if (!gv->GetLineText(0).ToDouble(&fy)) {
+            wxMessageBox("Couldn't save Gv.", "Preferences saving", wxICON_ERROR);
+            return;
+        }
+        dataCalib->intrinsics.at<double>(0, 0) = fx;
+        dataCalib->intrinsics.at<double>(1, 1) = fy;
+    } else {
+        flags &= ~(cv::CALIB_FIX_FOCAL_LENGTH);
+        dataCalib->intrinsics.at<double>(0, 0) = 0.0;
+        dataCalib->intrinsics.at<double>(1, 1) = 0.0;
+    }
+
+    // Principal point
+    if (ignorePoint) {
+        flags |= cv::CALIB_FIX_PRINCIPAL_POINT;
+        wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
+        wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
+        double cx;
+        if (!u0->GetLineText(0).ToDouble(&cx)) {
+            wxMessageBox("Couldn't save u0.", "Preferences saving", wxICON_ERROR);
+            return;
+        }
+        double cy;
+        if (!v0->GetLineText(0).ToDouble(&cy)) {
+            wxMessageBox("Couldn't save v0.", "Preferences saving", wxICON_ERROR);
+            return;
+        }
+        dataCalib->intrinsics.at<double>(0, 2) = cx;
+        dataCalib->intrinsics.at<double>(1, 2) = cy;
+    } else {
+        // Center of the image
+        cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
+        flags &= ~(cv::CALIB_FIX_PRINCIPAL_POINT);
+        dataCalib->intrinsics.at<double>(0, 2) = img.size().width / 2;
+        dataCalib->intrinsics.at<double>(1, 2) = img.size().height / 2;
+        img.release();
+    }
+
+    if (ignoreSkew) {
+        flags |= cv::omnidir::CALIB_FIX_SKEW;
+        wxTextCtrl *skew = (wxTextCtrl*) FindWindowById(A);
+        double a;
+        if (!skew->GetLineText(0).ToDouble(&a)) {
+            wxMessageBox("Couldn't save a.", "Preferences saving", wxICON_ERROR);
+            return;
+        }
+        dataCalib->intrinsics.at<double>(0, 1) = a;
+    } else {
+        flags &= ~(cv::omnidir::CALIB_FIX_SKEW);
+        dataCalib->intrinsics.at<double>(0, 1) = 0;
+    }
+
+    if (ignoreXi) {
+        flags |= cv::omnidir::CALIB_FIX_XI;
+        wxTextCtrl *xiText = (wxTextCtrl*) FindWindowById(XI);
+        double xi;
+        if (!xiText->GetLineText(0).ToDouble(&xi)) {
+            wxMessageBox("Couldn't save Xi.", "Preferences saving", wxICON_ERROR);
+            return;
+        }
+        dataCalib->Xi = xi;
+    } else {
+        flags &= ~(cv::omnidir::CALIB_FIX_XI);
+    }
+
+
+    // Calibration flags
+    // maybe un &&, peut être contraindre de fixer les 2 ou 0
+    if (ignorePoint || ignoreFocal) {
+        // eq. to cv::omnidir::CALIB_USE_GUESS
+        flags |= cv::CALIB_USE_INTRINSIC_GUESS;
+    } else {
+        flags &= ~(cv::CALIB_USE_INTRINSIC_GUESS);
+    }
+    
+
+    dataCalib->pref.parameters_flags = flags;
+    Close(true);
 }
 
 
@@ -121,15 +262,15 @@ void PreferencesSphericalFrame::CreateAndPlaceComponents() {
     xi->SetValue(!ignoreXi);
     fgboxParameters->Add(xi, wxGBPosition(3, 1), wxDefaultSpan, wxLEFT, 8);
     wxTextCtrl* xiText = new wxTextCtrl(parameters, XI, 
-            ignoreXi ? _("??") : _(""),
+            ignoreXi ? _(std::to_string(dataCalib->Xi)) : _(""),
             wxDefaultPosition, wxDefaultSize, 0, valParam);
     xiText->SetHint("Xi");
-    xiText->Show(ignoreSkew);
+    xiText->Show(ignoreXi);
     fgboxParameters->Add(xiText, wxGBPosition(3, 2), wxGBSpan(1, 2), wxRIGHT, 8);
 
     // Distorsions
     fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Distorsions :"),
-            wxGBPosition(4, 0), wxDefaultSpan, wxLEFT | wxALIGN_CENTER_VERTICAL, 8);
+            wxGBPosition(4, 0), wxDefaultSpan, wxLEFT | wxALIGN_CENTER_VERTICAL | wxBOTTOM, 8);
     
     const int KFixId[] = {cv::CALIB_FIX_K1,
                           cv::CALIB_FIX_K2,
@@ -141,7 +282,7 @@ void PreferencesSphericalFrame::CreateAndPlaceComponents() {
         wxCheckBox* k = new wxCheckBox(parameters, Pref::Spherical::ID_K1 + i, label);
         k->SetValue(!(dataCalib->pref.parameters_flags & KFixId[i]));
         int flag = (i == 0) ? wxLEFT : 0;
-        fgboxParameters->Add(k, wxGBPosition(4, (i + 1)), wxDefaultSpan, wxRIGHT | flag, 8);
+        fgboxParameters->Add(k, wxGBPosition(4, (i + 1)), wxDefaultSpan, wxRIGHT | flag | wxBOTTOM, 8);
     }
 
     fgboxParameters->SetSizeHints(parameters);
@@ -199,8 +340,8 @@ void PreferencesSphericalFrame::CreateAndPlaceComponents() {
     wxFloatingPointValidator<float> valFloat(2, NULL, wxNUM_VAL_ZERO_AS_BLANK);
     valFloat.SetRange(0, 100);
 
-    wxIntegerValidator<int> valInt(NULL);
-    valInt.SetRange(0, 100);
+    wxIntegerValidator<int> valInt(NULL, wxNUM_VAL_ZERO_AS_BLANK);
+    valInt.SetRange(1, 100);
 
     wxPanel* properties = new wxPanel(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_THEME);
     box->Add(new wxStaticText(panel, Pref::ID_CALIB_PROPERTIES, Pref::labels[Pref::ID_CALIB_PROPERTIES]),
@@ -255,9 +396,119 @@ void PreferencesSphericalFrame::CreateAndPlaceComponents() {
 
 
 void PreferencesSphericalFrame::UpdateFlags(wxCommandEvent& evt) {
+    switch(evt.GetId()) {
+        case Pref::Spherical::ID_FOCAL:
+        {   
+            ignoreFocal = !ignoreFocal;
+            SetOkState(evt);
+            wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
+            gu->Show(ignoreFocal);
+            wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
+            gv->Show(ignoreFocal);
+            fgboxParameters->SetSizeHints(parameters);
+            panel->Layout();
+            break;
+        }
+        case Pref::Spherical::ID_POINT:
+        {   
+            ignorePoint = !ignorePoint;
+            SetOkState(evt);
+            wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
+            u0->Show(ignorePoint);
+            wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
+            v0->Show(ignorePoint);
+            fgboxParameters->SetSizeHints(parameters);
+            panel->Layout();
+            break;
+        }
+        case Pref::Spherical::ID_SKEW:
+        {
+            ignoreSkew = !ignoreSkew;
+            SetOkState(evt);
+            wxTextCtrl* skew = (wxTextCtrl*) FindWindowById(A);
+            skew->Show(ignoreSkew);
+            fgboxParameters->SetSizeHints(parameters);
+            panel->Layout();
+            break;
+        }
+        case Pref::Spherical::ID_XI:
+        {
+            ignoreXi = !ignoreXi;
+            SetOkState(evt);
+            wxTextCtrl* xi = (wxTextCtrl*) FindWindowById(XI);
+            xi->Show(ignoreXi);
+            fgboxParameters->SetSizeHints(parameters);
+            panel->Layout();
+            break;
+        }
+        case Pref::Spherical::ID_K1:
+            flags ^= cv::CALIB_FIX_K1;
+            break;
+        case Pref::Spherical::ID_K2:
+            flags ^= cv::CALIB_FIX_K2;
+            break;
+        case Pref::Spherical::ID_K3:
+            flags ^= cv::CALIB_FIX_K3;
+            break;
+        case Pref::Spherical::ID_K4:
+            flags ^= cv::CALIB_FIX_K4;
+            break;
+        case Pref::Spherical::ID_K5:
+            flags ^= cv::CALIB_FIX_K5;
+            break;
+        case Pref::Spherical::ID_K6:
+            flags ^= cv::CALIB_FIX_K6;
+            break;
+        default:
+            break;
+
+    }
+    
 }
 
 
 void PreferencesSphericalFrame::SetOkState(wxCommandEvent& evt) {
+     wxButton *b = (wxButton*) FindWindowById(Btn::ID_EXIT_OK);
+    if (ignorePoint) {
+        wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
+        wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
+        if (u0->GetLineLength(0) == 0 || v0->GetLineLength(0) == 0) {
+            b->Enable(false);
+            return;
+        }
+    }
+    if (ignoreFocal) {
+        wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
+        wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
+        if (gu->GetLineLength(0) == 0 || gv->GetLineLength(0) == 0) {
+            b->Enable(false);
+            return;
+        }
+    }
 
+    if (ignoreSkew) {
+        wxTextCtrl* skew = (wxTextCtrl*) FindWindowById(A);
+        if (skew->GetLineText(0).Len() == 0) {
+            b->Enable(false);
+            return;
+        }
+    }
+
+    if (ignoreXi) {
+        wxTextCtrl* xi = (wxTextCtrl*) FindWindowById(XI);
+        if (xi->GetLineText(0).Len() == 0) {
+            b->Enable(false);
+            return;
+        }
+    }  
+
+    if (nbX->GetLineLength(0) == 0 || nbY->GetLineLength(0) == 0 ||
+        sizeX->GetLineLength(0) == 0 || sizeY->GetLineLength(0) == 0) {
+        b->Enable(false);
+            return;
+    }
+
+    if (!b->IsEnabled()) {
+        b->Enable(true);
+    }
 }

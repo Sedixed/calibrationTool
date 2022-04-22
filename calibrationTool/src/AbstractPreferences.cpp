@@ -7,6 +7,8 @@ AbstractPreferences::AbstractPreferences(const wxString& title, const wxPoint& p
     flags = dataCalib->pref.parameters_flags;
     searchWindowSize = calib->pref.search_window_size;
     renderWindowSize = calib->pref.render_size;
+    ignoreFocal = (flags & cv::CALIB_FIX_FOCAL_LENGTH);
+    ignorePoint = (flags & cv::CALIB_FIX_PRINCIPAL_POINT);
 
 }
 

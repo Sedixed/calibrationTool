@@ -83,17 +83,10 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     //  EN COURS
     // adapter pour windows à un moment
     // installé mais linkage marche pas
-
-    // commencé spherical : calib fix (pas de pb de taille de matrice mais de findchessboard,
-    //      flag cb_fast à désactiver -> donne un résultat
-    //      pas besoin de redimensionner en passant par des vecs chelou
-
-    // amélioration des boutons -> setButtonsState et gestion du cas ou on enchaine les calib
-    //  et erreurs de calib (pas tous les coins détectés etc, pas même taille 2d et 3d,
-    //  voir calibration et extractgrid  (active_image sert en fin de compte))
-    // amélioration de extractgrid : vérif que tout a été fait jusqu'au bout sinon fail (msg erreur)
-
-    // AJOUTER LA STRUCTURE MIRROR POUR OMNIDIR (peut-être) double Xi atm, voir si besoin de mirror
+    // voir param de calibrage pour omni (pas sûr pour les distorsions surtout)
+    // revoir utilité de render size (car défini après affichage de la mosaïque..)
+    // rendre préférences accessible direct mais pouvoir modifier que ça au début ?
+    // factoriser code des pref dans la superclasse ? -> utilise un appel à super pour la partie en commun
 
 
 
@@ -103,7 +96,12 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     // FAIT
     // remplacer try catch par if windowgetproperty
-
+    // fix des pref : possibilité de bypass et d'avoir des dimensions trop petites pour findchessboard
+    // mtn -> au moins 4x4
+    // +- fini fenêtre de préférences omni
+    // fix pb d'entrée de valeur : si incorrect, met un msg d'erreur approprié et empêche de passer à la suite
+    // amélioration du système de redimensionnement pour les params dans les prefs
+    // via fgboxparameters->Setsizehints(parameters) puis layout sur panel
 
     
     panel = new wxPanel(this);
@@ -181,6 +179,7 @@ void AppFrame::OnLoadImages(wxCommandEvent& evt) {
 
 
 void AppFrame::OnExtractGridCorners(wxCommandEvent& evt) {
+    try {
     int r = ExtractGridCorners(&dataCalib);
     if (r == 0) {
         setButtonsState(std::vector<Btn::ButtonsId> {
@@ -194,7 +193,9 @@ void AppFrame::OnExtractGridCorners(wxCommandEvent& evt) {
             Btn::ID_SAVE}, false
         );
     }
-
+    } catch (std::exception& e) {
+        std::cout << e.what() << std::endl;
+    }
 }
 
 
@@ -257,7 +258,7 @@ void AppFrame::OnPreferences(wxCommandEvent& evt) {
         case SPHERICAL_TYPE:
         {
             PreferencesSphericalFrame* frame = new PreferencesSphericalFrame("Preferences", wxPoint(-1, -1), 
-                    wxSize(550, 710), style, &dataCalib, this);
+                    wxSize(550, 750), style, &dataCalib, this);
             frame->Show(true);
             break;
         }

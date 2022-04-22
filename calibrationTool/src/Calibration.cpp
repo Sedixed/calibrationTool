@@ -105,7 +105,8 @@ int Calibration(Calib* dataCalib) {
         // ----------------------------------
         case SPHERICAL_TYPE:
         {   
-            cv::Mat Xi;
+            cv::Mat Xi(1, 1, CV_64F);
+            Xi.at<double>(0, 0) = dataCalib->Xi;
             cv::TermCriteria crit(cv::TermCriteria::COUNT + cv::TermCriteria::EPS, 300, 0.0001);
 
             // Calibration
