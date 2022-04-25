@@ -31,6 +31,8 @@ class AppFrame : public wxFrame {
     wxPanel *panel;
     // Calib structure associated to the running instance of the program using this frame
     Calib dataCalib;
+    // True if the error per view has been calculated through "Calibration results"
+    bool perViewErrorCalculated;
 
     public:
         AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style);

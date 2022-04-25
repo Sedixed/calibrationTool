@@ -5,7 +5,8 @@
 #include "../headers/PreferencesPerspective.hpp"
 #include "../headers/PreferencesSpherical.hpp"
 #include "../headers/Calibration.hpp"
-#include "../headers/ComputeViewsError.hpp"
+#include "../headers/ShowReprojection.hpp"
+#include "../headers/CalibrationResults.hpp"
 #include "../headers/Save.hpp"
 #include "../headers/LoadFile.hpp"
 #include <iostream>
@@ -62,29 +63,21 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     
     SetDefaultPreferences();
 
-    // UPDATE
-    // On a le choix entre un vecteur dans calibrateCameraRO et les reprojections via projectCorners
-    //  pour obtenir les erreurs par image : lequel est le meilleur ? jsp
-    // si celui de la fonction, revoir tout le code de computeviewserror
-    // De même, on a le choix entre les coordonnées brutes en 3D et celles recalculées par RO (pareil)
-
-
-
     // A VOIR
     // peut être supprimer le active_image (refaire toutes les images donc, à voir)
+    //on a le choix entre les coordonnées brutes en 3D et celles recalculées par RO (pareil)
 
 
 
     // EN COURS
-    // pb du flac CALIB_USE_INTRINSIC_GUESS : si point défini par user mais pas la focal length, problème
     // on peut pas fix focal length pour omnidir
-
 
 
     //  EN COURS
     // adapter pour windows à un moment
     // installé mais linkage marche pas
     // voir param de calibrage pour omni (pas sûr pour les distorsions surtout)
+    // peut être factoriser le code de showreproj (si y'a un truc finally pour les switch mais pas sûr)
 
 
 
@@ -98,9 +91,15 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // rendre préférences accessible direct mais pouvoir modifier que ça au début -> renders_size pas inutile :D
     // Enlevé l'input pour principal point : soit à calculer, soit centre de l'image -> plus de pb avec intrinsic_guess
     //  c'est commenté donc si besoin de remettre ça se fait
+    // fix affichage des images dans show reproj
+    // ajout de errorperview dans spherical -> retrait du recompute pour perspective car géré par opencv (en fait c'est == )
+    // séparation de compute en calibresults et showreproj
+    // ajout de l'attribut pererrorviewcalculated dans appframe, sert pour ces 2 là
+
+    // si case pas décochée avant calib, pas décochée après -> plus cohérent
 
 
-    
+    perViewErrorCalculated = false;
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
     placeButtons(BASE_SPACING);
@@ -162,6 +161,7 @@ void AppFrame::OnLoadImages(wxCommandEvent& evt) {
             Btn::ID_EXTRACT_GRID_CORNERS,
             Btn::ID_PREFERENCES}, true
         );
+        perViewErrorCalculated = false;
         // In case it is not the first calibration during execution
         setButtonsState(std::vector<Btn::ButtonsId> {
             Btn::ID_CALIB, 
@@ -201,21 +201,28 @@ void AppFrame::OnCalibration(wxCommandEvent& evt) {
             Btn::ID_SHOW_CORNERS_PROJ,
             Btn::ID_CALIB_RESULTS}, true
         );
+        if (dataCalib.type == PERSPECTIVE_TYPE) {
+            perViewErrorCalculated = true;
+        }
     }
 }
 
 
 void AppFrame::OnShowReprojection(wxCommandEvent& evt) {
-    ComputeViewsError(&dataCalib, this, 1);
+    int r = ShowReprojection(&dataCalib, this, perViewErrorCalculated);
+    if (r == 0) {
+        perViewErrorCalculated = true;
+    }
 }
 
 
 void AppFrame::OnCalibResults(wxCommandEvent& evt) {
-    int r = ComputeViewsError(&dataCalib);
+    int r = CalibrationResults(&dataCalib, perViewErrorCalculated);
     if (r == 0) {
         setButtonsState(std::vector<Btn::ButtonsId> {
             Btn::ID_SAVE}, true
         );
+        perViewErrorCalculated = true;
     }
 }
 
@@ -236,6 +243,7 @@ void AppFrame::OnLoadFile(wxCommandEvent& evt) {
             Btn::ID_SAVE,
             Btn::ID_PREFERENCES}, true
         );
+        perViewErrorCalculated = true;
     }
 }
 

@@ -9,18 +9,19 @@ OBJ_DIR = obj
 SRCS = $(SRC_DIR)/ButtonsUtils.cpp $(SRC_DIR)/AppFrame.cpp $(SRC_DIR)/App.cpp $(SRC_DIR)/LoadImages.cpp \
 	$(SRC_DIR)/Mosaic.cpp $(SRC_DIR)/ExtractGridCorners.cpp $(SRC_DIR)/PreferencesPerspective.cpp \
 	$(SRC_DIR)/Calibration.cpp $(SRC_DIR)/CornersReprojection.cpp $(SRC_DIR)/AbstractPreferences.cpp \
-	$(SRC_DIR)/PreferencesSpherical.cpp
+	$(SRC_DIR)/PreferencesSpherical.cpp $(SRC_DIR)/ShowReprojection.cpp $(SRC_DIR)/CalibrationResults.cpp
 
 # Objects to be created
 OBJS = $(OBJ_DIR)/ButtonsUtils.o $(OBJ_DIR)/AppFrame.o $(OBJ_DIR)/App.o $(OBJ_DIR)/LoadImages.o \
 	$(OBJ_DIR)/Mosaic.o $(OBJ_DIR)/ExtractGridCorners.o $(OBJ_DIR)/PreferencesPerspective.o \
 	$(OBJ_DIR)/Calibration.o $(OBJ_DIR)/ComputeViewsError.o $(OBJ_DIR)/Save.o $(OBJ_DIR)/LoadFile.o \
-	$(OBJ_DIR)/AbstractPreferences.o $(OBJ_DIR)/PreferencesSpherical.o
+	$(OBJ_DIR)/AbstractPreferences.o $(OBJ_DIR)/PreferencesSpherical.o $(OBJ_DIR)/ShowReprojection.o \
+	$(OBJ_DIR)/CalibrationResults.o
 
 # AppFrame headers required (there are a lot)
 AF_HDS = $(HD_DIR)/AppFrame.hpp $(HD_DIR)/ButtonsUtils.hpp $(HD_DIR)/LoadImages.hpp \
 	$(HD_DIR)/ExtractGridCorners.hpp $(HD_DIR)/PreferencesPerspective.hpp $(HD_DIR)/Calibration.hpp \
-	$(HD_DIR)/PreferencesSpherical.hpp
+	$(HD_DIR)/PreferencesSpherical.hpp $(HD_DIR)/ShowReprojection.hpp $(HD_DIR/CalibrationResults.hpp)
 
 LIBSWXBUILD = `wx-config --cxxflags`
 LIBSWXLINK = `wx-config --libs`

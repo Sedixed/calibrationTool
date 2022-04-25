@@ -70,6 +70,7 @@ void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
     }
 
     if (ignoreFocal) {
+        flags |= cv::CALIB_FIX_FOCAL_LENGTH;
         flags |= cv::CALIB_USE_INTRINSIC_GUESS;
         // To fix principal point
         cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
@@ -77,6 +78,7 @@ void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
         dataCalib->intrinsics.at<double>(1, 2) = img.size().height / 2;
         img.release();
     } else {
+        flags &= ~(cv::CALIB_FIX_FOCAL_LENGTH);
         flags &= ~(cv::CALIB_USE_INTRINSIC_GUESS);
     }
 

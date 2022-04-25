@@ -1,9 +1,10 @@
 #include "../headers/ComputeViewsError.hpp"
 #include <iomanip>
+#include <opencv2/ccalib/omnidir.hpp>
 
 #define IMG_NAME "Corners Reprojection :"
 
-int ComputeViewsError(Calib *dataCalib, wxWindow* parent, int show) {
+int ComputeViewsError(Calib *dataCalib, wxWindow* parent, bool show, bool perViewErrorCalculated) {
     // ---------------------------------------
     // --- Common to all calibration types ---
     // ---------------------------------------
@@ -11,9 +12,9 @@ int ComputeViewsError(Calib *dataCalib, wxWindow* parent, int show) {
     cv::Mat cameraMatrix = dataCalib->intrinsics;
     cv::Mat distCoeffs = dataCalib->distCoeffs;
 
-    // For results
-    //int totalPoints = 0;
-    //double totalErr = 0;
+    // For spherical error calculus
+    int totalPoints = 0;
+    double totalErr = 0;
 
     // Used for showing images
     cv::Size patternSize = cv::Size(dataCalib->calibPattern.nbSquareX - 1, dataCalib->calibPattern.nbSquareY - 1);
@@ -28,46 +29,66 @@ int ComputeViewsError(Calib *dataCalib, wxWindow* parent, int show) {
         std::vector<cv::Point2f> imgPointsOutput;                                  // Output 2D points
 
         switch (dataCalib->type) {
+            // ------------------------------------
+            // --- Perspective calibration case ---
+            // ------------------------------------
             case PERSPECTIVE_TYPE:
-            {
+            {   
+                cv::projectPoints(objPoints, rVec, tVec, cameraMatrix, distCoeffs, imgPointsOutput);
+
+                // Showing image if necessary
+                if (show) {
+                    double err = dataCalib->IOcalib[i].errorView;
+                    cv::Mat img = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_COLOR);
+                    cv::drawChessboardCorners(img, patternSize, cv::Mat(imgPointsOutput), true);
+                    std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);
+                    std::string errText = "View error : " + std::to_string(err);
+                    cv::putText(img, errText, cv::Point(15, img.rows - 15), cv::FONT_HERSHEY_DUPLEX, 0.8, cv::Scalar(0, 0, 255), 1, 8, false);
+                    cv::imshow(title, img);
+                    img.release();
+                    while(cv::waitKey(1) == -1);
+                    if (cv::getWindowProperty(title, cv::WND_PROP_AUTOSIZE) == -1) {
+                        return -1;
+                    }   
+                    cv::destroyWindow(title);
+                }
                 break;
             }
-
+            // ----------------------------------
+            // --- Spherical calibration case ---
+            // ----------------------------------
             case SPHERICAL_TYPE:
-            {
+            {   
+                cv::omnidir::projectPoints(objPoints, imgPointsOutput, rVec, tVec, cameraMatrix, dataCalib->Xi, dataCalib->distCoeffs);
+                
+                // Error per view calculus
+                double err = cv::norm(cv::Mat(dataCalib->IOcalib[i].CornersCoord2D), cv::Mat(imgPointsOutput), cv::NORM_L2);
+                int n = (int) objPoints.size();
+                dataCalib->IOcalib[i].errorView = (float) std::sqrt(err * err / n);
+                totalErr += err * err;
+                totalPoints += n;
+
+                // Showing image if necessary
+                if (show) {
+                    cv::Mat img = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_COLOR);
+                    cv::drawChessboardCorners(img, patternSize, cv::Mat(imgPointsOutput), true);
+                    std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);
+                    std::string errText = "View error : " + std::to_string(dataCalib->IOcalib[i].errorView);
+                    cv::putText(img, errText, cv::Point(15, img.rows - 15), cv::FONT_HERSHEY_DUPLEX, 0.8, cv::Scalar(0, 0, 255), 1, 8, false);
+                    cv::imshow(title, img);
+                    img.release();
+                    while(cv::waitKey(1) == -1);
+                    if (cv::getWindowProperty(title, cv::WND_PROP_AUTOSIZE) == -1) {
+                        return -1;
+                    }   
+                    cv::destroyWindow(title);
+                }
                 break;
             }
         }
-
-        cv::projectPoints(objPoints, rVec, tVec, cameraMatrix, distCoeffs, imgPointsOutput);
-
-        // Manual error
-        // double err = cv::norm(cv::Mat(dataCalib->IOcalib[i].CornersCoord2D), cv::Mat(imgPointsOutput), cv::NORM_L2);
-        // Auto error
-        double err = dataCalib->IOcalib[i].errorView;
-
-        // Showing image
-        if (show == 1) {
-            cv::Mat img = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_COLOR);
-            cv::drawChessboardCorners(img, patternSize, cv::Mat(imgPointsOutput), true);
-            std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);
-            std::string errText = "View error : " + std::to_string(err);
-            cv::putText(img, errText, cv::Point(15, img.rows - 15), cv::FONT_HERSHEY_DUPLEX, 0.8, cv::Scalar(0, 0, 255), 1, 8, false);
-            cv::imshow(title, img);
-            while(cv::waitKey(1) == -1);
-            cv::destroyWindow(title);
-            img.release();
-        // Saving current result
-        } else {
-            //int n = (int)objPoints.size();
-            //dataCalib->IOcalib[i].errorView = (float) std::sqrt(err * err / n);
-            //totalErr += err * err;
-            //totalPoints += n;
-        }
-        // Reprojection error
-        // std::to_string(std::sqrt(totalErr/totalPoints))
     }
-    if (show == 1) {
+
+    if (show) {
         parent->Raise();
     } else {
         // To manipulate values precision
