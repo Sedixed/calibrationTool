@@ -9,11 +9,27 @@
 #include <wx/gbsizer.h>
 
 
+// ============================================================================
+// ---- Contains PreferencesPerspectiveFrame class declaration and Pref    ----
+// ---- namespace completion. It also contains the base ID used by         ----
+// ---- checkBoxes of the frame.                                           ----
+// ============================================================================
+
+
 // Base ID for checkBoxes
 #define CHECKBOX_BASE_ID 60
 
 
-// Used for storing perspective specific constants, enums and constant arrays.
+// ============================================================================
+// ----------------------------------------------------------------------------
+// ------------------------------ Pref namespace ------------------------------
+// ----------------------------------------------------------------------------
+// @Desc : Completes the definition of the Pref namespace in the 
+//  AbstractPreferences header. It adds the followings :
+//      - an inner namespace called Perspective that contains the IDs 
+//          for the checkBoxes of the frame
+//      - the calibration method's button ID
+// ============================================================================
 namespace Pref {
 
     namespace Perspective {
@@ -35,10 +51,25 @@ namespace Pref {
     const int CALIB_METHOD_ID = 100;
 }
 
-/**
- * Class for perspective preferences frame.
- * 
- */
+// ============================================================================
+// ----------------------------------------------------------------------------
+// ------------- PreferencesPerspectiveFrame class declaration ----------------
+// ----------------------------------------------------------------------------
+// @Desc : PreferencesPerspectiveFrame is a derived class of 
+//  AbstractPreferences for setting preferences of the current perspective 
+//  calibration. It contains the definition of the abstract methods of its
+//  super class, and some methods that are proper to the perspective
+//  calibration settings.
+// ----------------------------------------------------------------------------
+// @Cons :
+//      - title  : Title of the frame
+//      - pos    : Default position of the frame on the screen
+//      - size   : Default size of the frame
+//      - style  : Flags used to define frame's behaviour
+//      - calib  : Pointer of Calib used for storing settings
+//      - parent : Pointer of AppFrame used to close the window if the
+//                   AppFrame one is closed
+// ============================================================================
 class PreferencesPerspectiveFrame : public AbstractPreferences {
     // Attributes
     private:

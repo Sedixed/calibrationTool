@@ -9,11 +9,26 @@
 #include <wx/gbsizer.h>
 
 
+// ============================================================================
+// ---- Contains PreferencesSphericalFrame class declaration and Pref      ----
+// ---- namespace completion. It also contains the base ID used by         ----
+// ---- checkBoxes of the frame.                                           ----
+// ============================================================================
+
+
 // Base ID for checkBoxes
 #define CHECKBOX_BASE_ID 60
 
 
-// Used for storing spherical specific constants, enums and constant arrays.
+// ============================================================================
+// ----------------------------------------------------------------------------
+// ------------------------------ Pref namespace ------------------------------
+// ----------------------------------------------------------------------------
+// @Desc : Completes the definition of the Pref namespace in the 
+//  AbstractPreferences header. It adds the followings :
+//      - an inner namespace called Spherical that contains the IDs 
+//          for the checkBoxes of the frame
+// ============================================================================
 namespace Pref {
 
     namespace Spherical {
@@ -35,10 +50,24 @@ namespace Pref {
 }
 
 
-/**
- * Class for spherical preferences frame.
- * 
- */
+// ============================================================================
+// ----------------------------------------------------------------------------
+// -------------- PreferencesSphericalFrame class declaration -----------------
+// ----------------------------------------------------------------------------
+// @Desc : PreferencesSphericalFrame is a derived class of 
+//  AbstractPreferences for setting preferences of the current spherical 
+//  calibration. It contains the definition of the abstract methods of its
+//  super class.
+// ----------------------------------------------------------------------------
+// @Cons :
+//      - title  : Title of the frame
+//      - pos    : Default position of the frame on the screen
+//      - size   : Default size of the frame
+//      - style  : Flags used to define frame's behaviour
+//      - calib  : Pointer of Calib used for storing settings
+//      - parent : Pointer of AppFrame used to close the window if the
+//                   AppFrame one is closed
+// ============================================================================
 class PreferencesSphericalFrame : public AbstractPreferences {
     // Attributes
     private:

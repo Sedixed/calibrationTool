@@ -6,6 +6,17 @@
 #endif
 
 
+// ============================================================================
+// ----------------------------------------------------------------------------
+// ------------------------------ Btn namespace -------------------------------
+// ----------------------------------------------------------------------------
+// @Desc : Btn namespace is used for storing buttons IDs, labels, and some
+//  utilitaries functions to retrieve one or more of these buttons.
+//  It especially contains : 
+//      - IDs of the application's buttons and their labels
+//      - Functions to retrieve a vector of buttons
+//      - Function to get a button from its ID
+// ============================================================================
 namespace Btn {
 
     // IDs of the differents buttons of the app

@@ -2,6 +2,13 @@
 
 #include "structs.hpp"
 
+
+// ============================================================================
+// ---- Contains LoadFile function, and some utilitaries functions to      ----
+// ---- translate a matrix into a vector of points.                        ----
+// ============================================================================
+
+
 /**
  * Load parameters for this calibration from a YML file, with 
  * name and location given by the user.

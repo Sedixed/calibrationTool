@@ -2,6 +2,13 @@
 
 #include "structs.hpp"
 
+
+// ============================================================================
+// ---- Contains Save function, and some utilitaries functions to          ----
+// ---- translate a vector of points into a matrix.                        ----
+// ============================================================================
+
+
 /**
  * Save the current parameters for this calibration into a YML file, with 
  * name and location given by the user.

@@ -10,6 +10,7 @@
 #include "../headers/LoadFile.hpp"
 #include <iostream>
 
+
 // Spacing between two buttons in the base menu
 #define BASE_SPACING 40
 
@@ -19,6 +20,7 @@
 // Spacing between two buttons in the spherical menu
 // à définir plus tard
 #define SPHERICAL_SPACING 30
+
 
 // Event table used by the frame.
 //  Makes each button corresponds its onclick function
@@ -95,13 +97,8 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
 
     // FAIT
-    // remplacer try catch par if windowgetproperty
-    // fix des pref : possibilité de bypass et d'avoir des dimensions trop petites pour findchessboard
-    // mtn -> au moins 4x4
     // +- fini fenêtre de préférences omni
-    // fix pb d'entrée de valeur : si incorrect, met un msg d'erreur approprié et empêche de passer à la suite
-    // amélioration du système de redimensionnement pour les params dans les prefs
-    // via fgboxparameters->Setsizehints(parameters) puis layout sur panel
+
 
     
     panel = new wxPanel(this);

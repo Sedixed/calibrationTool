@@ -9,6 +9,12 @@
 #include <wx/gbsizer.h>
 
 
+// ============================================================================
+// ---- Contains AbstractPreferences class declaration and Pref namespace. ----
+// ---- It also contains common IDs used by some widgets of the frame.     ----
+// ============================================================================
+
+
 /**
  * Calculates the number of elements of an array. 
  * 
@@ -23,8 +29,31 @@ int arrLength(T(&)[size]);
 // Base ID for search radioButtons
 #define SEARCH_BASE_ID 20
 
+// ID for commons wxTextCtrl 
+#define NB_X 1              // ID for the number of squares along x		
+#define NB_Y 2              // ID for the number of squares along y		
+#define SIZE_SQUARE_X 3     // ID for the size of a square along x (in mm) 
+#define SIZE_SQUARE_Y 4     // ID for the size of a square along y (in mm) 
+#define GU 80               // ID of the Gu wxTextCtrl
+#define GV 81               // ID of the Gv wxTextCtrl
+#define U0 82               // ID of the u0 wxTextCtrl
+#define V0 83               // ID of the v0 wxTextCtrl
 
-// Used for storing commons constants, enums and constant arrays.
+
+// ============================================================================
+// ----------------------------------------------------------------------------
+// ------------------------------ Pref namespace ------------------------------
+// ----------------------------------------------------------------------------
+// @Desc : Pref namespace is used for storing constants, enumerations 
+//  and const arrays that are used throughout preferences manipulation.
+//  In this file, only the common ones are stored as this file only contains
+//  common parameters. It especially contains :
+//      - Main labels IDs and their text values
+//      - Default values for mire properties
+//      - Search ID array and value array, default index and number of values
+//      - Render ID array and value array, default index and number of values
+//      - Default index for search and render arrays
+// ============================================================================
 namespace Pref {
 
     // IDs of the differents labels of the Perspective preferences frame
@@ -97,10 +126,25 @@ namespace Pref {
 }
 
 
-/**
- * Generic abstract class for preferences frame.
- * 
- */
+// ============================================================================
+// ----------------------------------------------------------------------------
+// ----------------- AbstractPreferences class declaration --------------------
+// ----------------------------------------------------------------------------
+// @Desc : AbstractPreferences is the abstract class used as a "generic" 
+//  frame for setting preferences of the current calibration. It contains
+//  all the common settings for calibrations, and has abstract functions
+//  for settings that may differ. However, it also contains generic functions
+//  that can be used in these abstract functions to avoid code repetition.
+// ----------------------------------------------------------------------------
+// @Cons :
+//      - title  : Title of the frame
+//      - pos    : Default position of the frame on the screen
+//      - size   : Default size of the frame
+//      - style  : Flags used to define frame's behaviour
+//      - calib  : Pointer of Calib used for storing settings
+//      - parent : Pointer of AppFrame used to close the window if the
+//                   AppFrame one is closed
+// ============================================================================
 class AbstractPreferences : public wxFrame {
     // Attributes
     protected:
@@ -122,7 +166,6 @@ class AbstractPreferences : public wxFrame {
         int flags;
         // Calib structure associated to the running instance of the program using this frame
         Calib* dataCalib;
-
         // Text controllers for Mire input
         wxTextCtrl* nbX;
         wxTextCtrl* nbY;
@@ -139,6 +182,16 @@ class AbstractPreferences : public wxFrame {
 
         // Called when a user click on the "OK" labeled button.
         virtual void OnExitOk(wxCommandEvent& evt) = 0;
+
+
+        /**
+         * Performs common instructions for a click on the "OK" labeled
+         * button. May be called within OnExitOk.
+         * It handles the saving of focal length, principal point, 
+         * mire properties, render size and search size.
+         * 
+         */
+        void GenericOnExitOk();
 
 
         /**
@@ -177,6 +230,19 @@ class AbstractPreferences : public wxFrame {
          * @param evt wxCommandEvent associated to the event.
          */
         virtual void SetOkState(wxCommandEvent& evt) = 0;
+
+
+        /**
+         * May be called within SetOkState : contains common tests
+         * for the different calibrations. It handles the focal length, the
+         * principal point and mire properties inputs, and toggles the wxButton 
+         * associated to a successful exit if necessary.
+         * 
+         * @param b    Pointer of a wxButton to toggle if necessary.
+         * @return int 0 if the button wasn't disabled, -1 otherwise.
+         * 
+         */
+        int GenericSetOkState(wxButton* b);
 
 
         /**

@@ -7,7 +7,7 @@
     #include <wx/wx.h>
 #endif
 
-// Nombre minimal d'images valides
+// Minimal amount of valid images
 #define MIN_VALID_IMAGES 3
 
 int Calibration(Calib* dataCalib) {

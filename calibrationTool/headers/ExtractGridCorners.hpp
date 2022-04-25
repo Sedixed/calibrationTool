@@ -3,6 +3,11 @@
 #include "structs.hpp"
 
 
+// ============================================================================
+// ------------------ Contains ExtractGridCorners function. -------------------
+// ============================================================================
+
+
 /**
  * Extract the grid corners from every image stored in the Calib structure.
  * For each image, displays it with the corners found highlighted and asks if the

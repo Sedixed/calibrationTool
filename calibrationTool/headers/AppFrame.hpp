@@ -6,6 +6,20 @@
 #endif
 #include "structs.hpp"
 
+// ============================================================================
+// ----------------------------------------------------------------------------
+// ---------------------- AppFrame class declaration --------------------------
+// ----------------------------------------------------------------------------
+// @Desc : AppFrame is the class used as the main frame of the
+//  application. It is used to display the 4 first buttons, and when a
+//  calibration type is selected, it refreshes its view to update its buttons.
+// ----------------------------------------------------------------------------
+// @Cons :
+//      - title : Title of the frame
+//      - pos   : Default position of the frame on the screen
+//      - size  : Default size of the frame
+//      - style : Flags used to define frame's behaviour
+// ============================================================================
 class AppFrame : public wxFrame {
     // Attributes
 

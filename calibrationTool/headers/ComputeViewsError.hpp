@@ -6,6 +6,11 @@
 #endif
 #include "structs.hpp"
 
+
+// ============================================================================
+// ------------------ Contains ComputeViewsError function. --------------------
+// ============================================================================
+
 /**
  * Todo (attendre de voir avec M. Boutteau si on met les résultats par image dans les résultats)
  * 
