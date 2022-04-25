@@ -18,7 +18,6 @@
 #define PERSPECTIVE_SPACING 30
 
 // Spacing between two buttons in the spherical menu
-// à définir plus tard
 #define SPHERICAL_SPACING 30
 
 
@@ -37,7 +36,6 @@ wxBEGIN_EVENT_TABLE(AppFrame, wxFrame)
     EVT_BUTTON(Btn::ID_SAVE,                 AppFrame::OnSave)
     EVT_BUTTON(Btn::ID_LOAD_FILE,            AppFrame::OnLoadFile)
     EVT_BUTTON(Btn::ID_PREFERENCES,          AppFrame::OnPreferences)
-    
 wxEND_EVENT_TABLE()
 
 
@@ -79,6 +77,7 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     // EN COURS
     // pb du flac CALIB_USE_INTRINSIC_GUESS : si point défini par user mais pas la focal length, problème
+    // on peut pas fix focal length pour omnidir
 
 
 
@@ -86,9 +85,6 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // adapter pour windows à un moment
     // installé mais linkage marche pas
     // voir param de calibrage pour omni (pas sûr pour les distorsions surtout)
-    // revoir utilité de render size (car défini après affichage de la mosaïque..)
-    // rendre préférences accessible direct mais pouvoir modifier que ça au début ?
-    // factoriser code des pref dans la superclasse ? -> utilise un appel à super pour la partie en commun
 
 
 
@@ -98,6 +94,10 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     // FAIT
     // +- fini fenêtre de préférences omni
+    // factoriser code des pref dans la superclasse -> utilise des fonctions génériques pour la partie en commun
+    // rendre préférences accessible direct mais pouvoir modifier que ça au début -> renders_size pas inutile :D
+    // Enlevé l'input pour principal point : soit à calculer, soit centre de l'image -> plus de pb avec intrinsic_guess
+    //  c'est commenté donc si besoin de remettre ça se fait
 
 
     
@@ -131,8 +131,7 @@ void AppFrame::OnPerspectiveSelection(wxCommandEvent& evt) {
         Btn::ID_CALIB, 
         Btn::ID_SHOW_CORNERS_PROJ, 
         Btn::ID_CALIB_RESULTS,
-        Btn::ID_SAVE,
-        Btn::ID_PREFERENCES}, false
+        Btn::ID_SAVE}, false
     );
     placeButtons(PERSPECTIVE_SPACING);
 }
@@ -150,8 +149,7 @@ void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
         Btn::ID_CALIB, 
         Btn::ID_SHOW_CORNERS_PROJ, 
         Btn::ID_CALIB_RESULTS,
-        Btn::ID_SAVE,
-        Btn::ID_PREFERENCES}, false
+        Btn::ID_SAVE}, false
     );
     placeButtons(SPHERICAL_SPACING);
 }
@@ -246,16 +244,28 @@ void AppFrame::OnPreferences(wxCommandEvent& evt) {
     long style = wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX);
     switch(dataCalib.type) {
         case PERSPECTIVE_TYPE:
-        {
-            PreferencesPerspectiveFrame* frame = new PreferencesPerspectiveFrame("Preferences", wxPoint(-1, -1), 
-                    wxSize(550, 710), style, &dataCalib, this);
+        {      
+            PreferencesPerspectiveFrame* frame;
+            if (dataCalib.nb_images > 0) {
+                frame = new PreferencesPerspectiveFrame("Preferences", wxPoint(-1, -1), 
+                    wxSize(550, 710), style, &dataCalib, this, true);
+            } else {
+                frame = new PreferencesPerspectiveFrame("Preferences", wxPoint(-1, -1), 
+                    wxSize(550, 710), style, &dataCalib, this, false);
+            }
             frame->Show(true);
             break;
         }
         case SPHERICAL_TYPE:
-        {
-            PreferencesSphericalFrame* frame = new PreferencesSphericalFrame("Preferences", wxPoint(-1, -1), 
-                    wxSize(550, 750), style, &dataCalib, this);
+        {   
+            PreferencesSphericalFrame* frame;
+            if (dataCalib.nb_images > 0) {
+                frame = new PreferencesSphericalFrame("Preferences", wxPoint(-1, -1), 
+                    wxSize(550, 750), style, &dataCalib, this, true);
+            } else {
+                frame = new PreferencesSphericalFrame("Preferences", wxPoint(-1, -1), 
+                    wxSize(550, 750), style, &dataCalib, this, false);
+            }
             frame->Show(true);
             break;
         }

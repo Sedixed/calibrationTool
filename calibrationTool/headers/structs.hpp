@@ -69,7 +69,7 @@ typedef struct iocalibration {
  */
 typedef struct calib {
 	int type;							// Calibration type (spherical / perspective)
-    int nb_images;                      // Number of loaded images
+    int nb_images{0};                   // Number of loaded images
     IOCalibration IOcalib[MAX_IMAGES];	// Images data used for the calibration
 	Mire calibPattern;				    // Calibration pattern properties
 	Preferences pref;					// Preferences

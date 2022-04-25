@@ -62,13 +62,14 @@ namespace Pref {
 //  calibration settings.
 // ----------------------------------------------------------------------------
 // @Cons :
-//      - title  : Title of the frame
-//      - pos    : Default position of the frame on the screen
-//      - size   : Default size of the frame
-//      - style  : Flags used to define frame's behaviour
-//      - calib  : Pointer of Calib used for storing settings
-//      - parent : Pointer of AppFrame used to close the window if the
-//                   AppFrame one is closed
+//      - title      : Title of the frame
+//      - pos        : Default position of the frame on the screen
+//      - size       : Default size of the frame
+//      - style      : Flags used to define frame's behaviour
+//      - calib      : Pointer of Calib used for storing settings
+//      - parent     : Pointer of AppFrame used to close the window if the
+//                      AppFrame one is closed
+//      - allEnabled : True if the user has loaded images, false otherwise
 // ============================================================================
 class PreferencesPerspectiveFrame : public AbstractPreferences {
     // Attributes
@@ -76,9 +77,9 @@ class PreferencesPerspectiveFrame : public AbstractPreferences {
         // 1 if we want to use the RO method, 0 otherwise
         int iFixedPoint;
 
-
     public:
-        PreferencesPerspectiveFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, AppFrame *parent);
+        PreferencesPerspectiveFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib,
+            AppFrame *parent, bool allEnabled);
 
     private:
         void OnExitOk(wxCommandEvent& evt);

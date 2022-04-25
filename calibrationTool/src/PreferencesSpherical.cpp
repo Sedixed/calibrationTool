@@ -33,8 +33,8 @@ wxBEGIN_EVENT_TABLE(PreferencesSphericalFrame, wxFrame)
 wxEND_EVENT_TABLE()
 
 
-PreferencesSphericalFrame::PreferencesSphericalFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, AppFrame* parent)
-    : AbstractPreferences(title, pos, size, style, calib, parent) {
+PreferencesSphericalFrame::PreferencesSphericalFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, 
+        AppFrame* parent, bool allEnabled) : AbstractPreferences(title, pos, size, style, calib, parent, allEnabled) {
     
     // Setting the base values
     ignoreSkew = (flags & cv::omnidir::CALIB_FIX_SKEW);
@@ -79,6 +79,7 @@ void PreferencesSphericalFrame::OnExitOk(wxCommandEvent& evt) {
     // Principal point
     if (ignorePoint) {
         flags |= cv::omnidir::CALIB_FIX_CENTER;
+        /*
         wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
         wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
         double cx;
@@ -93,23 +94,21 @@ void PreferencesSphericalFrame::OnExitOk(wxCommandEvent& evt) {
         }
         dataCalib->intrinsics.at<double>(0, 2) = cx;
         dataCalib->intrinsics.at<double>(1, 2) = cy;
+        */
     } else {
-        // Center of the image
+        flags &= ~(cv::omnidir::CALIB_FIX_CENTER);
+    }
+
+    if (ignoreFocal) {
+        // eq. to cv::CALIB_USE_INTRINSIC_GUESS
+        flags |= cv::omnidir::CALIB_USE_GUESS;
+        // To fix principal point
         cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
-        flags &= ~(cv::CALIB_FIX_PRINCIPAL_POINT);
         dataCalib->intrinsics.at<double>(0, 2) = img.size().width / 2;
         dataCalib->intrinsics.at<double>(1, 2) = img.size().height / 2;
         img.release();
-    }
-
-
-    // Calibration flags
-    // maybe un &&, peut être contraindre de fixer les 2 ou 0
-    if (ignorePoint || ignoreFocal) {
-        // eq. to cv::omnidir::CALIB_USE_GUESS
-        flags |= cv::CALIB_USE_INTRINSIC_GUESS;
     } else {
-        flags &= ~(cv::CALIB_USE_INTRINSIC_GUESS);
+        flags &= ~(cv::omnidir::CALIB_USE_GUESS);
     }
     
 
@@ -133,6 +132,7 @@ void PreferencesSphericalFrame::CreateAndPlaceComponents() {
             wxGBPosition(0, 0), wxDefaultSpan, wxALL | wxALIGN_CENTER_VERTICAL, 8);
     wxCheckBox* g = new wxCheckBox(parameters, Pref::Spherical::ID_FOCAL, "G");
     g->SetValue(!ignoreFocal);
+    g->Enable(allEnabled);
     fgboxParameters->Add(g, wxGBPosition(0, 1), wxDefaultSpan, wxLEFT | wxTOP, 8);
 
     // Validator for parameters input
@@ -144,6 +144,7 @@ void PreferencesSphericalFrame::CreateAndPlaceComponents() {
             ignoreFocal ? _(std::to_string(dataCalib->intrinsics.at<double>(0, 0))) : _(""), 
             wxDefaultPosition, wxDefaultSize, 0, valParam);
     gu->SetHint("Gu");
+    gu->Enable(allEnabled);
     gu->Show(ignoreFocal);
     fgboxParameters->Add(gu, wxGBPosition(0, 2), wxGBSpan(1, 2), wxTOP | wxRIGHT, 8);
 
@@ -151,6 +152,7 @@ void PreferencesSphericalFrame::CreateAndPlaceComponents() {
             ignoreFocal ? _(std::to_string(dataCalib->intrinsics.at<double>(1, 1))) : _(""), 
             wxDefaultPosition, wxDefaultSize, 0, valParam);
     gv->SetHint("Gv");
+    gv->Enable(allEnabled);
     gv->Show(ignoreFocal);
     fgboxParameters->Add(gv, wxGBPosition(0, 4), wxGBSpan(1, 2), wxTOP | wxRIGHT, 8);
 
@@ -160,31 +162,37 @@ void PreferencesSphericalFrame::CreateAndPlaceComponents() {
             wxGBPosition(1, 0), wxDefaultSpan, wxLEFT | wxALIGN_CENTER_VERTICAL, 8);
     wxCheckBox* p = new wxCheckBox(parameters, Pref::Spherical::ID_POINT, "P");
     p->SetValue(!ignorePoint);
+    p->Enable(allEnabled);
     fgboxParameters->Add(p, wxGBPosition(1, 1), wxDefaultSpan, wxLEFT, 8);
-
+    /*
     wxTextCtrl* u0 = new wxTextCtrl(parameters, U0, 
             ignorePoint ? _(std::to_string(dataCalib->intrinsics.at<double>(0, 2))) : _(""),
             wxDefaultPosition, wxDefaultSize, 0, valParam);
     u0->SetHint("u0");
+    u0->Enable(allEnabled);
     u0->Show(ignorePoint);
     fgboxParameters->Add(u0, wxGBPosition(1, 2), wxGBSpan(1, 2), wxRIGHT, 8);
     wxTextCtrl *v0 = new wxTextCtrl(parameters, V0,
             ignorePoint ? _(std::to_string(dataCalib->intrinsics.at<double>(1, 2))) : _(""),
             wxDefaultPosition, wxDefaultSize, 0, valParam);
     v0->SetHint("v0");
+    v0->Enable(allEnabled);
     v0->Show(ignorePoint);
     fgboxParameters->Add(v0, wxGBPosition(1, 4), wxGBSpan(1, 2), wxRIGHT, 8);
+    */
 
     // Skew
     fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Skew :"),
             wxGBPosition(2, 0), wxDefaultSpan, wxLEFT | wxALIGN_CENTER_VERTICAL, 8);
     wxCheckBox* skew = new wxCheckBox(parameters, Pref::Spherical::ID_SKEW, "a");
     skew->SetValue(!ignoreSkew);
+    skew->Enable(allEnabled);
     fgboxParameters->Add(skew, wxGBPosition(2, 1), wxDefaultSpan, wxLEFT, 8);
     wxTextCtrl* a = new wxTextCtrl(parameters, A, 
             ignoreSkew ? _(std::to_string(dataCalib->intrinsics.at<double>(0, 1))) : _(""),
             wxDefaultPosition, wxDefaultSize, 0, valParam);
     a->SetHint("a");
+    a->Enable(allEnabled);
     a->Show(ignoreSkew);
     fgboxParameters->Add(a, wxGBPosition(2, 2), wxGBSpan(1, 2), wxRIGHT, 8);
 
@@ -193,11 +201,13 @@ void PreferencesSphericalFrame::CreateAndPlaceComponents() {
             wxGBPosition(3, 0), wxDefaultSpan, wxLEFT | wxALIGN_CENTER_VERTICAL, 8);
     wxCheckBox* xi = new wxCheckBox(parameters, Pref::Spherical::ID_XI, "Xi");
     xi->SetValue(!ignoreXi);
+    xi->Enable(allEnabled);
     fgboxParameters->Add(xi, wxGBPosition(3, 1), wxDefaultSpan, wxLEFT, 8);
     wxTextCtrl* xiText = new wxTextCtrl(parameters, XI, 
             ignoreXi ? _(std::to_string(dataCalib->Xi)) : _(""),
             wxDefaultPosition, wxDefaultSize, 0, valParam);
     xiText->SetHint("Xi");
+    xiText->Enable(allEnabled);
     xiText->Show(ignoreXi);
     fgboxParameters->Add(xiText, wxGBPosition(3, 2), wxGBSpan(1, 2), wxRIGHT, 8);
 
@@ -214,6 +224,7 @@ void PreferencesSphericalFrame::CreateAndPlaceComponents() {
         std::string label = "k" + std::to_string(i + 1);
         wxCheckBox* k = new wxCheckBox(parameters, Pref::Spherical::ID_K1 + i, label);
         k->SetValue(!(dataCalib->pref.parameters_flags & KFixId[i]));
+        k->Enable(allEnabled);
         int flag = (i == 0) ? wxLEFT : 0;
         fgboxParameters->Add(k, wxGBPosition(4, (i + 1)), wxDefaultSpan, wxRIGHT | flag | wxBOTTOM, 8);
     }
@@ -346,12 +357,14 @@ void PreferencesSphericalFrame::UpdateFlags(wxCommandEvent& evt) {
         {   
             ignorePoint = !ignorePoint;
             SetOkState(evt);
+            /*
             wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
             u0->Show(ignorePoint);
             wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
             v0->Show(ignorePoint);
             fgboxParameters->SetSizeHints(parameters);
             panel->Layout();
+            */
             break;
         }
         case Pref::Spherical::ID_SKEW:

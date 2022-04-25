@@ -1,13 +1,15 @@
 #include "../headers/AbstractPreferences.hpp"
 
 
-AbstractPreferences::AbstractPreferences(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, AppFrame *parent)
+AbstractPreferences::AbstractPreferences(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, 
+        AppFrame *parent, bool allEnabled)
     : wxFrame(parent, 0, title, pos, size, style) {
     dataCalib = calib;
     flags = dataCalib->pref.parameters_flags;
     searchWindowSize = calib->pref.search_window_size;
     renderWindowSize = calib->pref.render_size;
     ignoreFocal = (flags & cv::CALIB_FIX_FOCAL_LENGTH);
+    this->allEnabled = allEnabled;
 }
 
 
@@ -102,7 +104,7 @@ void AbstractPreferences::GenericOnExitOk() {
 
 
 int AbstractPreferences::GenericSetOkState(wxButton* b) {
-    if (ignorePoint) {
+    /*if (ignorePoint) {
         wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
         wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
         if (u0->GetLineLength(0) == 0 || v0->GetLineLength(0) == 0) {
@@ -110,6 +112,7 @@ int AbstractPreferences::GenericSetOkState(wxButton* b) {
             return -1;
         }
     }
+    */
     if (ignoreFocal) {
         wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
         wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);

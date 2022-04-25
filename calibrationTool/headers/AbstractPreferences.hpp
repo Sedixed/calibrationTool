@@ -137,13 +137,14 @@ namespace Pref {
 //  that can be used in these abstract functions to avoid code repetition.
 // ----------------------------------------------------------------------------
 // @Cons :
-//      - title  : Title of the frame
-//      - pos    : Default position of the frame on the screen
-//      - size   : Default size of the frame
-//      - style  : Flags used to define frame's behaviour
-//      - calib  : Pointer of Calib used for storing settings
-//      - parent : Pointer of AppFrame used to close the window if the
-//                   AppFrame one is closed
+//      - title      : Title of the frame
+//      - pos        : Default position of the frame on the screen
+//      - size       : Default size of the frame
+//      - style      : Flags used to define frame's behaviour
+//      - calib      : Pointer of Calib used for storing settings
+//      - parent     : Pointer of AppFrame used to close the window if the
+//                      AppFrame one is closed
+//      - allEnabled : True if the user has loaded images, false otherwise
 // ============================================================================
 class AbstractPreferences : public wxFrame {
     // Attributes
@@ -152,6 +153,8 @@ class AbstractPreferences : public wxFrame {
         bool ignoreFocal;
         // Define if the user provides the principal point
         bool ignorePoint;
+        // Define if we set enabled all the widgets or not
+        bool allEnabled;
         // The main panel of the frame
         wxPanel* panel;
         // The panel used for displaying intrinsics parameters
@@ -173,7 +176,8 @@ class AbstractPreferences : public wxFrame {
         wxTextCtrl* sizeY;
 
     public:
-        AbstractPreferences(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, AppFrame *parent);
+        AbstractPreferences(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, 
+            AppFrame *parent, bool allEnabled);
 
     protected:
         // Called when a user click on the "Cancel" labeled button.

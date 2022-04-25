@@ -138,7 +138,6 @@ int Calibration(Calib* dataCalib) {
             std::cout << "Error : unknown calibration\n";
     }
 
-
     img.release();
     return 0;
 }

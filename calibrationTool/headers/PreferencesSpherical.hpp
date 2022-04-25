@@ -60,13 +60,14 @@ namespace Pref {
 //  super class.
 // ----------------------------------------------------------------------------
 // @Cons :
-//      - title  : Title of the frame
-//      - pos    : Default position of the frame on the screen
-//      - size   : Default size of the frame
-//      - style  : Flags used to define frame's behaviour
-//      - calib  : Pointer of Calib used for storing settings
-//      - parent : Pointer of AppFrame used to close the window if the
-//                   AppFrame one is closed
+//      - title      : Title of the frame
+//      - pos        : Default position of the frame on the screen
+//      - size       : Default size of the frame
+//      - style      : Flags used to define frame's behaviour
+//      - calib      : Pointer of Calib used for storing settings
+//      - parent     : Pointer of AppFrame used to close the window if the
+//                      AppFrame one is closed
+//      - allEnabled : True if the user has loaded images, false otherwise
 // ============================================================================
 class PreferencesSphericalFrame : public AbstractPreferences {
     // Attributes
@@ -77,7 +78,8 @@ class PreferencesSphericalFrame : public AbstractPreferences {
         bool ignoreXi;
 
     public:
-        PreferencesSphericalFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib, AppFrame *parent);
+        PreferencesSphericalFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib,
+            AppFrame *parent, bool allEnabled);
 
     private:
         void OnExitOk(wxCommandEvent& evt);
