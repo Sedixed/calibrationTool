@@ -8,7 +8,6 @@
 #define NB_OF_K_PARAM 5
 
 
-
 // Event table used by the preferences frame.
 //  Makes each button corresponds its onclick function, and 
 //  same for radioButtons and text updates.
@@ -35,6 +34,7 @@ PreferencesPerspectiveFrame::PreferencesPerspectiveFrame(const wxString& title, 
     
     // Setting the base values
     iFixedPoint = dataCalib->pref.fixed_point;
+    ignorePoint = (flags & cv::CALIB_FIX_PRINCIPAL_POINT);
     panel = new wxPanel(this);
     CreateAndPlaceComponents();
 }
@@ -46,6 +46,32 @@ void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
 
     // Calibration type
     dataCalib->pref.fixed_point = iFixedPoint;
+
+    // Principal point
+    if (ignorePoint) {
+        flags |= cv::CALIB_FIX_PRINCIPAL_POINT;
+        wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
+        wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
+        double cx;
+        if (!u0->GetLineText(0).ToDouble(&cx)) {
+            wxMessageBox("Couldn't save u0.", "Preferences saving", wxICON_ERROR);
+            return;
+        }
+        double cy;
+        if (!v0->GetLineText(0).ToDouble(&cy)) {
+            wxMessageBox("Couldn't save v0.", "Preferences saving", wxICON_ERROR);
+            return;
+        }
+        dataCalib->intrinsics.at<double>(0, 2) = cx;
+        dataCalib->intrinsics.at<double>(1, 2) = cy;
+    } else {
+        // Center of the image
+        cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
+        flags &= ~(cv::CALIB_FIX_PRINCIPAL_POINT);
+        dataCalib->intrinsics.at<double>(0, 2) = img.size().width / 2;
+        dataCalib->intrinsics.at<double>(1, 2) = img.size().height / 2;
+        img.release();
+    }
 
     // Calibration flags
     // maybe un &&, peut être contraindre de fixer les 2 ou 0

@@ -39,6 +39,7 @@ PreferencesSphericalFrame::PreferencesSphericalFrame(const wxString& title, cons
     // Setting the base values
     ignoreSkew = (flags & cv::omnidir::CALIB_FIX_SKEW);
     ignoreXi = (flags & cv::omnidir::CALIB_FIX_XI);
+    ignorePoint = (flags & cv::omnidir::CALIB_FIX_CENTER);
     panel = new wxPanel(this);
     CreateAndPlaceComponents();
 }
@@ -73,6 +74,32 @@ void PreferencesSphericalFrame::OnExitOk(wxCommandEvent& evt) {
         dataCalib->Xi = xi;
     } else {
         flags &= ~(cv::omnidir::CALIB_FIX_XI);
+    }
+
+    // Principal point
+    if (ignorePoint) {
+        flags |= cv::omnidir::CALIB_FIX_CENTER;
+        wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
+        wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
+        double cx;
+        if (!u0->GetLineText(0).ToDouble(&cx)) {
+            wxMessageBox("Couldn't save u0.", "Preferences saving", wxICON_ERROR);
+            return;
+        }
+        double cy;
+        if (!v0->GetLineText(0).ToDouble(&cy)) {
+            wxMessageBox("Couldn't save v0.", "Preferences saving", wxICON_ERROR);
+            return;
+        }
+        dataCalib->intrinsics.at<double>(0, 2) = cx;
+        dataCalib->intrinsics.at<double>(1, 2) = cy;
+    } else {
+        // Center of the image
+        cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
+        flags &= ~(cv::CALIB_FIX_PRINCIPAL_POINT);
+        dataCalib->intrinsics.at<double>(0, 2) = img.size().width / 2;
+        dataCalib->intrinsics.at<double>(1, 2) = img.size().height / 2;
+        img.release();
     }
 
 
@@ -178,8 +205,8 @@ void PreferencesSphericalFrame::CreateAndPlaceComponents() {
     fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Distorsions :"),
             wxGBPosition(4, 0), wxDefaultSpan, wxLEFT | wxALIGN_CENTER_VERTICAL | wxBOTTOM, 8);
     
-    const int KFixId[] = {cv::CALIB_FIX_K1,
-                          cv::CALIB_FIX_K2,
+    const int KFixId[] = {cv::omnidir::CALIB_FIX_K1,
+                          cv::omnidir::CALIB_FIX_K2,
                           cv::CALIB_FIX_K3,
                           cv::CALIB_FIX_K4,
                           cv::CALIB_FIX_K5};
@@ -348,10 +375,10 @@ void PreferencesSphericalFrame::UpdateFlags(wxCommandEvent& evt) {
             break;
         }
         case Pref::Spherical::ID_K1:
-            flags ^= cv::CALIB_FIX_K1;
+            flags ^= cv::omnidir::CALIB_FIX_K1;
             break;
         case Pref::Spherical::ID_K2:
-            flags ^= cv::CALIB_FIX_K2;
+            flags ^= cv::omnidir::CALIB_FIX_K2;
             break;
         case Pref::Spherical::ID_K3:
             flags ^= cv::CALIB_FIX_K3;

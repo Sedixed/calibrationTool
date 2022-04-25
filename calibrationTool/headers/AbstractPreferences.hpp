@@ -187,7 +187,7 @@ class AbstractPreferences : public wxFrame {
         /**
          * Performs common instructions for a click on the "OK" labeled
          * button. May be called within OnExitOk.
-         * It handles the saving of focal length, principal point, 
+         * It handles the saving of focal length,
          * mire properties, render size and search size.
          * 
          */
