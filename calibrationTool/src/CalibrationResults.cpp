@@ -7,31 +7,35 @@ int CalibrationResults(Calib *dataCalib) {
     cv::Mat cameraMatrix = dataCalib->intrinsics;
     cv::Mat distCoeffs = dataCalib->distCoeffs;
 
-    for (int i = 0; i < dataCalib->nb_images; ++i) {
-        if (!dataCalib->IOcalib[i].active_image) {
-            continue;
-        }
-
-        std::vector<cv::Point3f> objPoints = dataCalib->IOcalib[i].CornersCoord3D; // 3D Points
-        cv::Mat rVec = dataCalib->IOcalib[i].rotationMat;                          // Rotation matrix          
-        cv::Mat tVec = dataCalib->IOcalib[i].translationMat;                       // Translation matrix
-        std::vector<cv::Point2f> imgPointsOutput;                                  // Output 2D points
-
-        switch(dataCalib->type) {
-            case SPHERICAL_TYPE:
-            {   
-                cv::omnidir::projectPoints(objPoints, imgPointsOutput, rVec, tVec, cameraMatrix, dataCalib->Xi, dataCalib->distCoeffs);
-                // Error per view calculus
-                double err = cv::norm(cv::Mat(dataCalib->IOcalib[i].CornersCoord2D), cv::Mat(imgPointsOutput), cv::NORM_L2);
-                int n = (int) objPoints.size();
-                dataCalib->IOcalib[i].errorView = (float) std::sqrt(err * err / n);
-                break;
+    // Step useless if it is perspective type
+    if (dataCalib->type != PERSPECTIVE_TYPE) {
+        for (int i = 0; i < dataCalib->nb_images; ++i) {
+            if (!dataCalib->IOcalib[i].active_image) {
+                continue;
             }
-            default:
-                std::cout << "Unknown calibration type\n";
-            return -1;
+
+            std::vector<cv::Point3f> objPoints = dataCalib->IOcalib[i].CornersCoord3D; // 3D Points
+            cv::Mat rVec = dataCalib->IOcalib[i].rotationMat;                          // Rotation matrix          
+            cv::Mat tVec = dataCalib->IOcalib[i].translationMat;                       // Translation matrix
+            std::vector<cv::Point2f> imgPointsOutput;                                  // Output 2D points
+
+            switch(dataCalib->type) {
+                case SPHERICAL_TYPE:
+                {   
+                    cv::omnidir::projectPoints(objPoints, imgPointsOutput, rVec, tVec, cameraMatrix, dataCalib->Xi, dataCalib->distCoeffs);
+                    // Error per view calculus
+                    double err = cv::norm(cv::Mat(dataCalib->IOcalib[i].CornersCoord2D), cv::Mat(imgPointsOutput), cv::NORM_L2);
+                    int n = (int) objPoints.size();
+                    dataCalib->IOcalib[i].errorView = (float) std::sqrt(err * err / n);
+                    break;
+                }
+                default:
+                    std::cout << "Unknown calibration type\n";
+                return -1;
+            }
         }
     }
+    
 
     // Results display
 

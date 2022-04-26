@@ -23,10 +23,20 @@ AF_HDS = $(HD_DIR)/AppFrame.hpp $(HD_DIR)/ButtonsUtils.hpp $(HD_DIR)/LoadImages.
 	$(HD_DIR)/ExtractGridCorners.hpp $(HD_DIR)/PreferencesPerspective.hpp $(HD_DIR)/Calibration.hpp \
 	$(HD_DIR)/PreferencesSpherical.hpp $(HD_DIR)/ShowReprojection.hpp $(HD_DIR/CalibrationResults.hpp)
 
-LIBSWXBUILD = `wx-config --cxxflags`
-LIBSWXLINK = `wx-config --libs`
-LIBSOCV = `pkg-config --cflags --libs opencv4`
-LDFLAGS = -lm
+ifeq ($(OS), WINDOWS_NT)
+# todo
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S), Linux)
+		LIBSWXBUILD = `wx-config --cxxflags`
+		LIBSWXLINK = `wx-config --libs`
+		LIBSOCV = `pkg-config --cflags --libs opencv4`
+		LDFLAGS = -lm
+	endif
+endif
+
+
+
 
 all: $(EXEC) # clean
 

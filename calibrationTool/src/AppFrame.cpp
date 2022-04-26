@@ -87,6 +87,7 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // quand c'est à réévaluer -> calcul un ppeu coûteux mais pas trop donc acceptable, puis 
     // c++ rapide donc on va dire ok (j'ai fait ça car les perviewerror étaient pas update en changeant
     // les prefs, les images etc)
+    // gestion du save/load pour spherical
 
 
     panel = new wxPanel(this);

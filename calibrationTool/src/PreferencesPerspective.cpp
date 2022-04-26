@@ -48,17 +48,8 @@ void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
     // Calibration type
     dataCalib->pref.fixed_point = iFixedPoint;
 
-    // Principal point
-    if (ignorePoint) {
-        flags |= cv::CALIB_FIX_PRINCIPAL_POINT;
-    } else {
-        flags &= ~(cv::CALIB_FIX_PRINCIPAL_POINT);
-    }
-
     // Focal Length
     if (ignoreFocal) {
-        flags |= cv::CALIB_FIX_FOCAL_LENGTH;
-        flags |= cv::CALIB_USE_INTRINSIC_GUESS;
         wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
         wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
         double fx;
@@ -79,8 +70,6 @@ void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
         dataCalib->intrinsics.at<double>(1, 2) = img.size().height / 2;
         img.release();
     } else {
-        flags &= ~(cv::CALIB_FIX_FOCAL_LENGTH);
-        flags &= ~(cv::CALIB_USE_INTRINSIC_GUESS);
         dataCalib->intrinsics.at<double>(0, 0) = 0.0;
         dataCalib->intrinsics.at<double>(1, 1) = 0.0;
     }
@@ -279,6 +268,8 @@ void PreferencesPerspectiveFrame::UpdateFlags(wxCommandEvent& evt) {
         case Pref::Perspective::ID_FOCAL:
             {   
                 ignoreFocal = !ignoreFocal;
+                flags ^= cv::CALIB_FIX_FOCAL_LENGTH;
+                flags ^= cv::CALIB_USE_INTRINSIC_GUESS;
                 SetOkState(evt);
                 wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
                 gu->Show(ignoreFocal);
@@ -291,7 +282,7 @@ void PreferencesPerspectiveFrame::UpdateFlags(wxCommandEvent& evt) {
         case Pref::Perspective::ID_POINT:
             {   
                 ignorePoint = !ignorePoint;
-                SetOkState(evt);
+                flags ^= cv::CALIB_FIX_PRINCIPAL_POINT;
                 break;
             }
         case Pref::Perspective::ID_K1:
