@@ -34,10 +34,6 @@ int arrLength(T(&)[size]);
 #define NB_Y 2              // ID for the number of squares along y		
 #define SIZE_SQUARE_X 3     // ID for the size of a square along x (in mm) 
 #define SIZE_SQUARE_Y 4     // ID for the size of a square along y (in mm) 
-#define GU 80               // ID of the Gu wxTextCtrl
-#define GV 81               // ID of the Gv wxTextCtrl
-#define U0 82               // ID of the u0 wxTextCtrl
-#define V0 83               // ID of the v0 wxTextCtrl
 
 
 // ============================================================================
@@ -149,8 +145,6 @@ namespace Pref {
 class AbstractPreferences : public wxFrame {
     // Attributes
     protected:
-        // Define if the user provides the focal length
-        bool ignoreFocal;
         // Define if the user provides the principal point
         bool ignorePoint;
         // Define if we set enabled all the widgets or not
@@ -191,8 +185,8 @@ class AbstractPreferences : public wxFrame {
         /**
          * Performs common instructions for a click on the "OK" labeled
          * button. May be called within OnExitOk.
-         * It handles the saving of focal length,
-         * mire properties, render size and search size.
+         * It handles the saving of mire properties, render size 
+         * and search size.
          * 
          */
         void GenericOnExitOk();
@@ -238,7 +232,7 @@ class AbstractPreferences : public wxFrame {
 
         /**
          * May be called within SetOkState : contains common tests
-         * for the different calibrations. It handles the focal length, the
+         * for the different calibrations. It handles the
          * principal point and mire properties inputs, and toggles the wxButton 
          * associated to a successful exit if necessary.
          * 

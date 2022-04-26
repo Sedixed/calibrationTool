@@ -19,6 +19,10 @@
 // Base ID for checkBoxes
 #define CHECKBOX_BASE_ID 60
 
+// Focal length input IDs
+#define GU 80               // ID of the Gu wxTextCtrl
+#define GV 81               // ID of the Gv wxTextCtrl
+
 
 // ============================================================================
 // ----------------------------------------------------------------------------
@@ -76,6 +80,8 @@ class PreferencesPerspectiveFrame : public AbstractPreferences {
     private:
         // 1 if we want to use the RO method, 0 otherwise
         int iFixedPoint;
+        // Define if the user provides the focal length
+        bool ignoreFocal;
 
     public:
         PreferencesPerspectiveFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style, Calib* calib,

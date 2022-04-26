@@ -4,8 +4,8 @@
 #include <wx/valnum.h>
 
 
-// Number of K parameters for distorsion
-#define NB_OF_K_PARAM 5
+// Number of parameters for distorsion
+#define NB_OF_DIST_PARAM 5
 
 
 // Event table used by the preferences frame.
@@ -15,7 +15,7 @@ wxBEGIN_EVENT_TABLE(PreferencesPerspectiveFrame, wxFrame)
     EVT_BUTTON(Btn::ID_EXIT_OK,                         PreferencesPerspectiveFrame::OnExitOk)
     EVT_BUTTON(Btn::ID_EXIT_CANCEL,                     PreferencesPerspectiveFrame::OnExitCancel)
     EVT_BUTTON(Pref::CALIB_METHOD_ID,                   PreferencesPerspectiveFrame::ToggleROMode)
-    EVT_COMMAND_RANGE(GU, V0, wxEVT_TEXT,               PreferencesPerspectiveFrame::SetOkState)
+    EVT_COMMAND_RANGE(GU, GV, wxEVT_TEXT,               PreferencesPerspectiveFrame::SetOkState)
     EVT_COMMAND_RANGE(NB_X, SIZE_SQUARE_Y, wxEVT_TEXT,  PreferencesPerspectiveFrame::SetOkState)
 
     EVT_COMMAND_RANGE(Pref::RENDER_MIN_ID, Pref::RENDER_MIN_ID + Pref::RENDER_NB_ID - 1,
@@ -24,7 +24,7 @@ wxBEGIN_EVENT_TABLE(PreferencesPerspectiveFrame, wxFrame)
     EVT_COMMAND_RANGE(Pref::SEARCH_MIN_ID, Pref::SEARCH_MIN_ID + Pref::SEARCH_NB_ID - 1,
         wxEVT_RADIOBUTTON, PreferencesPerspectiveFrame::SetLastSearch)
 
-    EVT_COMMAND_RANGE(Pref::Perspective::ID_FOCAL, Pref::Perspective::ID_K1 + NB_OF_K_PARAM - 1,
+    EVT_COMMAND_RANGE(Pref::Perspective::ID_FOCAL, Pref::Perspective::ID_K1 + NB_OF_DIST_PARAM - 1,
         wxEVT_CHECKBOX, PreferencesPerspectiveFrame::UpdateFlags)
 wxEND_EVENT_TABLE()
 
@@ -34,6 +34,7 @@ PreferencesPerspectiveFrame::PreferencesPerspectiveFrame(const wxString& title, 
     
     // Setting the base values
     iFixedPoint = dataCalib->pref.fixed_point;
+    ignoreFocal = (flags & cv::CALIB_FIX_FOCAL_LENGTH);
     ignorePoint = (flags & cv::CALIB_FIX_PRINCIPAL_POINT);
     panel = new wxPanel(this);
     CreateAndPlaceComponents();
@@ -50,29 +51,29 @@ void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
     // Principal point
     if (ignorePoint) {
         flags |= cv::CALIB_FIX_PRINCIPAL_POINT;
-        /*wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
-        wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
-        double cx;
-        if (!u0->GetLineText(0).ToDouble(&cx)) {
-            wxMessageBox("Couldn't save u0.", "Preferences saving", wxICON_ERROR);
-            return;
-        }
-        double cy;
-        if (!v0->GetLineText(0).ToDouble(&cy)) {
-            wxMessageBox("Couldn't save v0.", "Preferences saving", wxICON_ERROR);
-            return;
-        }
-        dataCalib->intrinsics.at<double>(0, 2) = cx;
-        dataCalib->intrinsics.at<double>(1, 2) = cy;
-        */
     } else {
         flags &= ~(cv::CALIB_FIX_PRINCIPAL_POINT);
     }
 
+    // Focal Length
     if (ignoreFocal) {
         flags |= cv::CALIB_FIX_FOCAL_LENGTH;
         flags |= cv::CALIB_USE_INTRINSIC_GUESS;
-        // To fix principal point
+        wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
+        wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
+        double fx;
+        if (!gu->GetLineText(0).ToDouble(&fx)) {
+            wxMessageBox("Couldn't save Gu.", "Preferences saving", wxICON_ERROR);
+            return;
+        }
+        double fy;
+        if (!gv->GetLineText(0).ToDouble(&fy)) {
+            wxMessageBox("Couldn't save Gv.", "Preferences saving", wxICON_ERROR);
+            return;
+        }
+        dataCalib->intrinsics.at<double>(0, 0) = fx;
+        dataCalib->intrinsics.at<double>(1, 1) = fy;
+         // To fix principal point
         cv::Mat img = cv::imread(dataCalib->IOcalib[0].image_name, cv::IMREAD_COLOR);
         dataCalib->intrinsics.at<double>(0, 2) = img.size().width / 2;
         dataCalib->intrinsics.at<double>(1, 2) = img.size().height / 2;
@@ -80,6 +81,8 @@ void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
     } else {
         flags &= ~(cv::CALIB_FIX_FOCAL_LENGTH);
         flags &= ~(cv::CALIB_USE_INTRINSIC_GUESS);
+        dataCalib->intrinsics.at<double>(0, 0) = 0.0;
+        dataCalib->intrinsics.at<double>(1, 1) = 0.0;
     }
 
     dataCalib->pref.parameters_flags = flags;
@@ -135,22 +138,6 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     p->Enable(allEnabled);
     fgboxParameters->Add(p, wxGBPosition(1, 1), wxDefaultSpan, wxLEFT, 8);
 
-    /*wxTextCtrl *u0 = new wxTextCtrl(parameters, U0, 
-            ignorePoint ? _(std::to_string(dataCalib->intrinsics.at<double>(0, 2))) : _(""),
-            wxDefaultPosition, wxDefaultSize, 0, valParam);
-    u0->SetHint("u0");
-    u0->Enable(allEnabled);
-    u0->Show(ignorePoint);
-    fgboxParameters->Add(u0, wxGBPosition(1, 2), wxGBSpan(1, 2), wxRIGHT, 8);
-    wxTextCtrl *v0 = new wxTextCtrl(parameters, V0,
-            ignorePoint ? _(std::to_string(dataCalib->intrinsics.at<double>(1, 2))) : _(""),
-            wxDefaultPosition, wxDefaultSize, 0, valParam);
-    v0->SetHint("v0");
-    v0->Enable(allEnabled);
-    v0->Show(ignorePoint);
-    fgboxParameters->Add(v0, wxGBPosition(1, 4), wxGBSpan(1, 2), wxRIGHT, 8);
-    */
-
     // Distorsions
     fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Distorsions :"),
             wxGBPosition(2, 0), wxDefaultSpan, wxLEFT | wxALIGN_CENTER_VERTICAL, 8);
@@ -160,7 +147,7 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
                           cv::CALIB_FIX_K3,
                           cv::CALIB_FIX_K4,
                           cv::CALIB_FIX_K5};
-    for (int i = 0; i < NB_OF_K_PARAM; ++i) {
+    for (int i = 0; i < NB_OF_DIST_PARAM; ++i) {
         std::string label = "k" + std::to_string(i + 1);
         wxCheckBox* k = new wxCheckBox(parameters, Pref::Perspective::ID_K1 + i, label);
         k->SetValue(!(dataCalib->pref.parameters_flags & KFixId[i]));
@@ -305,13 +292,6 @@ void PreferencesPerspectiveFrame::UpdateFlags(wxCommandEvent& evt) {
             {   
                 ignorePoint = !ignorePoint;
                 SetOkState(evt);
-                /*wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
-                u0->Show(ignorePoint);
-                wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
-                v0->Show(ignorePoint);
-                fgboxParameters->SetSizeHints(parameters);
-                panel->Layout();
-                */
                 break;
             }
         case Pref::Perspective::ID_K1:
@@ -343,6 +323,15 @@ void PreferencesPerspectiveFrame::SetOkState(wxCommandEvent& evt) {
     // Common to all calibration types
     if (GenericSetOkState(b) != 0) {
         return;
+    }
+
+    if (ignoreFocal) {
+        wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
+        wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
+        if (gu->GetLineLength(0) == 0 || gv->GetLineLength(0) == 0) {
+            b->Enable(false);
+            return;
+        }
     }
 
     if (!b->IsEnabled()) {

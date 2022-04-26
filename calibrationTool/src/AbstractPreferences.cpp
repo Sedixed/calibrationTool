@@ -8,7 +8,6 @@ AbstractPreferences::AbstractPreferences(const wxString& title, const wxPoint& p
     flags = dataCalib->pref.parameters_flags;
     searchWindowSize = calib->pref.search_window_size;
     renderWindowSize = calib->pref.render_size;
-    ignoreFocal = (flags & cv::CALIB_FIX_FOCAL_LENGTH);
     this->allEnabled = allEnabled;
 }
 
@@ -75,52 +74,10 @@ void AbstractPreferences::GenericOnExitOk() {
 
     dataCalib->pref.render_size = renderWindowSize;
     dataCalib->pref.search_window_size = searchWindowSize;
-
-    // Saving user defined intrinsics parameters if provided
-
-    // Focal Length
-    if (ignoreFocal) {
-        flags |= cv::CALIB_FIX_FOCAL_LENGTH;
-        wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
-        wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
-        double fx;
-        if (!gu->GetLineText(0).ToDouble(&fx)) {
-            wxMessageBox("Couldn't save Gu.", "Preferences saving", wxICON_ERROR);
-            return;
-        }
-        double fy;
-        if (!gv->GetLineText(0).ToDouble(&fy)) {
-            wxMessageBox("Couldn't save Gv.", "Preferences saving", wxICON_ERROR);
-            return;
-        }
-        dataCalib->intrinsics.at<double>(0, 0) = fx;
-        dataCalib->intrinsics.at<double>(1, 1) = fy;
-    } else {
-        flags &= ~(cv::CALIB_FIX_FOCAL_LENGTH);
-        dataCalib->intrinsics.at<double>(0, 0) = 0.0;
-        dataCalib->intrinsics.at<double>(1, 1) = 0.0;
-    }
 }
 
 
-int AbstractPreferences::GenericSetOkState(wxButton* b) {
-    /*if (ignorePoint) {
-        wxTextCtrl* u0 = (wxTextCtrl*) FindWindowById(U0);
-        wxTextCtrl* v0 = (wxTextCtrl*) FindWindowById(V0);
-        if (u0->GetLineLength(0) == 0 || v0->GetLineLength(0) == 0) {
-            b->Enable(false);
-            return -1;
-        }
-    }
-    */
-    if (ignoreFocal) {
-        wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
-        wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
-        if (gu->GetLineLength(0) == 0 || gv->GetLineLength(0) == 0) {
-            b->Enable(false);
-            return -1;
-        }
-    }
+int AbstractPreferences::GenericSetOkState(wxButton* b) {    
     if (nbX->GetLineLength(0) == 0 || nbY->GetLineLength(0) == 0 ||
         sizeX->GetLineLength(0) == 0 || sizeY->GetLineLength(0) == 0) {
         b->Enable(false);
@@ -128,7 +85,6 @@ int AbstractPreferences::GenericSetOkState(wxButton* b) {
     }
     return 0;
 }
-
 
 
 // --- Utils ---

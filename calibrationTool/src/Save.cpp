@@ -26,8 +26,14 @@ int Save(Calib* dataCalib) {
     fs << "Size of a square along Y" << dataCalib->calibPattern.sizeSquareY << "}";
     // Mean error
     fs << "Mean error" <<  dataCalib->error;
+
     // Preferences
-    fs << "Method" << (dataCalib->pref.fixed_point == 0 ? "calibrateCamera" : "calibrateCameraRO");
+
+    // Perspective only (RO/default method)
+    if (dataCalib->type == PERSPECTIVE_TYPE) {
+        fs << "Method" << (dataCalib->pref.fixed_point == 0 ? "calibrateCamera" : "calibrateCameraRO");
+    }
+    
     fs << "Render size" << "{";
     fs << "Width" << dataCalib->pref.render_size.width;
     fs << "Height" << dataCalib->pref.render_size.height << "}";
@@ -36,6 +42,12 @@ int Save(Calib* dataCalib) {
     fs << "Intrinsics parameters" << dataCalib->intrinsics;
     // Distorsions
     fs << "Distorsion coefficients" << dataCalib->distCoeffs;
+
+    // Spherical only (Xi)
+    if (dataCalib->type == SPHERICAL_TYPE) {
+        fs << "Xi" << dataCalib->Xi;
+    }
+
     // Flags
     fs << "Flags" << dataCalib->pref.parameters_flags;
 

@@ -37,6 +37,8 @@ int LoadFile(Calib* dataCalib) {
         return -1;
     }
 
+    dataCalib->type = (type.compare("Perspective") == 0 ? PERSPECTIVE_TYPE : SPHERICAL_TYPE);
+
     fs["Number of images"] >> dataCalib->nb_images;
     // Mire data
     fs["Mire used"]["Number of squares along X"] >> dataCalib->calibPattern.nbSquareX;
@@ -45,10 +47,16 @@ int LoadFile(Calib* dataCalib) {
     fs["Mire used"]["Size of a square along Y"] >> dataCalib->calibPattern.sizeSquareY;
     // Mean error
     fs["Mean error"] >> dataCalib->error;
+
     // Preferences
-    std::string method;
-    fs["Method"] >> method;
-    dataCalib->pref.fixed_point = (method.compare("calibrateCamera") == 0 ? 0 : dataCalib->calibPattern.nbSquareX - 1);
+
+    // Perspective only
+    if (dataCalib->type == PERSPECTIVE_TYPE) {
+        std::string method;
+        fs["Method"] >> method;
+        dataCalib->pref.fixed_point = (method.compare("calibrateCamera") == 0 ? 0 : dataCalib->calibPattern.nbSquareX - 1);
+    }
+    
     fs["Render size"]["Width"] >> dataCalib->pref.render_size.width;
     fs["Render size"]["Height"] >> dataCalib->pref.render_size.height;
     fs["Search window size"] >> dataCalib->pref.search_window_size;
@@ -56,6 +64,11 @@ int LoadFile(Calib* dataCalib) {
     fs["Intrinsics parameters"] >> dataCalib->intrinsics;
     // Distorsions
     fs["Distorsion coefficients"] >> dataCalib->distCoeffs;
+
+    if (dataCalib->type == SPHERICAL_TYPE) {
+        fs["Xi"] >> dataCalib->Xi;
+    }
+
     // Flags
     fs["Flags"] >> dataCalib->pref.parameters_flags;
 

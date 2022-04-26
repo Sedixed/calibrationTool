@@ -35,16 +35,13 @@ namespace Pref {
 
         // IDs used by the different checkbox for parameters to estimate
         enum CheckBoxId : int {
-            ID_FOCAL = CHECKBOX_BASE_ID,
-            ID_POINT,
+            ID_POINT = CHECKBOX_BASE_ID,
             ID_SKEW,
             ID_XI,
             ID_K1,
             ID_K2,
-            ID_K3,
-            ID_K4,
-            ID_K5,
-            ID_K6 // Not used at the moment
+            ID_P1,
+            ID_P2
         };
     }
 }
