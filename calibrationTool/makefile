@@ -1,9 +1,9 @@
 CC = g++
-RM = rm
 
 EXEC = app
 HD_DIR = headers
 SRC_DIR = src
+LIBS_DIR = "libs"
 OBJ_DIR = obj
 # Source files
 SRCS = $(SRC_DIR)/ButtonsUtils.cpp $(SRC_DIR)/AppFrame.cpp $(SRC_DIR)/App.cpp $(SRC_DIR)/LoadImages.cpp \
@@ -23,36 +23,45 @@ AF_HDS = $(HD_DIR)/AppFrame.hpp $(HD_DIR)/ButtonsUtils.hpp $(HD_DIR)/LoadImages.
 	$(HD_DIR)/ExtractGridCorners.hpp $(HD_DIR)/PreferencesPerspective.hpp $(HD_DIR)/Calibration.hpp \
 	$(HD_DIR)/PreferencesSpherical.hpp $(HD_DIR)/ShowReprojection.hpp $(HD_DIR/CalibrationResults.hpp)
 
-ifeq ($(OS), WINDOWS_NT)
-# todo
+LDFLAGS := -lm
+CFLAGS := -Wall
+
+ifeq ($(OS), Windows_NT)
+	RM := del
+
+	WXB := -I "C:\Users\sedix\Documents\libs\wxWidgets\lib\gcc810_x64_dll\mswud" \
+		-I "C:\Users\sedix\Documents\libs\wxWidgets\include"
+
+	WXL := -L "C:\Users\sedix\Documents\libs\wxWidgets\lib\gcc810_x64_dll" \
+		-lwxmsw316u_core_gcc810_x64 -lwxbase316u_gcc810_x64
+
+	OPENCV := -I "C:\Users\sedix\Documents\libs\opencv\install\include"
+
+	OCVLINK := -L "C:\Users\sedix\Documents\libs\opencv\install\x64\mingw\bin" \
+			-L "C:\Users\sedix\Documents\libs\opencv\install\x64\mingw\lib" \
+			-lopencv_highgui455 -lopencv_core455 -lopencv_ccalib455 -lopencv_calib3d455 \
+			-lopencv_imgproc455 -lopencv_imgcodecs455
 else
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S), Linux)
-		LIBSWXBUILD = `wx-config --cxxflags`
-		LIBSWXLINK = `wx-config --libs`
-		LIBSOCV = `pkg-config --cflags --libs opencv4`
-		LDFLAGS = -lm
-	endif
+	RM := rm
+	WXB := `wx-config --cxxflags`
+	WXL := `wx-config --libs`
+	OCVLINK := 
+	OPENCV := `pkg-config --cflags --libs opencv4`
 endif
 
+all: $(EXEC) #clean
 
-
-
-all: $(EXEC) # clean
-
-$(EXEC): $(OBJS)
-	$(CC) $(OBJS) $(LIBSWXLINK) $(LIBSOCV) $(LDFLAGS) -o $(EXEC)
+$(EXEC) : $(OBJS)
+	$(CC) $(WXL) $(OCVLINK) $(LDFLAGS) -o $(EXEC) $(OBJS)
 
 $(OBJ_DIR)/AppFrame.o: $(SRC_DIR)/AppFrame.cpp $(AF_HDS)
-	$(CC) -c $(LIBSWXBUILD) $(LIBSOCV) -o $@ $<
+	$(CC) -c $(WXB) $(OPENCV) $(CFLAGS) -o $@ $<
 
 $(OBJ_DIR)/App.o: $(SRC_DIR)/App.cpp $(HD_DIR)/AppFrame.hpp
-	$(CC) -c $(LIBSWXBUILD) $(LIBSOCV) -o $@ $<
-
+	$(CC) -c $(WXB) $(OPENCV) $(CFLAGS) -o $@ $<
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HD_DIR)/%.hpp
-	$(CC) -c $(LIBSWXBUILD) $(LIBSOCV) -o $@ $<
+	$(CC) -c $(WXB) $(OPENCV) $(CFLAGS) -o $@ $<
 
 clean:
 	$(RM) $(OBJ_DIR)/*.o $(EXEC)
-
