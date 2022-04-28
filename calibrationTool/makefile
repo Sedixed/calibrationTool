@@ -45,14 +45,15 @@ else
 	RM := rm
 	WXB := `wx-config --cxxflags`
 	WXL := `wx-config --libs`
-	OCVLINK := 
 	OPENCV := `pkg-config --cflags --libs opencv4`
+	OCVLINK := $(OPENCV)
+	
 endif
 
 all: $(EXEC) #clean
 
 $(EXEC) : $(OBJS)
-	$(CC) $(WXL) $(OCVLINK) $(LDFLAGS) -o $(EXEC) $(OBJS)
+	$(CC) $(OBJS) $(WXL) $(OCVLINK) $(LDFLAGS) -o $(EXEC) 
 
 $(OBJ_DIR)/AppFrame.o: $(SRC_DIR)/AppFrame.cpp $(AF_HDS)
 	$(CC) -c $(WXB) $(OPENCV) $(CFLAGS) -o $@ $<
