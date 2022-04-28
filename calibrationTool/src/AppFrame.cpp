@@ -60,7 +60,6 @@ void setButtonsState(std::vector<Btn::ButtonsId> ids, bool state);
 
 AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style)
     : wxFrame(NULL, 0, title, pos, size, style) {
-    
     SetDefaultPreferences();
 
     // A VOIR

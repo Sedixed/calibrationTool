@@ -1,9 +1,7 @@
 CC = g++
 
-EXEC = app
 HD_DIR = headers
 SRC_DIR = src
-LIBS_DIR = "libs"
 OBJ_DIR = obj
 # Source files
 SRCS = $(SRC_DIR)/ButtonsUtils.cpp $(SRC_DIR)/AppFrame.cpp $(SRC_DIR)/App.cpp $(SRC_DIR)/LoadImages.cpp \
@@ -21,13 +19,16 @@ OBJS = $(OBJ_DIR)/ButtonsUtils.o $(OBJ_DIR)/AppFrame.o $(OBJ_DIR)/App.o $(OBJ_DI
 # AppFrame headers required (there are a lot)
 AF_HDS = $(HD_DIR)/AppFrame.hpp $(HD_DIR)/ButtonsUtils.hpp $(HD_DIR)/LoadImages.hpp \
 	$(HD_DIR)/ExtractGridCorners.hpp $(HD_DIR)/PreferencesPerspective.hpp $(HD_DIR)/Calibration.hpp \
-	$(HD_DIR)/PreferencesSpherical.hpp $(HD_DIR)/ShowReprojection.hpp $(HD_DIR/CalibrationResults.hpp)
+	$(HD_DIR)/PreferencesSpherical.hpp $(HD_DIR)/ShowReprojection.hpp $(HD_DIR)/CalibrationResults.hpp
 
 LDFLAGS := -lm
 CFLAGS := -Wall
 
 ifeq ($(OS), Windows_NT)
 	RM := del
+	EXEC := app.exe
+	OBJS += $(OBJ_DIR)/rc.o
+	CLEAN_OBJS := /f $(OBJ_DIR)
 
 	WXB := -I "C:\Users\sedix\Documents\libs\wxWidgets\lib\gcc810_x64_dll\mswud" \
 		-I "C:\Users\sedix\Documents\libs\wxWidgets\include"
@@ -43,17 +44,18 @@ ifeq ($(OS), Windows_NT)
 			-lopencv_imgproc455 -lopencv_imgcodecs455
 else
 	RM := rm
+	EXEC := app
+	CLEAN_OBJS := $(OBJ_DIR)/*.o
 	WXB := `wx-config --cxxflags`
 	WXL := `wx-config --libs`
 	OPENCV := `pkg-config --cflags --libs opencv4`
 	OCVLINK := $(OPENCV)
-	
 endif
 
 all: $(EXEC) #clean
 
 $(EXEC) : $(OBJS)
-	$(CC) $(OBJS) $(WXL) $(OCVLINK) $(LDFLAGS) -o $(EXEC) 
+	$(CC) $(OBJS) $(WXL) $(OCVLINK) $(LDFLAGS) -o $(EXEC)
 
 $(OBJ_DIR)/AppFrame.o: $(SRC_DIR)/AppFrame.cpp $(AF_HDS)
 	$(CC) -c $(WXB) $(OPENCV) $(CFLAGS) -o $@ $<
@@ -64,5 +66,9 @@ $(OBJ_DIR)/App.o: $(SRC_DIR)/App.cpp $(HD_DIR)/AppFrame.hpp
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HD_DIR)/%.hpp
 	$(CC) -c $(WXB) $(OPENCV) $(CFLAGS) -o $@ $<
 
+# Resource file (windows only)
+$(OBJ_DIR)/rc.o:
+	windres $(WXB) app.rc -o $@
+
 clean:
-	$(RM) $(OBJ_DIR)/*.o $(EXEC)
+	$(RM) $(EXEC) $(CLEAN_OBJS)
