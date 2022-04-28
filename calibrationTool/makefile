@@ -28,7 +28,7 @@ ifeq ($(OS), Windows_NT)
 	RM := del
 	EXEC := app.exe
 	OBJS += $(OBJ_DIR)/rc.o
-	CLEAN_OBJS := /f $(OBJ_DIR)
+	CLEAN_OBJS := /f $(OBJ_DIR)/*
 
 	WXB := -I "C:\Users\sedix\Documents\libs\wxWidgets\lib\gcc810_x64_dll\mswud" \
 		-I "C:\Users\sedix\Documents\libs\wxWidgets\include"
