@@ -14,7 +14,7 @@ int LoadImages(Calib* dataCalib, wxWindow* parent) {
         askImages->GetPaths(paths);
 
         // Amount of images
-        int max = (int)paths.GetCount();
+        int max = (int) paths.GetCount();
         if (max > MAX_IMAGES) {
             wxMessageDialog(NULL, _("An error ocurred : too many images were loaded."), 
                             _(""), wxCENTER | wxICON_ERROR).ShowModal();
@@ -22,12 +22,12 @@ int LoadImages(Calib* dataCalib, wxWindow* parent) {
         }
 
         dataCalib->nb_images = max;
-
         cv::Mat images[MAX_IMAGES];
 
         for (int i = 0; i < max; ++i) {
             //save image path/name into dataCalib
-            strcpy(dataCalib->IOcalib[i].image_name, paths[i].c_str());
+            wxCharBuffer buffer = paths[i].ToUTF8();
+            memcpy((void *)dataCalib->IOcalib[i].image_name, buffer.data(), buffer.length() + 1);
 
             // open image to check its validity
             images[i] = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_GRAYSCALE);
@@ -38,9 +38,9 @@ int LoadImages(Calib* dataCalib, wxWindow* parent) {
                 dataCalib->IOcalib[i].active_image = true;
             }
         }
-
         // Show the mosaic
         int r = Mosaic(images, max, dataCalib->pref.render_size.width);
+
         if (r != 0) {
             return -1;
         }

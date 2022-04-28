@@ -31,6 +31,7 @@ int Mosaic(cv::Mat images[], int nbImages, int width) {
     mosaicSize.width = images[0].cols / n_col;
 	mosaicSize.height = images[0].rows / n_row;
 
+
     // Image that will be resized to fit in the final image
     cv::Mat render1 = cv::Mat(cv::Size(
                                 n_col * mosaicSize.width, 

@@ -68,25 +68,14 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
 
     //  EN COURS
-    // adapter pour windows à un moment
-    // installé mais linkage marche pas
+    // makefile à améliorer
+    // voir si on peut ignorer des img (si pas détecté)
 
 
     // FAIT
     // +- fini fenêtre de préférences omni
-    // clic souric pour next image (showreproj et ECC)
-    // factorisation du code de showreproj via fonction pour switch sur le projectpoints à faire
-    // retrait des input pour les paramètres dont on peut pas donner la valeur dans omnidir (xi, skew, pp)
-    // retrait de focal length dans omnidir car pas fixable
-    // bonne implantation des params de calibrage pour omni -> tout ok à priori, vérifier avec calib results
-    // resize les images pour afficher les corners extraits -> pas sûr mais plus grand donc plus visible
-
-
-    // on supprime pererrorviewcalculated -> difficile à mettre à jour car on peut pas savoir précisément
-    // quand c'est à réévaluer -> calcul un ppeu coûteux mais pas trop donc acceptable, puis 
-    // c++ rapide donc on va dire ok (j'ai fait ça car les perviewerror étaient pas update en changeant
-    // les prefs, les images etc)
-    // gestion du save/load pour spherical
+    // windows ok
+    // tests faits : high fonctionne, weak quasi pas, low 4/26 pas détecté
 
 
     panel = new wxPanel(this);
