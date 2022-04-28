@@ -68,7 +68,7 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
 
     //  EN COURS
-    // makefile à améliorer
+    // makefile à améliorer (voir si on fait via un dossier libs ou si on fait avec env var)
     // voir si on peut ignorer des img (si pas détecté)
 
 
