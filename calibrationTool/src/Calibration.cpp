@@ -23,6 +23,7 @@ int Calibration(Calib* dataCalib) {
         if (!dataCalib->IOcalib[i].active_image) {
             continue;
         }
+
         // If the user declared extraction successful but it wasn't 
         // (not all corners detected on at least one view)
         if (dataCalib->IOcalib[i].CornersCoord3D.size() != dataCalib->IOcalib[i].CornersCoord2D.size()) {
@@ -52,7 +53,6 @@ int Calibration(Calib* dataCalib) {
 
     // Future result of calibration
     double error;
-    
 
     switch(dataCalib->type) {
         // ------------------------------------
@@ -88,13 +88,15 @@ int Calibration(Calib* dataCalib) {
             // Save mean error
             dataCalib->error = error;
             // Save extrinsics parameters
+            int cpt = 0;
             for (int i = 0; i < dataCalib->nb_images; ++i) {
                 if (!dataCalib->IOcalib[i].active_image) {
                     continue;
                 }
-                dataCalib->IOcalib[i].rotationMat = rVecs[i];
-                dataCalib->IOcalib[i].translationMat = tVecs[i];
-                dataCalib->IOcalib[i].errorView = perViewError[i];
+                dataCalib->IOcalib[i].rotationMat = rVecs[cpt];
+                dataCalib->IOcalib[i].translationMat = tVecs[cpt];
+                dataCalib->IOcalib[i].errorView = perViewError[cpt];
+                ++cpt;
             }
             wxMessageBox("Calibration succeeded !", "Calibration", wxOK);
             break;
@@ -123,12 +125,14 @@ int Calibration(Calib* dataCalib) {
             dataCalib->Xi = Xi.at<double>(0, 0);
             dataCalib->error = error;
             // Save extrinsics parameters
+            int cpt = 0;
             for (int i = 0; i < dataCalib->nb_images; ++i) {
                 if (!dataCalib->IOcalib[i].active_image) {
                     continue;
                 }
-                dataCalib->IOcalib[i].rotationMat = rVecs[i];
-                dataCalib->IOcalib[i].translationMat = tVecs[i];
+                dataCalib->IOcalib[i].rotationMat = rVecs[cpt];
+                dataCalib->IOcalib[i].translationMat = tVecs[cpt];
+                ++cpt;
             }
             wxMessageBox("Calibration succeeded !", "Calibration", wxOK);
             break;

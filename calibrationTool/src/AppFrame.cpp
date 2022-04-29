@@ -63,20 +63,20 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     SetDefaultPreferences();
 
     // A VOIR
-    // peut être supprimer le active_image (refaire toutes les images donc, à voir)
     //on a le choix entre les coordonnées brutes en 3D et celles recalculées par RO (pareil)
 
 
     //  EN COURS
-    // makefile à améliorer (voir si on fait via un dossier libs ou si on fait avec env var)
-    // voir si on peut ignorer des img (si pas détecté)
-    // mode d'emploi
+    // makefile à améliorer
+    
 
 
     // FAIT
     // +- fini fenêtre de préférences omni
-    // windows ok
-    // tests faits : high fonctionne, weak quasi pas, low 4/26 pas détecté
+    // on peut ignorer des img (si pas détecté ou via clic droit si utilisateur décide)
+    // meilleur gestion de l'affichage des img : même fenêtre utilisée, on change que img + titre
+    // pour EGC et SR
+
 
 
     panel = new wxPanel(this);
@@ -152,22 +152,21 @@ void AppFrame::OnLoadImages(wxCommandEvent& evt) {
 
 
 void AppFrame::OnExtractGridCorners(wxCommandEvent& evt) {
-    try {
+    setButtonsState(std::vector<Btn::ButtonsId> {
+        Btn::ID_SHOW_CORNERS_PROJ, 
+        Btn::ID_CALIB_RESULTS,
+        Btn::ID_SAVE}, false
+    );
     int r = ExtractGridCorners(&dataCalib);
     if (r == 0) {
         setButtonsState(std::vector<Btn::ButtonsId> {
             Btn::ID_CALIB}, true
         );
+        
     } else {
         setButtonsState(std::vector<Btn::ButtonsId> {
-            Btn::ID_CALIB, 
-            Btn::ID_SHOW_CORNERS_PROJ, 
-            Btn::ID_CALIB_RESULTS,
-            Btn::ID_SAVE}, false
+            Btn::ID_CALIB}, false
         );
-    }
-    } catch (std::exception& e) {
-        std::cout << e.what() << std::endl;
     }
 }
 
@@ -192,11 +191,15 @@ void AppFrame::OnShowReprojection(wxCommandEvent& evt) {
 
 
 void AppFrame::OnCalibResults(wxCommandEvent& evt) {
+    try {
     int r = CalibrationResults(&dataCalib);
     if (r == 0) {
         setButtonsState(std::vector<Btn::ButtonsId> {
             Btn::ID_SAVE}, true
         );
+    }
+    } catch (std::exception& e) {
+        std::cout << e.what() << std::endl;
     }
 }
 

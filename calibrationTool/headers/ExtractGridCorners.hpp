@@ -21,8 +21,9 @@ int ExtractGridCorners(Calib *dataCalib);
 
 
 /**
- * Allows the user to close a window by a left click on it, through
- * a pointer on a boolean value. ECC stands for ExtractGridCorners.
+ * Allows the user to close a window and set it as an active image for calibration 
+ * by a left click on it, or to close and set is as an unactive image by a 
+ * right click on it. ECC stands for ExtractGridCorners.
  * 
  * @param evt   Event the function is responding to : here its a left click.
  * @param x     Coordinate of the mouse position along X axis.
