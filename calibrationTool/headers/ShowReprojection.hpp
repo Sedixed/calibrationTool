@@ -15,9 +15,8 @@
 
 
 /**
- * Calculates the error per view, and then for each image, 
- * displays it with the reprojected corners highlighted
- * extraction was successful.
+ * Calculates the error per view for each active image, and then for each
+ * of these images, displays it with the reprojected corners highlighted.
  * 
  * @param dataCalib              pointer of Calib used to read and set its parameters.
  * @param parent                 wxWindow from which the function was called.

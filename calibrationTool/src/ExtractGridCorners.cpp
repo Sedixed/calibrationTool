@@ -56,8 +56,8 @@ int ExtractGridCorners(Calib *dataCalib) {
         allCorners.push_back(corners);
         allCorners3D.push_back(corners3D);
 
-        bool clickClosed = false;
-        std::vector<void *> data{(void *)&clickClosed, (void *)dataCalib, (void *)&i};
+        bool clickNext = false;
+        std::vector<void *> data{(void *)&clickNext, (void *)dataCalib, (void *)&i};
         cv::resize(src, src, dataCalib->pref.render_size, cv::INTER_LINEAR);
         
         std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);
@@ -70,10 +70,10 @@ int ExtractGridCorners(Calib *dataCalib) {
         // If the user closes the image, followings won't be displayed
         // and he will not be able to perform calibration.
         while (1) {
-            if (clickClosed || cv::waitKey(1) != -1) {
+            if (clickNext || cv::waitKey(1) != -1) {
                 break;
             };
-            if (!clickClosed && cv::getWindowProperty(windowID, cv::WND_PROP_AUTOSIZE) == -1) {
+            if (!clickNext && cv::getWindowProperty(windowID, cv::WND_PROP_AUTOSIZE) == -1) {
                 wxMessageBox("All corners weren't extracted properly : you won't be able to perform calibration.",
                 "Corners extraction", wxICON_ERROR);
                 return -1;
@@ -102,21 +102,20 @@ int ExtractGridCorners(Calib *dataCalib) {
             }
             return -1;
         }
-        
     return 0;
 }
 
 
 void callbackClickECC(int evt, int x, int y, int flags, void* data) {
     std::vector<void *>* v = ( std::vector<void *>*) data;
-    bool* clickClosed = (bool*) v->at(0);
+    bool* clickNext = (bool*) v->at(0);
     Calib* calib = (Calib*) v->at(1);
     int* i = (int*) v->at(2);
     if (evt == cv::EVENT_LBUTTONDOWN) {
-        *clickClosed = true;
+        *clickNext = true;
     }
     if (evt == cv::EVENT_RBUTTONDOWN) {
         calib->IOcalib[*i].active_image = false;
-        *clickClosed = true;
+        *clickNext = true;
     }
 }

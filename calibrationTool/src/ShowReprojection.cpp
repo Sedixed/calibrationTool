@@ -8,9 +8,6 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
     cv::Mat cameraMatrix = dataCalib->intrinsics;
     cv::Mat distCoeffs = dataCalib->distCoeffs;
 
-    int totalPoints = 0;
-    double totalErr = 0;
-
     for (int i = 0; i < dataCalib->nb_images; ++i) {
         if (!dataCalib->IOcalib[i].active_image) {
             continue;
@@ -58,7 +55,7 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
             continue;
         }
 
-        bool clickClosed = false;
+        bool clickNext = false;
         std::vector<cv::Point2f> imgPointsOutput; // Output 2D points
         projectPoints(dataCalib, i, imgPointsOutput);
         // Showing image
@@ -70,9 +67,9 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
         cv::putText(img, errText, cv::Point(15, img.rows - 15), cv::FONT_HERSHEY_DUPLEX, 0.8, cv::Scalar(0, 0, 255), 1, 8, false);
         cv::resize(img, img, dataCalib->pref.render_size, cv::INTER_LINEAR);
         cv::imshow(windowID, img);
-        cv::setMouseCallback(windowID, callbackClickSR, &clickClosed);
+        cv::setMouseCallback(windowID, callbackClickSR, &clickNext);
         img.release();
-        while(!clickClosed && cv::waitKey(1) == -1);
+        while(!clickNext && cv::waitKey(1) == -1);
         if (cv::getWindowProperty(windowID, cv::WND_PROP_AUTOSIZE) == -1) {
             return -1;
         }   
@@ -86,9 +83,9 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
 
 
 void callbackClickSR(int evt, int x, int y, int flags, void* data) {
-    bool* clickClosed = (bool*) data;
+    bool* clickNext = (bool*) data;
     if (evt == cv::EVENT_LBUTTONDOWN) {
-        *clickClosed = true;
+        *clickNext = true;
     }
 }
 

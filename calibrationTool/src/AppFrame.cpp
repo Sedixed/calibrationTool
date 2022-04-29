@@ -77,10 +77,6 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     //on a le choix entre les coordonnées brutes en 3D et celles recalculées par RO (pareil)
 
 
-    //  EN COURS
-    // makefile à améliorer
-    
-
     // FAIT
     // +- fini fenêtre de préférences omni
     // on peut ignorer des img (si pas détecté ou via clic droit si utilisateur décide)
@@ -195,23 +191,17 @@ void AppFrame::OnCalibration(wxCommandEvent& evt) {
 
 
 void AppFrame::OnShowReprojection(wxCommandEvent& evt) {
-    int r = ShowReprojection(&dataCalib, this);
-    if (r == 0) {
-        //
-    }
+    ShowReprojection(&dataCalib, this);
+
 }
 
 
 void AppFrame::OnCalibResults(wxCommandEvent& evt) {
-    try {
     int r = CalibrationResults(&dataCalib);
     if (r == 0) {
         setButtonsState(std::vector<Btn::ButtonsId> {
             Btn::ID_SAVE}, true
         );
-    }
-    } catch (std::exception& e) {
-        std::cout << e.what() << std::endl;
     }
 }
 
@@ -326,7 +316,7 @@ void AppFrame::SetDefaultPreferences() {
 
 void getMaxSizeOfBtns(std::vector<wxButton*>& btns, wxSize* retSize) {
     *retSize = btns.at(0)->GetSize();
-    for (int i = 1; i < btns.size(); ++i) {
+    for (size_t i = 1; i < btns.size(); ++i) {
         if (retSize->GetWidth() < btns.at(i)->GetSize().GetWidth()) {
             *retSize = btns.at(i)->GetSize();
         }
