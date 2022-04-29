@@ -95,7 +95,7 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     wxCheckBox* g = new wxCheckBox(parameters, Pref::Perspective::ID_FOCAL, "G");
     g->SetValue(!ignoreFocal);
     g->Enable(allEnabled);
-    fgboxParameters->Add(g, wxGBPosition(0, 1), wxDefaultSpan, wxLEFT | wxTOP, 8);
+    fgboxParameters->Add(g, wxGBPosition(0, 1), wxDefaultSpan, wxLEFT | wxTOP | wxALIGN_CENTER_VERTICAL, 8);
 
     // Validator for focal length / principal point input
     wxFloatingPointValidator<float> valParam(3, NULL, wxNUM_VAL_ZERO_AS_BLANK);
@@ -108,7 +108,7 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     gu->SetHint("Gu");
     gu->Enable(allEnabled);
     gu->Show(ignoreFocal);
-    fgboxParameters->Add(gu, wxGBPosition(0, 2), wxGBSpan(1, 2), wxTOP | wxRIGHT, 8);
+    fgboxParameters->Add(gu, wxGBPosition(0, 2), wxGBSpan(1, 2), wxTOP | wxRIGHT | wxALIGN_CENTER_VERTICAL, 8);
 
     wxTextCtrl *gv = new wxTextCtrl(parameters, GV, 
             ignoreFocal ? _(std::to_string(dataCalib->intrinsics.at<double>(1, 1))) : _(""), 
@@ -116,7 +116,7 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     gv->SetHint("Gv");
     gv->Enable(allEnabled);
     gv->Show(ignoreFocal);
-    fgboxParameters->Add(gv, wxGBPosition(0, 4), wxGBSpan(1, 2), wxTOP | wxRIGHT, 8);
+    fgboxParameters->Add(gv, wxGBPosition(0, 4), wxGBSpan(1, 2), wxTOP | wxRIGHT | wxALIGN_CENTER_VERTICAL, 8);
 
 
     // Principal point 
@@ -142,7 +142,7 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
         k->SetValue(!(dataCalib->pref.parameters_flags & KFixId[i]));
         k->Enable(allEnabled);
         int flag = (i == 0) ? wxLEFT : 0;
-        fgboxParameters->Add(k, wxGBPosition(2, (i + 1)), wxDefaultSpan, wxRIGHT | flag, 8);
+        fgboxParameters->Add(k, wxGBPosition(2, (i + 1)), wxDefaultSpan, wxRIGHT | wxALIGN_CENTER_VERTICAL | flag, 8);
     }
 
     // Calibration method

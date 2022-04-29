@@ -4,6 +4,8 @@ CC = g++
 HD_DIR = headers
 SRC_DIR = src
 OBJ_DIR = obj
+WXL_DIR = libs/wx
+OPENCVL_DIR = libs/opencv
 
 # Files
 SRCS = $(SRC_DIR)/*.cpp
@@ -22,6 +24,7 @@ CFLAGS := -Wall
 # Windows OS
 ifeq ($(OS), Windows_NT)
 	RM := del
+	CFLAGS += -DWINDOWS
 	EXEC := app.exe
 	OBJS += $(OBJ_DIR)/rc.o
 	CLEAN_OBJS := /q $(OBJ_DIR)\*.o
@@ -30,12 +33,18 @@ ifeq ($(OS), Windows_NT)
 	WXB := -I "C:\Users\sedix\Documents\libs\wxWidgets\lib\gcc810_x64_dll\mswud" \
 		-I "C:\Users\sedix\Documents\libs\wxWidgets\include"
 # Lib path for wxWidgets + libraries linked
-	WXL := -L "C:\Users\sedix\Documents\libs\wxWidgets\lib\gcc810_x64_dll" \
+
+#WXL := -L "C:\Users\sedix\Documents\libs\wxWidgets\lib\gcc810_x64_dll"
+
+	WXL := -L $(WXL_DIR) \
 		-lwxmsw316u_core_gcc810_x64 -lwxbase316u_gcc810_x64
 # Include path for openCV
 	OPENCVB := -I "C:\Users\sedix\Documents\libs\opencv\install\include"
 # Lib path for openCV  + libraries linked (shared, must be lib dir for static)
-	OPENCVL := -L "C:\Users\sedix\Documents\libs\opencv\install\x64\mingw\bin" \
+
+#OPENCVL := -L "C:\Users\sedix\Documents\libs\opencv\install\x64\mingw\bin" 
+
+	OPENCVL := -L $(OPENCVL_DIR) \
 			-lopencv_highgui455 -lopencv_core455 -lopencv_ccalib455 -lopencv_calib3d455 \
 			-lopencv_imgproc455 -lopencv_imgcodecs455
 

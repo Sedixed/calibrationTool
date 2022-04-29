@@ -21,6 +21,17 @@
 // Spacing between two buttons in the spherical menu
 #define SPHERICAL_SPACING 30
 
+// Adapt size for both Linux and Windows widgets sizes
+#ifdef WINDOWS  
+    #define MENU_SIZE wxSize(300, 550)
+    #define PREF_SPHER_SIZE wxSize(500, 600)
+    #define PREF_PERSP_SIZE wxSize(500, 600)
+#else
+    #define MENU_SIZE wxSize(300, 650)
+    #define PREF_SPHER_SIZE wxSize(550, 720)
+    #define PREF_PERSP_SIZE wxSize(550, 710)
+#endif
+
 
 // Event table used by the frame.
 //  Makes each button corresponds its onclick function
@@ -101,7 +112,7 @@ void AppFrame::OnPerspectiveSelection(wxCommandEvent& evt) {
     resetButtons();
     dataCalib.type = PERSPECTIVE_TYPE;
     buttons = Btn::perspectiveButtons(panel);
-    SetSize(wxSize(300, 650));
+    SetSize(MENU_SIZE);
     SetTitle("Perspective calibration");
     // Disabling buttons 
     setButtonsState(std::vector<Btn::ButtonsId> {
@@ -119,7 +130,7 @@ void AppFrame::OnSphericalSelection(wxCommandEvent& evt) {
     resetButtons();
     dataCalib.type = SPHERICAL_TYPE;
     buttons = Btn::sphericalButtons(panel);
-    SetSize(wxSize(300, 650));
+    SetSize(MENU_SIZE);
     SetTitle("Spherical calibration");
     // Disabling buttons 
     setButtonsState(std::vector<Btn::ButtonsId> {
@@ -232,10 +243,10 @@ void AppFrame::OnPreferences(wxCommandEvent& evt) {
             PreferencesPerspectiveFrame* frame;
             if (dataCalib.nb_images > 0) {
                 frame = new PreferencesPerspectiveFrame("Preferences", wxPoint(-1, -1), 
-                    wxSize(550, 710), style, &dataCalib, this, true);
+                    PREF_PERSP_SIZE, style, &dataCalib, this, true);
             } else {
                 frame = new PreferencesPerspectiveFrame("Preferences", wxPoint(-1, -1), 
-                    wxSize(550, 710), style, &dataCalib, this, false);
+                   PREF_PERSP_SIZE, style, &dataCalib, this, false);
             }
             frame->Show(true);
             break;
@@ -245,10 +256,10 @@ void AppFrame::OnPreferences(wxCommandEvent& evt) {
             PreferencesSphericalFrame* frame;
             if (dataCalib.nb_images > 0) {
                 frame = new PreferencesSphericalFrame("Preferences", wxPoint(-1, -1), 
-                    wxSize(550, 720), style, &dataCalib, this, true);
+                   PREF_SPHER_SIZE, style, &dataCalib, this, true);
             } else {
                 frame = new PreferencesSphericalFrame("Preferences", wxPoint(-1, -1), 
-                    wxSize(550, 720), style, &dataCalib, this, false);
+                   PREF_SPHER_SIZE, style, &dataCalib, this, false);
             }
             frame->Show(true);
             break;
