@@ -24,8 +24,8 @@
 // Adapt size for both Linux and Windows widgets sizes
 #ifdef WINDOWS  
     #define MENU_SIZE wxSize(300, 550)
-    #define PREF_SPHER_SIZE wxSize(500, 600)
-    #define PREF_PERSP_SIZE wxSize(500, 600)
+    #define PREF_SPHER_SIZE wxSize(425, 580)
+    #define PREF_PERSP_SIZE wxSize(470, 590)
 #else
     #define MENU_SIZE wxSize(300, 650)
     #define PREF_SPHER_SIZE wxSize(550, 720)
