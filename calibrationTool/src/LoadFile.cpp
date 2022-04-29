@@ -1,4 +1,5 @@
 #include "../headers/LoadFile.hpp"
+#include "../headers/Mosaic.hpp"
 #include <opencv2/opencv.hpp>
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
@@ -79,6 +80,7 @@ int LoadFile(Calib* dataCalib) {
         std::string path = (std::string)view["Path"];
         path.copy(dataCalib->IOcalib[i].image_name, path.length() + 1);
         view["View error"] >> dataCalib->IOcalib[i].errorView;
+        view["Active"] >> dataCalib->IOcalib[i].active_image;
         view["Rotation vector"] >> dataCalib->IOcalib[i].rotationMat;
         view["Translation vector"] >> dataCalib->IOcalib[i].translationMat;
         cv::Mat corners2D;
@@ -87,11 +89,19 @@ int LoadFile(Calib* dataCalib) {
         cv::Mat corners3D;
         view["Object points"] >> corners3D;
         dataCalib->IOcalib[i].CornersCoord3D = MatToVecPoint3F(corners3D);
-        // dégagera probablement
-        dataCalib->IOcalib[i].active_image = true;
     }
 
     fs.release();
+
+    // Show mosaic
+    cv::Mat images[MAX_IMAGES];
+    for (int i = 0; i < dataCalib->nb_images; ++i) {
+        images[i] = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_GRAYSCALE);
+    }
+    r = Mosaic(images, dataCalib->nb_images, dataCalib->pref.render_size.width);
+    if (r != 0) {
+        return -1;
+    }
     return 0;
 }
 

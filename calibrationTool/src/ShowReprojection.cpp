@@ -24,6 +24,11 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
         // We don't handle perspective calibration case because it has 
         //  necessarily been calculated through calibrateCameraRO
         switch (dataCalib->type) {
+            // ------------------------------------
+            // --- Perspective calibration case ---
+            // ------------------------------------
+            case PERSPECTIVE_TYPE:
+                break;
             // ----------------------------------
             // --- Spherical calibration case ---
             // ----------------------------------
@@ -45,6 +50,8 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
 
     // For drawChessboardCorners function
     cv::Size patternSize = cv::Size(dataCalib->calibPattern.nbSquareX - 1, dataCalib->calibPattern.nbSquareY - 1);
+    std::string windowID = "Corners reprojection";
+    cv::namedWindow(windowID, 1);
     
     for (int i = 0; i < dataCalib->nb_images; ++i) {
         if (!dataCalib->IOcalib[i].active_image) {
@@ -54,24 +61,23 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
         bool clickClosed = false;
         std::vector<cv::Point2f> imgPointsOutput; // Output 2D points
         projectPoints(dataCalib, i, imgPointsOutput);
-
         // Showing image
         cv::Mat img = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_COLOR);
         cv::drawChessboardCorners(img, patternSize, cv::Mat(imgPointsOutput), true);
         std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);
+        cv::setWindowTitle(windowID, title);
         std::string errText = "View error : " + std::to_string(dataCalib->IOcalib[i].errorView);
         cv::putText(img, errText, cv::Point(15, img.rows - 15), cv::FONT_HERSHEY_DUPLEX, 0.8, cv::Scalar(0, 0, 255), 1, 8, false);
         cv::resize(img, img, dataCalib->pref.render_size, cv::INTER_LINEAR);
-        cv::imshow(title, img);
-        cv::setMouseCallback(title, callbackClickSR, &clickClosed);
+        cv::imshow(windowID, img);
+        cv::setMouseCallback(windowID, callbackClickSR, &clickClosed);
         img.release();
         while(!clickClosed && cv::waitKey(1) == -1);
-        if (cv::getWindowProperty(title, cv::WND_PROP_AUTOSIZE) == -1) {
+        if (cv::getWindowProperty(windowID, cv::WND_PROP_AUTOSIZE) == -1) {
             return -1;
         }   
-        cv::destroyWindow(title);
     }
-
+    cv::destroyWindow(windowID);
     if (parent != NULL) {
         parent->Raise();
     }

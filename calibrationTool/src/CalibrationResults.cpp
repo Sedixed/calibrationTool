@@ -13,7 +13,6 @@ int CalibrationResults(Calib *dataCalib) {
             if (!dataCalib->IOcalib[i].active_image) {
                 continue;
             }
-
             std::vector<cv::Point3f> objPoints = dataCalib->IOcalib[i].CornersCoord3D; // 3D Points
             cv::Mat rVec = dataCalib->IOcalib[i].rotationMat;                          // Rotation matrix          
             cv::Mat tVec = dataCalib->IOcalib[i].translationMat;                       // Translation matrix

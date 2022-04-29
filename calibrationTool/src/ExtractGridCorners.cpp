@@ -11,6 +11,10 @@
 int ExtractGridCorners(Calib *dataCalib) {
     std::vector<std::vector<cv::Point2f>> allCorners;
     std::vector<std::vector<cv::Point3f>> allCorners3D;
+
+    std::string windowID = IMG_NAME;
+    cv::namedWindow(windowID, 1);
+
     for (int i = 0; i < dataCalib->nb_images; ++i) {
         cv::Mat src = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_COLOR);
 
@@ -26,6 +30,7 @@ int ExtractGridCorners(Calib *dataCalib) {
         cv::Size patternSize = cv::Size(dataCalib->calibPattern.nbSquareX - 1, dataCalib->calibPattern.nbSquareY - 1);
         bool found = cv::findChessboardCorners(src, patternSize, corners, chessBoardFlags);
 
+        std::vector<cv::Point3f> corners3D;
         if (found) {
             cv::TermCriteria criteria = cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 30, 0.0001);
             cv::Mat viewGray;
@@ -34,26 +39,32 @@ int ExtractGridCorners(Calib *dataCalib) {
                                 cv::Size(-1,-1), criteria);
             cv::drawChessboardCorners(src, patternSize, cv::Mat(corners), found);
             viewGray.release();
-        }
 
-        // 3D coordinates of the points
-        std::vector<cv::Point3f> corners3D;
-        for (int j = 0; j < dataCalib->calibPattern.nbSquareY - 1; ++j) {
-            for (int k = 0; k < dataCalib->calibPattern.nbSquareX - 1; ++k) {
-                corners3D.push_back(cv::Point3f(
-                                    k * dataCalib->calibPattern.sizeSquareX,
-                                    j * dataCalib->calibPattern.sizeSquareY, 
-                                    0));
+            // 3D coordinates of the points
+            
+            for (int j = 0; j < dataCalib->calibPattern.nbSquareY - 1; ++j) {
+                for (int k = 0; k < dataCalib->calibPattern.nbSquareX - 1; ++k) {
+                    corners3D.push_back(cv::Point3f(
+                                        k * dataCalib->calibPattern.sizeSquareX,
+                                        j * dataCalib->calibPattern.sizeSquareY, 
+                                        0));
+                }
             }
+        } else {
+            dataCalib->IOcalib[i].active_image = false;
         }
-
         allCorners.push_back(corners);
         allCorners3D.push_back(corners3D);
-        std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);
+
         bool clickClosed = false;
+        std::vector<void *> data{(void *)&clickClosed, (void *)dataCalib, (void *)&i};
         cv::resize(src, src, dataCalib->pref.render_size, cv::INTER_LINEAR);
-        cv::imshow(title, src);
-        cv::setMouseCallback(title, callbackClickECC, &clickClosed);
+        
+        std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);
+        cv::setWindowTitle(windowID, title);
+        cv::imshow(windowID, src);
+        
+        cv::setMouseCallback(windowID, callbackClickECC, &data);
         src.release();
         // Wait for any key input or for user to close image himself.
         // If the user closes the image, followings won't be displayed
@@ -62,43 +73,50 @@ int ExtractGridCorners(Calib *dataCalib) {
             if (clickClosed || cv::waitKey(1) != -1) {
                 break;
             };
-            if (!clickClosed && cv::getWindowProperty(title, cv::WND_PROP_AUTOSIZE) == -1) {
+            if (!clickClosed && cv::getWindowProperty(windowID, cv::WND_PROP_AUTOSIZE) == -1) {
                 wxMessageBox("All corners weren't extracted properly : you won't be able to perform calibration.",
                 "Corners extraction", wxICON_ERROR);
                 return -1;
             }
         }
-        cv::destroyWindow(title);
+        
     }
-
+    cv::destroyWindow(windowID);
     int result = wxMessageBox("Was the extraction successful ?", "Corners extraction", wxYES_NO | wxICON_QUESTION);
         if (result == wxYES) {
             // Saving corners positions in 2D and 3D
-            for (int i = 0; i < allCorners.size(); ++i) {
-                dataCalib->IOcalib[i].active_image = true;
+            for (int i = 0; i < dataCalib->nb_images; ++i) {
+                if (!dataCalib->IOcalib[i].active_image) {
+                    continue;
+                }
                 std::vector<cv::Point2f> corners = allCorners.at(i);               
                 std::vector<cv::Point3f> corners3D = allCorners3D.at(i);
                 dataCalib->IOcalib[i].CornersCoord2D = corners;
                 dataCalib->IOcalib[i].CornersCoord3D = corners3D;
+                dataCalib->IOcalib[i].active_image = true;
+                
             }
         } else {
-            for (int i = 0; i < allCorners.size(); ++i) {
+            for (int i = 0; i < dataCalib->nb_images; ++i) {
                 dataCalib->IOcalib[i].active_image = false;
             }
             return -1;
         }
-        /*
-        for (int i = 1; i <= dataCalib->nb_images; ++i) {
-            cv::destroyWindow(std::string(IMG_NAME) + " " + std::to_string(i));
-        }
-        */
+        
     return 0;
 }
 
 
 void callbackClickECC(int evt, int x, int y, int flags, void* data) {
-    bool* clickClosed = (bool*) data;
+    std::vector<void *>* v = ( std::vector<void *>*) data;
+    bool* clickClosed = (bool*) v->at(0);
+    Calib* calib = (Calib*) v->at(1);
+    int* i = (int*) v->at(2);
     if (evt == cv::EVENT_LBUTTONDOWN) {
+        *clickClosed = true;
+    }
+    if (evt == cv::EVENT_RBUTTONDOWN) {
+        calib->IOcalib[*i].active_image = false;
         *clickClosed = true;
     }
 }

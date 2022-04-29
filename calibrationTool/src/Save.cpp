@@ -55,6 +55,7 @@ int Save(Calib* dataCalib) {
     fs << "Views data" << "{";
     for (int i = 0; i < dataCalib->nb_images; ++i) {
         fs << "View " + std::to_string(i + 1) << "{";
+        fs << "Active" << dataCalib->IOcalib[i].active_image;
         fs << "Path" << dataCalib->IOcalib[i].image_name;
         fs << "View error" << dataCalib->IOcalib[i].errorView;
         fs << "Rotation vector" << dataCalib->IOcalib[i].rotationMat;
