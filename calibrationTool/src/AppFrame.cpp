@@ -81,12 +81,13 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // makefile à améliorer
     
 
-
     // FAIT
     // +- fini fenêtre de préférences omni
     // on peut ignorer des img (si pas détecté ou via clic droit si utilisateur décide)
     // meilleur gestion de l'affichage des img : même fenêtre utilisée, on change que img + titre
     // pour EGC et SR
+    // size != pour windows donc resize via définition d'une macroconstante windows à la compil
+    // -> taille variant selon la macro
 
 
 
