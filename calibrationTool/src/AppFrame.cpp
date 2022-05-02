@@ -76,17 +76,6 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // A VOIR
     //on a le choix entre les coordonnées brutes en 3D et celles recalculées par RO (pareil)
 
-
-    // FAIT
-    // +- fini fenêtre de préférences omni
-    // on peut ignorer des img (si pas détecté ou via clic droit si utilisateur décide)
-    // meilleur gestion de l'affichage des img : même fenêtre utilisée, on change que img + titre
-    // pour EGC et SR
-    // size != pour windows donc resize via définition d'une macroconstante windows à la compil
-    // -> taille variant selon la macro
-
-
-
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
     placeButtons(BASE_SPACING);
