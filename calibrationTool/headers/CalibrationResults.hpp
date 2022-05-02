@@ -17,6 +17,7 @@
  * wxMessageBox the results of the current calibration.
  * 
  * @param dataCalib              pointer of Calib used to read and set its parameters.
+ * @param parent                 wxWindow from which the function was called.
  * @return int                   0 in case of success, -1 otherwise.
  */
-int CalibrationResults(Calib *dataCalib);
+int CalibrationResults(Calib *dataCalib, wxWindow* parent);

@@ -77,6 +77,15 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     //on a le choix entre les coordonnées brutes en 3D et celles recalculées par RO (pareil)
 
     // todo : handle load yml error
+    //  ecart-type etc
+    //  bel affichage (couleurs, positionnement, ..)
+    // installateur clean
+    // version release/debug ?
+
+    // fait : mit les include
+    // manuel v1
+    // installateur passable
+    // calib results plus clean -> début de la table de views
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
@@ -188,7 +197,7 @@ void AppFrame::OnShowReprojection(wxCommandEvent& evt) {
 
 
 void AppFrame::OnCalibResults(wxCommandEvent& evt) {
-    int r = CalibrationResults(&dataCalib);
+    int r = CalibrationResults(&dataCalib, this);
     if (r == 0) {
         setButtonsState(std::vector<Btn::ButtonsId> {
             Btn::ID_SAVE}, true
