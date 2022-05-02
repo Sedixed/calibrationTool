@@ -76,6 +76,8 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // A VOIR
     //on a le choix entre les coordonnées brutes en 3D et celles recalculées par RO (pareil)
 
+    // todo : handle load yml error
+
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
     placeButtons(BASE_SPACING);

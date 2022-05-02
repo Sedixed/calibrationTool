@@ -97,7 +97,7 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     g->Enable(allEnabled);
     fgboxParameters->Add(g, wxGBPosition(0, 1), wxDefaultSpan, wxLEFT | wxTOP | wxALIGN_CENTER_VERTICAL, 8);
 
-    // Validator for focal length / principal point input
+    // Validator for focal length input
     wxFloatingPointValidator<float> valParam(3, NULL, wxNUM_VAL_ZERO_AS_BLANK);
     valParam.SetMin(0);
 
