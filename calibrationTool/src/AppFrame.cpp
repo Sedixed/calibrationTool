@@ -248,7 +248,7 @@ void AppFrame::OnPreferences(wxCommandEvent& evt) {
         }
         default:
         {
-            std::cout << "Unknown type\n";
+            wxMessageBox("Error : unknown calibration type.", "Error", wxICON_ERROR);
         }
     }
     

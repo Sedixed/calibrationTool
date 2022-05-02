@@ -29,8 +29,8 @@ int CalibrationResults(Calib *dataCalib) {
                     break;
                 }
                 default:
-                    std::cout << "Unknown calibration type\n";
-                return -1;
+                    wxMessageBox("Error : unknown calibration type.", "Error", wxICON_ERROR);
+                    return -1;
             }
         }
     }
@@ -105,7 +105,7 @@ int CalibrationResults(Calib *dataCalib) {
             break;
         }
         default:
-            std::cout << "Unknown calibration type\n";
+            wxMessageBox("Error : unknown calibration type.", "Error", wxICON_ERROR);
             return -1;
     }
 

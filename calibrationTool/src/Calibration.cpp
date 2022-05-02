@@ -73,17 +73,9 @@ int Calibration(Calib* dataCalib) {
                     dataCalib->intrinsics, dataCalib->distCoeffs, rVecs, tVecs, newObjPoints, 
                     cv::noArray(), cv::noArray(), cv::noArray(), perViewError, flags);
             } catch (std::exception& e) {
-                std::cout << e.what() << std::endl;
+                wxMessageBox("An unknown error occurred.", "Error", wxICON_ERROR);
                 return -1;
             }
-
-            /*
-            // Approximativement égal à ObjectPoints
-            std::cout << "\n--new (ro only) --\n";
-            for (int i = 0; i < newObjPoints.size(); ++i) {
-                std::cout << newObjPoints[i].x << " " << newObjPoints[i].y << " " << newObjPoints[i].z << std::endl;
-            }
-            */
 
             // Save mean error
             dataCalib->error = error;
@@ -117,7 +109,7 @@ int Calibration(Calib* dataCalib) {
                     dataCalib->intrinsics, Xi, dataCalib->distCoeffs, rVecs, tVecs,
                     flags, crit);
             } catch (std::exception& e) {
-                std::cout << e.what() << std::endl;
+                wxMessageBox("An unknown error occurred.", "Error", wxICON_ERROR);
                 return -1;
             }
 
@@ -139,7 +131,7 @@ int Calibration(Calib* dataCalib) {
         }
 
         default:
-            std::cout << "Error : unknown calibration\n";
+            wxMessageBox("Error : unknown calibration type.", "Error", wxICON_ERROR);
     }
 
     img.release();

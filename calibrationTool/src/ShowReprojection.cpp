@@ -40,7 +40,7 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
                 break;
             }
             default:
-                std::cout << "Unknown calibration type\n";
+                wxMessageBox("Error : unknown calibration type.", "Error", wxICON_ERROR);
                 return -1;
         }
     }
@@ -112,7 +112,7 @@ int projectPoints(Calib *dataCalib, int index, std::vector<cv::Point2f>& imgPoin
             return 0;
         }
         default:
-            std::cout << "Unknown calibration type\n";
+            wxMessageBox("Error : unknown calibration type.", "Error", wxICON_ERROR);
             return -1;
     }
 }
