@@ -1,6 +1,7 @@
 #include "../headers/CalibrationResults.hpp"
 #include <iomanip>
 #include <opencv2/ccalib/omnidir.hpp>
+#include <wx/gbsizer.h>
 
 
 int CalibrationResults(Calib *dataCalib) {
@@ -108,6 +109,14 @@ int CalibrationResults(Calib *dataCalib) {
             wxMessageBox("Error : unknown calibration type.", "Error", wxICON_ERROR);
             return -1;
     }
+
+    wxScrolledWindow *resultsFrame = new wxScrolledWindow(NULL, wxID_ANY, wxDefaultPosition, wxSize(400, 350), wxSUNKEN_BORDER);
+    wxGridBagSizer* box = new wxGridBagSizer(10, 10);
+    
+    box->SetSizeHints(resultsFrame);
+    resultsFrame->SetSizer(box);
+    resultsFrame->Show(true);
+
 
 
     return 0;
