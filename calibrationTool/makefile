@@ -27,7 +27,7 @@ CFLAGS := -Wall
 ifeq ($(OS), Windows_NT)
 	RM := del
 	CFLAGS += -DWINDOWS
-	EXEC := app.exe
+	EXEC := "Calibration Tool.exe"
 	OBJS += $(OBJ_DIR)/rc.o
 	CLEAN_OBJS := /q $(OBJ_DIR)\*.o
 
@@ -88,3 +88,6 @@ $(OBJ_DIR)/rc.o:
 
 clean:
 	$(RM) $(EXEC) $(CLEAN_OBJS)
+
+clean_objs:
+	$(RM) $(CLEAN_OBJS)
