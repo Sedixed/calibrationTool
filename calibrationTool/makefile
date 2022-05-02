@@ -68,7 +68,7 @@ else
 # Include path (+ lib path) for openCV
 	OPENCVB := `pkg-config --cflags --libs opencv4`
 # Lib path for openCV (remains the same)
-	OPENCVL := $(OPENCV)
+	OPENCVL := $(OPENCVB)
 endif
 
 all: $(EXEC)
