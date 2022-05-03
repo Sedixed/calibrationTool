@@ -58,7 +58,11 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "hash_set": "cpp",
+        "unordered_set": "cpp",
+        "future": "cpp",
+        "shared_mutex": "cpp"
     },
     "editor.detectIndentation": false
 }

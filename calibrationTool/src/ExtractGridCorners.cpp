@@ -16,6 +16,7 @@ int ExtractGridCorners(Calib *dataCalib) {
     cv::namedWindow(windowID, 1);
 
     for (int i = 0; i < dataCalib->nb_images; ++i) {
+        dataCalib->IOcalib[i].active_image = true;
         cv::Mat src = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_COLOR);
 
         // Corners detection
@@ -112,6 +113,7 @@ void callbackClickECC(int evt, int x, int y, int flags, void* data) {
     Calib* calib = (Calib*) v->at(1);
     int* i = (int*) v->at(2);
     if (evt == cv::EVENT_LBUTTONDOWN) {
+        calib->IOcalib[*i].active_image = true;
         *clickNext = true;
     }
     if (evt == cv::EVENT_RBUTTONDOWN) {

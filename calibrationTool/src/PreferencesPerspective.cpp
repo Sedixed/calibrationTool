@@ -5,7 +5,7 @@
 
 
 // Number of parameters for distorsion
-#define NB_OF_DIST_PARAM 5
+#define NB_OF_DIST_PARAM 4
 
 
 // Event table used by the preferences frame.
@@ -133,11 +133,10 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     
     const int KFixId[] = {cv::CALIB_FIX_K1,
                           cv::CALIB_FIX_K2,
-                          cv::CALIB_FIX_K3,
-                          cv::CALIB_FIX_K4,
-                          cv::CALIB_FIX_K5};
+                          cv::CALIB_ZERO_TANGENT_DIST,
+                          cv::CALIB_FIX_K3};
     for (int i = 0; i < NB_OF_DIST_PARAM; ++i) {
-        std::string label = "k" + std::to_string(i + 1);
+        std::string label = i == NB_OF_DIST_PARAM - 2 ? "p1, p2" : "k" + std::to_string(i + 1);
         wxCheckBox* k = new wxCheckBox(parameters, Pref::Perspective::ID_K1 + i, label);
         k->SetValue(!(dataCalib->pref.parameters_flags & KFixId[i]));
         k->Enable(allEnabled);
@@ -294,14 +293,8 @@ void PreferencesPerspectiveFrame::UpdateFlags(wxCommandEvent& evt) {
         case Pref::Perspective::ID_K3:
             flags ^= cv::CALIB_FIX_K3;
             break;
-        case Pref::Perspective::ID_K4:
-            flags ^= cv::CALIB_FIX_K4;
-            break;
-        case Pref::Perspective::ID_K5:
-            flags ^= cv::CALIB_FIX_K5;
-            break;
-        case Pref::Perspective::ID_K6:
-            flags ^= cv::CALIB_FIX_K6;
+        case Pref::Perspective::ID_P1P2:
+            flags ^= cv::CALIB_ZERO_TANGENT_DIST;
             break;
         default:
             break;

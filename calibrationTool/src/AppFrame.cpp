@@ -73,19 +73,17 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     : wxFrame(NULL, 0, title, pos, size, style) {
     SetDefaultPreferences();
 
-    // A VOIR
-    //on a le choix entre les coordonnées brutes en 3D et celles recalculées par RO (pareil)
-
     // todo : handle load yml error
-    //  ecart-type etc
-    //  bel affichage (couleurs, positionnement, ..)
     // installateur clean
     // version release/debug ?
+    // override drawcorners pour ECG ?
+    // zoom sur SR / ECG ?
 
-    // fait : mit les include
-    // manuel v1
-    // installateur passable
-    // calib results plus clean -> début de la table de views
+    // fait :
+    // table des views (bel affichage)
+    // stdd
+    // fix k1 .. k5 -> remplacé par k1 k2 p1 p2 k3
+    // fix calib (quand quasi pas de détectés et que mal détectés)
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);

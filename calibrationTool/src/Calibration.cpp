@@ -23,7 +23,6 @@ int Calibration(Calib* dataCalib) {
         if (!dataCalib->IOcalib[i].active_image) {
             continue;
         }
-
         // If the user declared extraction successful but it wasn't 
         // (not all corners detected on at least one view)
         if (dataCalib->IOcalib[i].CornersCoord3D.size() != dataCalib->IOcalib[i].CornersCoord2D.size()) {
@@ -37,7 +36,6 @@ int Calibration(Calib* dataCalib) {
         objectPoints.push_back(dataCalib->IOcalib[i].CornersCoord3D);
         imagePoints.push_back(dataCalib->IOcalib[i].CornersCoord2D);
     }
-
     // Error if not enough images
     if (nbValid < MIN_VALID_IMAGES) {
         wxMessageBox("Calibration requires at least 3 valid images.", "Calibration", wxICON_ERROR);
@@ -62,10 +60,7 @@ int Calibration(Calib* dataCalib) {
         {
             std::vector<double> perViewError;                              // Error per view vector
             std::vector<cv::Point3f> newObjPoints;                         // New object points
-            if (!(flags & cv::CALIB_FIX_K3 && flags & cv::CALIB_FIX_K4 && flags & cv::CALIB_FIX_K5)) {
-                flags |= cv::CALIB_RATIONAL_MODEL; 
-            } 
-
+        
             // Calibration
             try {
                 error = cv::calibrateCameraRO(objectPoints, imagePoints, img.size(), 
@@ -112,7 +107,6 @@ int Calibration(Calib* dataCalib) {
                 wxMessageBox("An unknown error occurred.", "Error", wxICON_ERROR);
                 return -1;
             }
-
             // Save mean error and Xi
             dataCalib->Xi = Xi.at<double>(0, 0);
             dataCalib->error = error;
@@ -122,9 +116,21 @@ int Calibration(Calib* dataCalib) {
                 if (!dataCalib->IOcalib[i].active_image) {
                     continue;
                 }
-                dataCalib->IOcalib[i].rotationMat = rVecs[cpt];
-                dataCalib->IOcalib[i].translationMat = tVecs[cpt];
-                ++cpt;
+                try {
+                    if ((size_t) cpt < rVecs.size()) {
+                        dataCalib->IOcalib[i].rotationMat = rVecs[cpt];
+                        dataCalib->IOcalib[i].translationMat = tVecs[cpt];
+                        ++cpt;
+                    } else {
+                        wxMessageBox("Calibration failed : please ensure that the grid corners extraction was correct.", "Calibration", wxICON_ERROR);
+                        img.release();
+                        return -1;
+                    }
+                } catch (std::exception& e) {
+                    wxMessageBox("Calibration failed : please ensure that the grid corners extraction was correct.", "Calibration", wxICON_ERROR);
+                    img.release();
+                    return -1;
+                }
             }
             wxMessageBox("Calibration succeeded !", "Calibration", wxOK);
             break;

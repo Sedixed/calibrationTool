@@ -44,10 +44,8 @@ namespace Pref {
             ID_POINT,
             ID_K1,
             ID_K2,
-            ID_K3,
-            ID_K4,
-            ID_K5,
-            ID_K6 // Not used at the moment
+            ID_P1P2,
+            ID_K3
         };
     }
 
