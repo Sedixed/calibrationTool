@@ -84,6 +84,8 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // stdd
     // fix k1 .. k5 -> remplacé par k1 k2 p1 p2 k3
     // fix calib (quand quasi pas de détectés et que mal détectés)
+    // override drawchesscorners là
+    // remplacement des ronds etc par des cross + légende
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
