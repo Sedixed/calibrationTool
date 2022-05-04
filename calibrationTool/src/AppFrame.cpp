@@ -81,28 +81,6 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     //      expliquer rapidement le modèle (tu peux t'inspirer de opencv + faire référence à un papier)
 
     // fait :
-    // fix pb de croix manquante (condition inutile, qui servait pour le tracé de lignes)
-    // handle load yml error (sauf views mais galère)
-    // supp la string path inutile dans CR
-    // file ImageUtils -> contient drawchessboardcorners redéfini et drawCross
-    // on utilise l'overridée dans EGC (on laisse l'autre commentée)
-    // zoom sur SR / EGC dans ImageUtils
-
-    // zoom functionment SR
-    //  enter quand rien sélectionné -> next image
-    //  enter quand sélectionné -> applique le zoom
-    //  esc /clic quand sélectionné -> déselectionne
-    //  esc quand zoomé -> réaffiche sans zoom
-
-    // zoom functionment EGC
-    //  enter,y, o quand rien sélectionné -> next image, set ok
-    // n quand rien sélectionné -> next image, set pas ok
-    //  enter quand sélectionné -> applique le zoom
-    //  esc quand zoomé -> réaffiche sans zoom
-    // esc /clic quand sélectionné -> déselectionne
-    // n quand zoomé -> next image, set pas ok
-
-    
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
