@@ -22,12 +22,14 @@ OBJS = $(OBJ_DIR)/ButtonsUtils.o $(OBJ_DIR)/AppFrame.o $(OBJ_DIR)/App.o $(OBJ_DI
 # Flags
 LDFLAGS := -lm
 CFLAGS := -Wall
+EXEC := calibrationTool
 
 # Windows OS
 ifeq ($(OS), Windows_NT)
 	RM := del
 	CFLAGS += -DWINDOWS
-	EXEC := "Calibration Tool.exe"
+	LDFLAGS += -mwindows
+	EXEC_NAME := "Calibration Tool.exe"
 	OBJS += $(OBJ_DIR)/rc.o
 	CLEAN_OBJS := /q $(OBJ_DIR)\*.o
 
@@ -58,7 +60,8 @@ ifeq ($(OS), Windows_NT)
 # Other OS (only Linux supported)
 else
 	RM := rm
-	EXEC := app
+	EXEC_NAME := app
+
 	CLEAN_OBJS := $(OBJ_DIR)/*.o
 
 # Include path for wxWidgets
@@ -74,7 +77,7 @@ endif
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
-	$(CC) $(OBJS) $(WXL) $(OPENCVL) $(LDFLAGS) -o $(EXEC)
+	$(CC) $^ $(WXL) $(OPENCVL) $(LDFLAGS) -o $(EXEC_NAME)
 
 $(OBJ_DIR)/App.o: $(SRC_DIR)/App.cpp $(HD_DIR)/AppFrame.hpp
 	$(CC) -c $(WXB) $(OPENCVB) $(CFLAGS) -o $@ $<
@@ -87,7 +90,7 @@ $(OBJ_DIR)/rc.o:
 	windres $(WXB) app.rc -o $@
 
 clean:
-	$(RM) $(EXEC) $(CLEAN_OBJS)
+	$(RM) $(EXEC_NAME) $(CLEAN_OBJS)
 
 clean_objs:
 	$(RM) $(CLEAN_OBJS)
