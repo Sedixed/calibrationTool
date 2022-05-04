@@ -4,32 +4,17 @@
 
 
 // ============================================================================
-// ----------------- Contains ExtractGridCorners function and -----------------
-// ----------------- mouse callback function.                 -----------------
+// ------------------- Contains ExtractGridCorners function. ------------------
 // ============================================================================
 
 
 /**
  * Extract the grid corners from every image stored in the Calib structure.
- * For each image, displays it with the corners found highlighted and asks if the
- * extraction was successful. If not, the image is no longer active for calibration.
- * The user can also set an image as not active by right clicking it.
+ * For each image, displays it with the corners found with a red cross on it
+ * and it finally asks if the extraction was successful. If not, images are
+ * no longer active for calibration.
  * 
  * @param dataCalib pointer of Calib used to read and set its parameters.
  * @return int      0 in case of success, -1 if the extraction failed.
  */
 int ExtractGridCorners(Calib *dataCalib);
-
-
-/**
- * Allows the user to close a window and set it as an active image for calibration 
- * by a left click on it, or to close and set is as an unactive image by a 
- * right click on it. ECC stands for ExtractGridCorners.
- * 
- * @param evt   Event the function is responding to : here its a left click.
- * @param x     Coordinate of the mouse position along X axis.
- * @param y     Coordinate of the mouse position along Y axis.
- * @param flags Flags used for the action of the callback : 0 here.
- * @param data  Parameters used to perform an action : here its a boolean pointer.
- */
-void callbackClickECC(int evt, int x, int y, int flags, void* data);

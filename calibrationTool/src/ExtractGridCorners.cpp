@@ -15,7 +15,7 @@ int ExtractGridCorners(Calib *dataCalib) {
 
     std::string windowID = IMG_NAME;
     cv::namedWindow(windowID, 1);
-
+    bool reIterated = false;
     for (int i = 0; i < dataCalib->nb_images; ++i) {
         dataCalib->IOcalib[i].active_image = true;
         cv::Mat src = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_COLOR);
@@ -56,33 +56,86 @@ int ExtractGridCorners(Calib *dataCalib) {
         } else {
             dataCalib->IOcalib[i].active_image = false;
         }
+
+        // To remove the last added as we re-evaluate it
+        if (reIterated) {
+            allCorners.pop_back();
+            allCorners3D.pop_back();
+        }
         allCorners.push_back(corners);
         allCorners3D.push_back(corners3D);
 
-        bool clickNext = false;
-        std::vector<void *> data{(void *)&clickNext, (void *)dataCalib, (void *)&i};
+
         cv::resize(src, src, dataCalib->pref.render_size, cv::INTER_LINEAR);
         
         std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);
         cv::setWindowTitle(windowID, title);
-        cv::imshow(windowID, src);
-        
-        cv::setMouseCallback(windowID, callbackClickECC, &data);
-        src.release();
-        // Wait for any key input or for user to close image himself.
-        // If the user closes the image, followings won't be displayed
-        // and he will not be able to perform calibration.
-        while (1) {
-            if (clickNext || cv::waitKey(1) != -1) {
-                break;
-            };
-            if (!clickNext && cv::getWindowProperty(windowID, cv::WND_PROP_AUTOSIZE) == -1) {
-                wxMessageBox("All corners weren't extracted properly : you won't be able to perform calibration.",
+        // Zoom functionality
+        cv::Rect r = ::selectROI(windowID, src, false, true);
+
+        // After possible selection 
+
+        // Exit via click on exit button
+        if (r.size().width == EXIT && r.size().height == EXIT) {
+            wxMessageBox("All corners weren't extracted properly : you won't be able to perform calibration.",
                 "Corners extraction", wxICON_ERROR);
+            return -1;
+        }
+        // Next image via Enter/Y/O (no ROI selected)
+        if (r.size().width == NEXT_ENTER_OK && r.size().height == NEXT_ENTER_OK) {
+            dataCalib->IOcalib[i].active_image = true;
+            reIterated = false;
+            src.release();
+            continue;
+        }
+        // Next image via N (no ROI selected)
+        if (r.size().width == NEXT_ENTER_NOT_OK && r.size().height == NEXT_ENTER_NOT_OK) {
+            dataCalib->IOcalib[i].active_image = false;
+            src.release();
+            reIterated = false;
+            continue;
+        }
+        // Reselect ROI for this image
+        if (r.size().width == RESELECT && r.size().height == RESELECT) {
+            --i;
+            src.release();
+            reIterated = true;
+            continue;
+        }
+
+        // Selection, if set, is done
+
+        cv::Mat focused = src(r);
+        cv::resize(focused, focused, src.size(), cv::INTER_LINEAR);
+        cv::imshow(windowID, focused);
+        focused.release();
+        src.release();
+        
+        while(1) {
+            if (cv::getWindowProperty(windowID, cv::WND_PROP_AUTOSIZE) == -1) {
+                wxMessageBox("All corners weren't extracted properly : you won't be able to perform calibration.",
+                    "Corners extraction", wxICON_ERROR);
                 return -1;
             }
+            int k = cv::waitKey(1);
+            // ESC
+            if (k == 27) {
+                --i;
+                reIterated = true;
+                break;
+            }
+            // ENTER, O, Y
+            if (k == 13 || k == 111 || k == 121) {
+                dataCalib->IOcalib[i].active_image = true;
+                reIterated = false;
+                break;
+            }
+            if (k == 110) {
+                dataCalib->IOcalib[i].active_image = false;
+                reIterated = false;
+                break;
+            }
         }
-        
     }
     cv::destroyWindow(windowID);
     int result = wxMessageBox("Was the extraction successful ?", "Corners extraction", wxYES_NO | wxICON_QUESTION);
@@ -106,20 +159,4 @@ int ExtractGridCorners(Calib *dataCalib) {
             return -1;
         }
     return 0;
-}
-
-
-void callbackClickECC(int evt, int x, int y, int flags, void* data) {
-    std::vector<void *>* v = ( std::vector<void *>*) data;
-    bool* clickNext = (bool*) v->at(0);
-    Calib* calib = (Calib*) v->at(1);
-    int* i = (int*) v->at(2);
-    if (evt == cv::EVENT_LBUTTONDOWN) {
-        calib->IOcalib[*i].active_image = true;
-        *clickNext = true;
-    }
-    if (evt == cv::EVENT_RBUTTONDOWN) {
-        calib->IOcalib[*i].active_image = false;
-        *clickNext = true;
-    }
 }

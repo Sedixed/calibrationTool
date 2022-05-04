@@ -76,15 +76,30 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // todo :
     // installateur clean
     // version release/debug ?
-    // zoom sur SR / ECG ?
+    // update le manuel
+    //      expliquer rapidement le modèle (tu peux t'inspirer de opencv + faire référence à un papier)
 
     // fait :
-    //fix pb de croix manquante (condition inutile, qui servait pour le tracé de lignes)
+    // fix pb de croix manquante (condition inutile, qui servait pour le tracé de lignes)
     // handle load yml error (sauf views mais galère)
     // supp la string path inutile dans CR
     // file ImageUtils -> draw redéfini et drawCross
     // on utilise l'overridée dans EGC (on laisse l'autre commentée)
-    // zoom entamé : space/esc pour retour sur img pour rezoom, enter/flèche droite pour continuer/clic gauche
+    // zoom sur SR / EGC
+
+    // zoom functionment SR
+    //  enter quand rien sélectionné -> next image
+    //  enter quand sélectionné -> applique le zoom
+    //  esc /clic quand sélectionné -> déselectionne
+    //  esc quand zoomé -> réaffiche sans zoom
+
+    // zoom functionment EGC
+    //  enter,y, o quand rien sélectionné -> next image, set ok
+    // n quand rien sélectionné -> next image, set pas ok
+    //  enter quand sélectionné -> applique le zoom
+    //  esc quand zoomé -> réaffiche sans zoom
+    // esc /clic quand sélectionné -> déselectionne
+    // n quand zoomé -> next image, set pas ok
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);

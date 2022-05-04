@@ -9,33 +9,20 @@
 
 // ============================================================================
 // ------------------- Contains ShowReprojection function, --------------------
-// ------------------- utilitary function and mouse        --------------------
-// ------------------- callback function.                  --------------------
+// ------------------- and an utilitary function.          --------------------
 // ============================================================================
 
 
 /**
  * Calculates the error per view for each active image, and then for each
- * of these images, displays it with the reprojected corners highlighted.
+ * of these images, displays it with the reprojected corners with red crosses on them,
+ * and the precalculated one with blue crosses on them.
  * 
  * @param dataCalib              pointer of Calib used to read and set its parameters.
  * @param parent                 wxWindow from which the function was called.
  * @return int                   0 in case of success, -1 otherwise.
  */
 int ShowReprojection(Calib *dataCalib, wxWindow* parent);
-
-
-/**
- * Allows the user to close a window by a left click on it, through
- * a pointer on a boolean value. SR stands for ShowReprojection.
- * 
- * @param evt   Event the function is responding to : here its a left click.
- * @param x     Coordinate of the mouse position along X axis.
- * @param y     Coordinate of the mouse position along Y axis.
- * @param flags Flags used for the action of the callback : 0 here.
- * @param data  Parameters used to perform an action : here its a boolean pointer.
- */
-void callbackClickSR(int evt, int x, int y, int flags, void* data);
 
 
 /**

@@ -56,7 +56,6 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
             continue;
         }
 
-        bool clickNext = false;
         std::vector<cv::Point2f> imgPointsOutput; // Output 2D points
         projectPoints(dataCalib, i, imgPointsOutput);
         // Showing image
@@ -75,22 +74,50 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
         cv::putText(img, "Extracted points", cv::Point(45, img.rows - 75), cv::FONT_HERSHEY_DUPLEX, 0.8, cv::Scalar(0, 0, 255), 1, 8, false);
         cv::putText(img, "Calculated points",cv::Point(45, img.rows - 45), cv::FONT_HERSHEY_DUPLEX, 0.8, cv::Scalar(255, 0, 0), 1, 8, false);
         cv::resize(img, img, dataCalib->pref.render_size, cv::INTER_LINEAR);
-        // Blocking call
-        cv::Rect r = ::selectROI(windowID, img, false);
-        if (r.size().width == 0 && r.size().height == 0) {
-            --i;
+        // Zoom functionality
+        cv::Rect r = ::selectROI(windowID, img, false, false);
+
+        // After possible selection 
+
+        // Exit via click on exit button
+        if (r.size().width == EXIT && r.size().height == EXIT) {
+            return -1;
+        }
+        // Next image via enter (no ROI selected)
+        if (r.size().width == NEXT_ENTER_OK && r.size().height == NEXT_ENTER_OK) {
+            img.release();
             continue;
         }
+        // Reselect ROI for this image
+        if (r.size().width == 0 && r.size().height == 0) {
+            --i;
+            img.release();
+            continue;
+        }
+
+        // Selection, if set, is done
+
         cv::Mat focused = img(r);
         cv::resize(focused, focused, img.size(), cv::INTER_LINEAR);
         cv::imshow(windowID, focused);
         focused.release();
-        cv::setMouseCallback(windowID, callbackClickSR, &clickNext);
         img.release();
-        while(!clickNext && cv::waitKey(1) == -1) {
+        
+        while(1) {
             if (cv::getWindowProperty(windowID, cv::WND_PROP_AUTOSIZE) == -1) {
                 return -1;
             }
+            int k = cv::waitKey(1);
+            // ESC
+            if (k == 27) {
+                --i;
+                break;
+            }
+            // ENTER
+            if (k == 13) {
+                break;
+            }
+            
         }
     }
     cv::destroyWindow(windowID);
@@ -98,14 +125,6 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
         parent->Raise();
     }
     return 0;
-}
-
-
-void callbackClickSR(int evt, int x, int y, int flags, void* data) {
-    bool* clickNext = (bool*) data;
-    if (evt == cv::EVENT_RBUTTONDOWN) {
-        *clickNext = true;
-    }
 }
 
 

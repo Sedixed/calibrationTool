@@ -1,5 +1,6 @@
 #include "../headers/ImageUtils.hpp"
 
+
 void drawCross(cv::InputOutputArray _image, double x, double y, int size, int type, int thickness, cv::Scalar color) {
     using namespace cv;
 
@@ -64,26 +65,7 @@ void drawChessboardCorners(cv::InputOutputArray image, cv::Size patternSize, cv:
 }
 
 
-void performZoom(Calib* dataCalib, cv::InputOutputArray image, cv::Point2f mousePos, std::string& windowID) {
-    int w = dataCalib->pref.render_size.width;
-    int h = dataCalib->pref.render_size.height;
-
-    int roi_w = w / 4;
-    int roi_h = h / 4;
-
-    float xPos = mousePos.x;
-    float yPos = mousePos.y;
-
-    // ROI rect
-    cv::Rect roi(xPos - (roi_w / 2), yPos - (roi_h / 2), roi_w, roi_h);
-    // ROI image
-    cv::Mat roiImg(cv::Size(roi_w, roi_h), CV_8UC1);
-    cv::resize(image, roiImg, roiImg.size(), cv::INTER_LINEAR);
-    cv::imshow(windowID, roiImg);
-}
-
-
-cv::Rect DerivedROISelector::select(const std::string &windowName, cv::Mat img, bool fromCenter) {
+cv::Rect DerivedROISelector::select(const std::string &windowName, cv::Mat img, bool fromCenter, bool needApproval) {
     using namespace cv;
 
     key = 0;
@@ -97,18 +79,24 @@ cv::Rect DerivedROISelector::select(const std::string &windowName, cv::Mat img, 
 
     // Copy the data, rectangle should be drawn in the fresh image
     selectorParams.image = img.clone();
+    selectorParams.box = Rect();
 
     // Object selection
     setMouseCallback(windowName, mouseHandler, (void*)this);
 
-    // end selection process on SPACE (32) or ENTER (13)
-    while (!(key == 32 || key == 13)) {
+    while (1) {
+        // Exit via button
+        if (cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) == -1) {
+            selectorParams.box = Rect(0, 0, EXIT, EXIT);
+            break;
+        }
+
         // Draw the selected object
-        rectangle(selectorParams.image, selectorParams.box, Scalar(255, 0, 0), 2, 1);
+        rectangle(selectorParams.image, selectorParams.box, Scalar(0, 255, 0), 2, 1);
 
         // Show the image bounding box
         imshow(windowName, selectorParams.image);
-
+        
         // Reset the image
         selectorParams.image = img.clone();
 
@@ -120,6 +108,28 @@ cv::Rect DerivedROISelector::select(const std::string &windowName, cv::Mat img, 
             selectorParams.box = Rect();
             break;
         }
+
+        // Zoom in / Next image (ENTER)
+        if (key == 13) {
+            // Not any selection -> next image
+            if (selectorParams.box.width == 0) {
+                selectorParams.box = Rect(0, 0, NEXT_ENTER_OK, NEXT_ENTER_OK);
+            }
+            break;
+        }
+
+        if (needApproval) {
+            // O, Y
+            if (key == 111 || key == 121) {
+                selectorParams.box = Rect(0, 0, NEXT_ENTER_OK, NEXT_ENTER_OK);
+                break;
+            }
+            // N
+            if (key == 110) {
+                selectorParams.box = Rect(0, 0, NEXT_ENTER_NOT_OK, NEXT_ENTER_NOT_OK);
+                break;
+            }
+        }
     }
 
     // Cleanup callback
@@ -129,7 +139,9 @@ cv::Rect DerivedROISelector::select(const std::string &windowName, cv::Mat img, 
 }
 
 
-void DerivedROISelector::emptyMouseHandler(int, int, int, int, void*) {}
+void DerivedROISelector::emptyMouseHandler(int, int, int, int, void*) {
+    // Nothing
+}
 
 
 void DerivedROISelector::mouseHandler(int event, int x, int y, int flags, void *param) {
@@ -195,7 +207,7 @@ void DerivedROISelector::opencv_mouse_callback(int event, int x, int y, int) {
 }
 
 
-cv::Rect selectROI(const std::string& windowName, cv::InputArray img, bool fromCenter) {
+cv::Rect selectROI(const std::string& windowName, cv::InputArray img, bool fromCenter, bool needApproval) {
     DerivedROISelector selector;
-    return selector.select(windowName, img.getMat(), fromCenter);
+    return selector.select(windowName, img.getMat(), fromCenter, needApproval);
 }
