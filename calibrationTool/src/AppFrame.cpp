@@ -83,9 +83,9 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // fix pb de croix manquante (condition inutile, qui servait pour le tracé de lignes)
     // handle load yml error (sauf views mais galère)
     // supp la string path inutile dans CR
-    // file ImageUtils -> draw redéfini et drawCross
+    // file ImageUtils -> contient drawchessboardcorners redéfini et drawCross
     // on utilise l'overridée dans EGC (on laisse l'autre commentée)
-    // zoom sur SR / EGC
+    // zoom sur SR / EGC dans ImageUtils
 
     // zoom functionment SR
     //  enter quand rien sélectionné -> next image
