@@ -17,7 +17,7 @@ OBJS = $(OBJ_DIR)/ButtonsUtils.o $(OBJ_DIR)/AppFrame.o $(OBJ_DIR)/App.o $(OBJ_DI
 	$(OBJ_DIR)/Mosaic.o $(OBJ_DIR)/ExtractGridCorners.o $(OBJ_DIR)/PreferencesPerspective.o \
 	$(OBJ_DIR)/Calibration.o $(OBJ_DIR)/Save.o $(OBJ_DIR)/LoadFile.o \
 	$(OBJ_DIR)/AbstractPreferences.o $(OBJ_DIR)/PreferencesSpherical.o $(OBJ_DIR)/ShowReprojection.o \
-	$(OBJ_DIR)/CalibrationResults.o
+	$(OBJ_DIR)/CalibrationResults.o $(OBJ_DIR)/ImageUtils.o
 
 # Flags
 LDFLAGS := -lm

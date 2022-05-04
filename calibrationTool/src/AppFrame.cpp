@@ -73,19 +73,18 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     : wxFrame(NULL, 0, title, pos, size, style) {
     SetDefaultPreferences();
 
-    // todo : handle load yml error
+    // todo :
     // installateur clean
     // version release/debug ?
-    // override drawcorners pour ECG ?
     // zoom sur SR / ECG ?
 
     // fait :
-    // table des views (bel affichage)
-    // stdd
-    // fix k1 .. k5 -> remplacé par k1 k2 p1 p2 k3
-    // fix calib (quand quasi pas de détectés et que mal détectés)
-    // override drawchesscorners là
-    // remplacement des ronds etc par des cross + légende
+    //fix pb de croix manquante (condition inutile, qui servait pour le tracé de lignes)
+    // handle load yml error (sauf views mais galère)
+    // supp la string path inutile dans CR
+    // file ImageUtils -> draw redéfini et drawCross
+    // on utilise l'overridée dans EGC (on laisse l'autre commentée)
+    // zoom entamé : space/esc pour retour sur img pour rezoom, enter/flèche droite pour continuer/clic gauche
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);

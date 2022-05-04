@@ -126,16 +126,17 @@ int CalibrationResults(Calib *dataCalib, wxWindow* parent) {
             return -1;
     }
 
-    // Mean error
+    // Mean error panel
     wxPanel *errPanel = new wxPanel(summaryPanel);
     wxGridBagSizer* errSizer = new wxGridBagSizer(10, 10);
     errSizer->Add(new wxStaticText(errPanel, wxID_ANY, 
             _("Mean error : \t\t\t")), wxGBPosition(0, 0), wxDefaultSpan, wxTOP | wxBOTTOM | wxRIGHT | wxALIGN_CENTER_VERTICAL, 8);
-    
+    // Inner mean error panel (for background color)
     wxPanel* innerErrPanel = new wxPanel(errPanel, -1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER);
     innerErrPanel->SetBackgroundColour(dataCalib->error >= 1 ? RED : GREEN);
     innerErrPanel->SetForegroundColour((wxColour) * wxBLACK);
     wxGridBagSizer* innerErrSizer = new wxGridBagSizer(10, 10);
+    // Standard deviation + mean error display
     double stdd = standardDeviation(dataCalib);
     innerErrSizer->Add(new wxStaticText(innerErrPanel, wxID_ANY, 
             std::to_wstring(dataCalib->error) + L" \u00b1 " + std::to_wstring(stdd)), 
@@ -166,9 +167,6 @@ int CalibrationResults(Calib *dataCalib, wxWindow* parent) {
     gt->SetColLabelValue(1, "Used");
     gt->SetColLabelValue(2, "Error");
     for (int i = 0; i < dataCalib->nb_images; ++i) {
-        std::string base = dataCalib->IOcalib[i].image_name;
-        int k = base.find_last_of("/\\");
-        std::string name = (k == 0 ? base : "..." + base.substr(k, base.length() - k));
         gt->SetValue(i, 0, dataCalib->IOcalib[i].image_name);
         gt->SetValue(i, 1, dataCalib->IOcalib[i].active_image ? "Yes" : "No");
         gt->SetValue(i, 2, std::to_string(dataCalib->IOcalib[i].errorView));

@@ -38,40 +38,125 @@ int LoadFile(Calib* dataCalib) {
         return -1;
     }
 
-    dataCalib->type = (type.compare("Perspective") == 0 ? PERSPECTIVE_TYPE : SPHERICAL_TYPE);
+    // Number of images
+    int nbImages;
+    fs["Number of images"] >> nbImages;
+    if (nbImages < 3) {
+        wxMessageBox("Error : must provide at least 3 images.", "Error loading file", wxICON_ERROR);
+        fs.release();
+        return -1;
+    }
 
-    fs["Number of images"] >> dataCalib->nb_images;
     // Mire data
-    fs["Mire used"]["Number of squares along X"] >> dataCalib->calibPattern.nbSquareX;
-    fs["Mire used"]["Number of squares along Y"] >> dataCalib->calibPattern.nbSquareY;
-    fs["Mire used"]["Size of a square along X"] >> dataCalib->calibPattern.sizeSquareX;
-    fs["Mire used"]["Size of a square along Y"] >> dataCalib->calibPattern.sizeSquareY;
-    // Mean error
-    fs["Mean error"] >> dataCalib->error;
-
-    // Preferences
-
-    // Perspective only
-    if (dataCalib->type == PERSPECTIVE_TYPE) {
-        std::string method;
-        fs["Method"] >> method;
-        dataCalib->pref.fixed_point = (method.compare("calibrateCamera") == 0 ? 0 : dataCalib->calibPattern.nbSquareX - 1);
+    int nbSquareX;
+    int nbSquareY;
+    fs["Mire used"]["Number of squares along X"] >> nbSquareX;
+    fs["Mire used"]["Number of squares along Y"] >> nbSquareY;
+    if (nbSquareX < 4 || nbSquareY < 4) {
+        wxMessageBox("Error : grid must be at least 4x4.", "Error loading file", wxICON_ERROR);
+        fs.release();
+        return -1;
+    }
+    int sizeX;
+    int sizeY;
+    fs["Mire used"]["Size of a square along X"] >> sizeX;
+    fs["Mire used"]["Size of a square along Y"] >> sizeY;
+    if (sizeX <= 0 || sizeY <= 0) {
+        wxMessageBox("Error : a square must have strict positive dimension.", "Error loading file", wxICON_ERROR);
+        fs.release();
+        return -1;
     }
     
-    fs["Render size"]["Width"] >> dataCalib->pref.render_size.width;
-    fs["Render size"]["Height"] >> dataCalib->pref.render_size.height;
-    fs["Search window size"] >> dataCalib->pref.search_window_size;
-    // Intrinsics parameters
-    fs["Intrinsics parameters"] >> dataCalib->intrinsics;
-    // Distorsions
-    fs["Distorsion coefficients"] >> dataCalib->distCoeffs;
+    // Preferences
 
+    std::string method;
+    // Perspective only
+    if (dataCalib->type == PERSPECTIVE_TYPE) {
+        fs["Method"] >> method;
+        if (method.compare("calibrateCamera") != 0 && method.compare("calibrateCameraRO") != 0) {
+            wxMessageBox("Error : invalid method", "Error loading file", wxICON_ERROR);
+            fs.release();
+            return -1;
+        }
+    }
+
+    int renderWidth;
+    int renderHeight;
+    fs["Render size"]["Width"] >> renderWidth;
+    fs["Render size"]["Height"] >> renderHeight;
+    if (renderWidth <= 0 || renderHeight <= 0) {
+        wxMessageBox("Error : invalid render size", "Error loading file", wxICON_ERROR);
+        fs.release();
+        return -1;
+    }
+
+    int searchSize;
+    fs["Search window size"] >> searchSize;
+    if (searchSize <= 0) {
+        wxMessageBox("Error : invalid search size", "Error loading file", wxICON_ERROR);
+        fs.release();
+        return -1;
+    }
+    
+    // Intrinsics parameters
+    cv::Mat intrinsics;
+    fs["Intrinsics parameters"] >> intrinsics;
+    if (intrinsics.cols != 3 || intrinsics.rows != 3) {
+        wxMessageBox("Error : invalid intrinsics matrix size", "Error loading file", wxICON_ERROR);
+        fs.release();
+        return -1;
+    }
+    if (intrinsics.at<double>(0, 2) <= 0 || intrinsics.at<double>(1, 2) <= 0 || intrinsics.at<double>(2, 2) != 1 ||
+        intrinsics.at<double>(1, 0) != 0 || intrinsics.at<double>(2, 0) != 0 || intrinsics.at<double>(2, 1) != 0) {
+        wxMessageBox("Error : invalid intrinsics matrix content", "Error loading file", wxICON_ERROR);
+        fs.release();
+        return -1;
+    }
+
+    // Distorsions
+    cv::Mat dist;
+    fs["Distorsion coefficients"] >> dist;
+    if (dist.rows != 1) {
+        wxMessageBox("Error : invalid distorsions matrix size", "Error loading file", wxICON_ERROR);
+        fs.release();
+        return -1;
+    }
+    
+    double Xi;
     if (dataCalib->type == SPHERICAL_TYPE) {
-        fs["Xi"] >> dataCalib->Xi;
+        fs["Xi"] >> Xi;
     }
 
     // Flags
-    fs["Flags"] >> dataCalib->pref.parameters_flags;
+    int flags;
+    fs["Flags"] >> flags;
+    if (flags < 0) {
+        wxMessageBox("Error : invalid flags integer value", "Error loading file", wxICON_ERROR);
+        fs.release();
+        return -1;
+    }
+
+    // --- Results saving ---
+    dataCalib->nb_images = nbImages;
+    dataCalib->type = (type.compare("Perspective") == 0 ? PERSPECTIVE_TYPE : SPHERICAL_TYPE);
+    dataCalib->calibPattern.nbSquareX = nbSquareX;
+    dataCalib->calibPattern.nbSquareY = nbSquareY;
+    dataCalib->calibPattern.sizeSquareX = sizeX;
+    dataCalib->calibPattern.sizeSquareY = sizeY;
+    // Mean error
+    fs["Mean error"] >> dataCalib->error;
+    if (dataCalib->type == PERSPECTIVE_TYPE) {
+        dataCalib->pref.fixed_point = (method.compare("calibrateCamera") == 0 ? 0 : dataCalib->calibPattern.nbSquareX - 1);
+    }
+    dataCalib->pref.render_size.width = renderWidth;
+    dataCalib->pref.render_size.height = renderHeight;
+    dataCalib->pref.search_window_size = searchSize;
+    dataCalib->intrinsics = intrinsics;
+    dataCalib->distCoeffs = dist;
+    if (dataCalib->type == SPHERICAL_TYPE) {
+        dataCalib->Xi = Xi;
+    }
+    dataCalib->pref.parameters_flags = flags;
 
     // Views
     for (int i = 0; i < dataCalib->nb_images; ++i) {
@@ -97,6 +182,10 @@ int LoadFile(Calib* dataCalib) {
     cv::Mat images[MAX_IMAGES];
     for (int i = 0; i < dataCalib->nb_images; ++i) {
         images[i] = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_GRAYSCALE);
+        if (images[i].empty()) {
+            wxMessageBox("Error : at least one image isn't correct.", "Error loading file", wxICON_ERROR);
+            return -1;
+        }
     }
     r = Mosaic(images, dataCalib->nb_images, dataCalib->pref.render_size.width);
     if (r != 0) {

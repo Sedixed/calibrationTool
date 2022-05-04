@@ -136,7 +136,12 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
                           cv::CALIB_ZERO_TANGENT_DIST,
                           cv::CALIB_FIX_K3};
     for (int i = 0; i < NB_OF_DIST_PARAM; ++i) {
-        std::string label = i == NB_OF_DIST_PARAM - 2 ? "p1, p2" : "k" + std::to_string(i + 1);
+        std::string label;
+        if (i == NB_OF_DIST_PARAM - 2) {
+            label = "p1, p2";
+        } else {
+            label = "k" + std::to_string(i == NB_OF_DIST_PARAM - 1 ? i : i + 1);
+        }
         wxCheckBox* k = new wxCheckBox(parameters, Pref::Perspective::ID_K1 + i, label);
         k->SetValue(!(dataCalib->pref.parameters_flags & KFixId[i]));
         k->Enable(allEnabled);

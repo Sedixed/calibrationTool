@@ -9,25 +9,9 @@
 
 // ============================================================================
 // ------------------- Contains ShowReprojection function, --------------------
-// ------------------- cv::drawChessboardCorners           --------------------
-// ------------------- redefinition, draw crossing,        --------------------
 // ------------------- utilitary function and mouse        --------------------
 // ------------------- callback function.                  --------------------
 // ============================================================================
-
-
-/**
- * Draw a cross on an image.
- * 
- * @param _image    The image to draw the cross on.
- * @param x         The x coordinate of the cross.
- * @param y         The y coordinate of the cross.
- * @param size      Size of the cross in pixels.
- * @param type      0 = vertical cross, 1 = 45 degrees cross.
- * @param thickness Thickness of the cross.
- * @param color     Color of the cross.
- */
-void drawCross(cv::InputOutputArray _image, double x, double y, int size, int type, int thickness, cv::Scalar color);
 
 
 /**
@@ -39,20 +23,6 @@ void drawCross(cv::InputOutputArray _image, double x, double y, int size, int ty
  * @return int                   0 in case of success, -1 otherwise.
  */
 int ShowReprojection(Calib *dataCalib, wxWindow* parent);
-
-
-/**
- * @brief Redefinition of the drawChessboardCorners from openCV4.X : only draws crosses of color given
- * by the cv::Scalar color.
- * 
- * @param image           Destination image. It must be an 8-bit color image. 
- * @param patternSize     Number of inner corners per a chessboard row and column
- * @param _corners        Array of detected corners.
- * @param patternWasFound Parameter indicating whether the complete board was found or not.
- * @param color           Color the circles must be drawn with.
- * @param type            Type of cross
- */ 
-void drawChessboardCorners(cv::InputOutputArray image, cv::Size patternSize, cv::InputArray _corners, bool patternWasFound, cv::Scalar color, int type);
 
 
 /**

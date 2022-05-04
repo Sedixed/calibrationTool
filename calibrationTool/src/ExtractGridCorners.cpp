@@ -1,4 +1,5 @@
 #include "../headers/ExtractGridCorners.hpp"
+#include "../headers/ImageUtils.hpp"
 
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
@@ -38,7 +39,8 @@ int ExtractGridCorners(Calib *dataCalib) {
             cv::cvtColor(src, viewGray, cv::COLOR_BGR2GRAY);
             cv::cornerSubPix(viewGray, corners, cv::Size(dataCalib->pref.search_window_size, dataCalib->pref.search_window_size),
                                 cv::Size(-1,-1), criteria);
-            cv::drawChessboardCorners(src, patternSize, cv::Mat(corners), found);
+            drawChessboardCorners(src, patternSize, cv::Mat(corners), found, cv::Scalar(0, 0, 255, 0), 0);
+            //cv::drawChessboardCorners(src, patternSize, cv::Mat(corners), found);
             viewGray.release();
 
             // 3D coordinates of the points
