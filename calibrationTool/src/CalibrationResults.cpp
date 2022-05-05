@@ -3,7 +3,7 @@
 #include <opencv2/ccalib/omnidir.hpp>
 #include <wx/gbsizer.h>
 
-
+// Adapt size for both Linux and Windows widgets sizes
 #ifdef WINDOWS
     #define SIZE wxSize(660, 500)
 #else
