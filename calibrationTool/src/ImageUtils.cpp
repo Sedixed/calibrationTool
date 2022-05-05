@@ -1,6 +1,5 @@
 #include "../headers/ImageUtils.hpp"
 
-
 void drawCross(cv::InputOutputArray _image, double x, double y, int size, int type, int thickness, cv::Scalar color) {
     using namespace cv;
 
@@ -82,11 +81,24 @@ cv::Rect DerivedROISelector::select(const std::string &windowName, cv::Mat img, 
     selectorParams.box = Rect();
 
     // Object selection
-    setMouseCallback(windowName, mouseHandler, (void*)this);
+    
+    try {
+        setMouseCallback(windowName, mouseHandler, (void*)this);
+    } catch (std::exception& e) {
+        // Nothing : the window is closed.
+    }
+   
 
     while (1) {
         // Exit via button
-        if (cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) == -1) {
+        // Exception handling necessary for windows as getWindowProperty
+        // throws an exception if the window is not found (eq. closed)
+        try {
+            if (cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) == -1) {
+                selectorParams.box = Rect(0, 0, EXIT, EXIT);
+                break;
+            }
+        } catch (std::exception& e) {
             selectorParams.box = Rect(0, 0, EXIT, EXIT);
             break;
         }
@@ -133,7 +145,11 @@ cv::Rect DerivedROISelector::select(const std::string &windowName, cv::Mat img, 
     }
 
     // Cleanup callback
-    setMouseCallback(windowName, emptyMouseHandler, NULL);
+    try {
+        setMouseCallback(windowName, emptyMouseHandler, NULL);
+    } catch (std::exception& e) {
+        // Nothing : the window is closed.
+    }
 
     return selectorParams.box;
 }

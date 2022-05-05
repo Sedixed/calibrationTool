@@ -107,9 +107,17 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
         img.release();
         
         while(1) {
-            if (cv::getWindowProperty(windowID, cv::WND_PROP_AUTOSIZE) == -1) {
+            // Exception handling necessary for windows as getWindowProperty
+            // throws an exception if the window is not found (eq. closed)
+            try {
+                if (cv::getWindowProperty(windowID, cv::WND_PROP_AUTOSIZE) == -1) {
+                    return -1;
+                }
+            } catch (std::exception& e) {
                 return -1;
             }
+            
+            
             int k = cv::waitKey(1);
             // ESC
             if (k == 27) {
@@ -123,7 +131,12 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
             
         }
     }
-    cv::destroyWindow(windowID);
+    try {
+        cv::destroyWindow(windowID);
+    } catch (std::exception& e) {
+        // Nothing : window already closed.
+    }
+    
     if (parent != NULL) {
         parent->Raise();
     }

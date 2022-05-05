@@ -3,6 +3,13 @@
 #include <opencv2/ccalib/omnidir.hpp>
 #include <wx/gbsizer.h>
 
+
+#ifdef WINDOWS
+    #define SIZE wxSize(660, 500)
+#else
+    #define SIZE wxSize(640, 500)
+#endif
+
 #define GREEN wxColour(57, 240, 119)
 #define RED wxColour(237, 67, 55)
 
@@ -43,7 +50,7 @@ int CalibrationResults(Calib *dataCalib, wxWindow* parent) {
     // Results display
     long style = wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX);
 
-    wxFrame* resultsFrame = new wxFrame(parent, wxID_ANY, _("Calibration results"), wxPoint(-1, -1), wxSize(640, 500), style);
+    wxFrame* resultsFrame = new wxFrame(parent, wxID_ANY, _("Calibration results"), wxPoint(-1, -1), SIZE, style);
     wxScrolledWindow* panel = new wxScrolledWindow(resultsFrame);
     panel->SetScrollbars(0, 10, 0, 1000);
     wxGridBagSizer* box = new wxGridBagSizer(10, 10);
@@ -57,16 +64,22 @@ int CalibrationResults(Calib *dataCalib, wxWindow* parent) {
     // Focal length
     double fx = dataCalib->intrinsics.at<double>(0, 0);
     double fy = dataCalib->intrinsics.at<double>(1, 1);
-    std::string fl = dataCalib->type == PERSPECTIVE_TYPE ? "Focal length : \t\t\t\t" : "Generalised focal length :\t";
+    std::string fl = dataCalib->type == PERSPECTIVE_TYPE ? "Focal length :" : "Generalised focal length :";
     sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
-        _(fl + std::to_string(fx) + "  " + std::to_string(fy))), wxGBPosition(0, 0), wxDefaultSpan,
+        _(fl)), wxGBPosition(0, 0), wxDefaultSpan,
+        wxALL | wxEXPAND, 8);
+    sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY,
+        _(std::to_string(fx) + "  " + std::to_string(fy))), wxGBPosition(0, 1), wxDefaultSpan,
         wxALL | wxEXPAND, 8);
 
     // Principal point
     double cx = dataCalib->intrinsics.at<double>(0, 2);
     double cy = dataCalib->intrinsics.at<double>(1, 2);
     sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
-        _("Principal point :\t\t\t\t" + std::to_string(cx) + "  " + std::to_string(cy))), wxGBPosition(1, 0), wxDefaultSpan,
+        _("Principal point :")), wxGBPosition(1, 0), wxDefaultSpan,
+        wxALL | wxEXPAND, 8);
+    sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
+        _(std::to_string(cx) + "  " + std::to_string(cy))), wxGBPosition(1, 1), wxDefaultSpan,
         wxALL | wxEXPAND, 8);
     
     int nextRow;
@@ -77,20 +90,24 @@ int CalibrationResults(Calib *dataCalib, wxWindow* parent) {
         case PERSPECTIVE_TYPE:
         {   
             // Distorsions
-            std::string dist = "Distorsions : \t\t\t\t";
+            sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
+            _("Distorsions :")), wxGBPosition(2, 0), wxDefaultSpan,
+            wxALL | wxEXPAND, 8);
+            std::string distCoeffs = "";
             for (int j = 0; j < dataCalib->distCoeffs.cols; ++j) {
-                //if (j == 0 || j == 1 || j == 4 || j == 5 || j == 6) {
-                    dist += std::to_string(dataCalib->distCoeffs.at<double>(0, j)) + "  ";
-                //}
+                distCoeffs += std::to_string(dataCalib->distCoeffs.at<double>(0, j)) + "  ";
             }
             sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
-            _(dist)), wxGBPosition(2, 0), wxDefaultSpan,
+            _(distCoeffs)), wxGBPosition(2, 1), wxDefaultSpan,
             wxALL | wxEXPAND, 8);
             
             // Method used
+            sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
+            _("Method used :")), wxGBPosition(3, 0), wxDefaultSpan,
+            wxALL | wxEXPAND, 8);
             std::string method = dataCalib->pref.fixed_point == 0 ? "calibrateCamera" : "calibrateCameraRO";
             sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
-            _("Method used : \t\t\t\t" + method)), wxGBPosition(3, 0), wxDefaultSpan,
+            _(method)), wxGBPosition(3, 1), wxDefaultSpan,
             wxALL | wxEXPAND, 8);
 
             nextRow = 4;
@@ -103,36 +120,48 @@ int CalibrationResults(Calib *dataCalib, wxWindow* parent) {
         {   
             // Skew
             sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
-            _("Skew : \t\t\t\t\t\t" + std::to_string(dataCalib->intrinsics.at<double>(0, 1)))), wxGBPosition(2, 0), wxDefaultSpan,
+            _("Skew :")), wxGBPosition(2, 0), wxDefaultSpan,
             wxALL | wxEXPAND, 8);
+            sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
+            _(std::to_string(dataCalib->intrinsics.at<double>(0, 1)))), wxGBPosition(2, 1), wxDefaultSpan,
+            wxALL | wxEXPAND, 8);
+
             // Xi
             sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
-            _("Xi : \t\t\t\t\t\t\t" + std::to_string(dataCalib->Xi))), wxGBPosition(3, 0), wxDefaultSpan,
+            _("Xi :")), wxGBPosition(3, 0), wxDefaultSpan,
             wxALL | wxEXPAND, 8);
+            sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
+            _(std::to_string(dataCalib->Xi))), wxGBPosition(3, 1), wxDefaultSpan,
+            wxALL | wxEXPAND, 8);
+
             // Distorsions
-            std::string dist = "Distorsions : \t\t\t\t";
+            sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
+            _("Distorsions :")), wxGBPosition(4, 0), wxDefaultSpan,
+            wxALL | wxEXPAND, 8);
+            std::string distCoeffs = "";
             for (int j = 0; j < dataCalib->distCoeffs.cols; ++j) {
-                dist += std::to_string(dataCalib->distCoeffs.at<double>(0, j)) + "  ";
+                distCoeffs += std::to_string(dataCalib->distCoeffs.at<double>(0, j)) + "  ";
             }
             sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
-            _(dist)), wxGBPosition(4, 0), wxDefaultSpan,
+            _(distCoeffs)), wxGBPosition(4, 1), wxDefaultSpan,
             wxALL | wxEXPAND, 8);
 
             nextRow = 5;
             break;
         }
         default:
-             wxMessageBox("Error : unknown calibration type.", "Error", wxICON_ERROR);
+            wxMessageBox("Error : unknown calibration type.", "Error", wxICON_ERROR);
             return -1;
     }
 
     // Mean error panel
-    wxPanel *errPanel = new wxPanel(summaryPanel);
-    wxGridBagSizer* errSizer = new wxGridBagSizer(10, 10);
-    errSizer->Add(new wxStaticText(errPanel, wxID_ANY, 
-            _("Mean error : \t\t\t")), wxGBPosition(0, 0), wxDefaultSpan, wxTOP | wxBOTTOM | wxRIGHT | wxALIGN_CENTER_VERTICAL, 8);
-    // Inner mean error panel (for background color)
-    wxPanel* innerErrPanel = new wxPanel(errPanel, -1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER);
+
+    sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
+            _("Mean error :")), wxGBPosition(nextRow, 0), wxDefaultSpan,
+            wxALL | wxEXPAND | wxALIGN_CENTER_VERTICAL, 8);
+
+    wxPanel* innerErrPanel = new wxPanel(summaryPanel, -1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER);
+
     innerErrPanel->SetBackgroundColour(dataCalib->error >= 1 ? RED : GREEN);
     innerErrPanel->SetForegroundColour((wxColour) * wxBLACK);
     wxGridBagSizer* innerErrSizer = new wxGridBagSizer(10, 10);
@@ -140,17 +169,12 @@ int CalibrationResults(Calib *dataCalib, wxWindow* parent) {
     double stdd = standardDeviation(dataCalib);
     innerErrSizer->Add(new wxStaticText(innerErrPanel, wxID_ANY, 
             std::to_wstring(dataCalib->error) + L" \u00b1 " + std::to_wstring(stdd)), 
-            wxGBPosition(0, 0), wxDefaultSpan, wxALL | wxALIGN_CENTER_VERTICAL, 8);
-
+            wxGBPosition(0, 0), wxDefaultSpan, wxALL | wxALIGN_CENTER | wxEXPAND, 8);
     innerErrSizer->SetSizeHints(innerErrPanel);
     innerErrPanel->SetSizer(innerErrSizer);
 
-    errSizer->Add(innerErrPanel, wxGBPosition(0, 1), wxDefaultSpan, wxALL, 8);
-
-    errSizer->SetSizeHints(errPanel);
-    errPanel->SetSizer(errSizer);
-
-    sumBox->Add(errPanel, wxGBPosition(nextRow, 0), wxDefaultSpan, wxALL | wxEXPAND , 8);
+    sumBox->Add(innerErrPanel, wxGBPosition(nextRow, 1), wxDefaultSpan,
+            wxALL | wxEXPAND | wxALIGN_CENTER, 8);
 
     sumBox->SetSizeHints(summaryPanel);
     summaryPanel->SetSizer(sumBox);

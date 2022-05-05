@@ -14,7 +14,7 @@ int ExtractGridCorners(Calib *dataCalib) {
     std::vector<std::vector<cv::Point3f>> allCorners3D;
 
     std::string windowID = IMG_NAME;
-    cv::namedWindow(windowID, 1);
+    cv::namedWindow(windowID, cv::WND_PROP_AUTOSIZE);
     bool reIterated = false;
     for (int i = 0; i < dataCalib->nb_images; ++i) {
         dataCalib->IOcalib[i].active_image = true;
@@ -79,6 +79,7 @@ int ExtractGridCorners(Calib *dataCalib) {
         if (r.size().width == EXIT && r.size().height == EXIT) {
             wxMessageBox("All corners weren't extracted properly : you won't be able to perform calibration.",
                 "Corners extraction", wxICON_ERROR);
+            src.release();
             return -1;
         }
         // Next image via Enter/Y/O (no ROI selected)
@@ -114,9 +115,17 @@ int ExtractGridCorners(Calib *dataCalib) {
         src.release();
         
         while(1) {
-            if (cv::getWindowProperty(windowID, cv::WND_PROP_AUTOSIZE) == -1) {
-                wxMessageBox("All corners weren't extracted properly : you won't be able to perform calibration.",
-                    "Corners extraction", wxICON_ERROR);
+            // Exception handling necessary for windows as getWindowProperty
+            // throws an exception if the window is not found (eq. closed)
+            try {
+                if (cv::getWindowProperty(windowID, cv::WND_PROP_AUTOSIZE) == -1) {
+                    wxMessageBox("All corners weren't extracted properly : you won't be able to perform calibration.",
+                        "Corners extraction", wxICON_ERROR);
+                    return -1;
+                }
+            } catch (std::exception& e) {
+                 wxMessageBox("All corners weren't extracted properly : you won't be able to perform calibration.",
+                        "Corners extraction", wxICON_ERROR);
                 return -1;
             }
             int k = cv::waitKey(1);
@@ -141,7 +150,13 @@ int ExtractGridCorners(Calib *dataCalib) {
             }
         }
     }
-    cv::destroyWindow(windowID);
+    
+    try {
+        cv::destroyWindow(windowID);
+    } catch (std::exception& e) {
+        // Nothing : already closed.
+    }
+    
     int result = wxMessageBox("Was the extraction successful ?", "Corners extraction", wxYES_NO | wxICON_QUESTION);
         if (result == wxYES) {
             // Saving corners positions in 2D and 3D

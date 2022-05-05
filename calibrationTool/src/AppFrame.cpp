@@ -80,6 +80,7 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     // fait :
     // manuel user (reste que generalised focal length)
+    // remplacer getwindowproperty par des try/catch (marche pas sur windows)
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
