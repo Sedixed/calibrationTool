@@ -68,7 +68,7 @@ int Calibration(Calib* dataCalib) {
                     dataCalib->intrinsics, dataCalib->distCoeffs, rVecs, tVecs, newObjPoints, 
                     cv::noArray(), cv::noArray(), cv::noArray(), perViewError, flags);
             } catch (std::exception& e) {
-                wxMessageBox("An unknown error occurred.", "Error", wxICON_ERROR);
+                wxMessageBox("An unknown error occurred.", "Calibration", wxICON_ERROR);
                 return -1;
             }
 
@@ -80,10 +80,23 @@ int Calibration(Calib* dataCalib) {
                 if (!dataCalib->IOcalib[i].active_image) {
                     continue;
                 }
-                dataCalib->IOcalib[i].rotationMat = rVecs[cpt];
-                dataCalib->IOcalib[i].translationMat = tVecs[cpt];
-                dataCalib->IOcalib[i].errorView = perViewError[cpt];
-                ++cpt;
+                try {
+                    if ((size_t) cpt < rVecs.size()) {
+                        dataCalib->IOcalib[i].rotationMat = rVecs[cpt];
+                        dataCalib->IOcalib[i].translationMat = tVecs[cpt];
+                        dataCalib->IOcalib[i].errorView = perViewError[cpt];
+                        ++cpt;
+                    } else {
+                        wxMessageBox("Calibration failed : please ensure that the grid corners extraction was correct.", "Calibration", wxICON_ERROR);
+                        img.release();
+                        return -1;
+                    }
+                } catch (std::exception& e) {
+                    wxMessageBox("Calibration failed : please ensure that the grid corners extraction was correct.", "Calibration", wxICON_ERROR);
+                    img.release();
+                    return -1;
+                }
+                
             }
             wxMessageBox("Calibration succeeded !", "Calibration", wxOK);
             break;
@@ -137,7 +150,8 @@ int Calibration(Calib* dataCalib) {
         }
 
         default:
-            wxMessageBox("Error : unknown calibration type.", "Error", wxICON_ERROR);
+            wxMessageBox("Error : unknown calibration type.", "Calibration", wxICON_ERROR);
+            return -1;
     }
 
     img.release();

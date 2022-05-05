@@ -90,7 +90,7 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     fgboxParameters = new wxGridBagSizer(10, 10);
 
     // Focal length
-    fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Generalised focal length :"),
+    fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Focal length :"),
             wxGBPosition(0, 0), wxDefaultSpan, wxALL | wxALIGN_CENTER_VERTICAL, 8);
     wxCheckBox* g = new wxCheckBox(parameters, Pref::Perspective::ID_FOCAL, "G");
     g->SetValue(!ignoreFocal);

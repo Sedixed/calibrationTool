@@ -83,7 +83,9 @@ int ExtractGridCorners(Calib *dataCalib) {
         }
         // Next image via Enter/Y/O (no ROI selected)
         if (r.size().width == NEXT_ENTER_OK && r.size().height == NEXT_ENTER_OK) {
-            dataCalib->IOcalib[i].active_image = true;
+            if (found) {
+                dataCalib->IOcalib[i].active_image = true;
+            }
             reIterated = false;
             src.release();
             continue;
@@ -126,7 +128,9 @@ int ExtractGridCorners(Calib *dataCalib) {
             }
             // ENTER, O, Y
             if (k == 13 || k == 111 || k == 121) {
-                dataCalib->IOcalib[i].active_image = true;
+                if (found) {
+                    dataCalib->IOcalib[i].active_image = true;
+                }
                 reIterated = false;
                 break;
             }

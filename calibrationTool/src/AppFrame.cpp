@@ -77,10 +77,9 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // installateur clean
     // version release/debug ?
     // installateur kinda sus : fonctionne même avec que l'exécutable avec nsis, pas besoin des dll
-    // update le manuel
-    //      expliquer rapidement le modèle (tu peux t'inspirer de opencv + faire référence à un papier)
 
     // fait :
+    // manuel user (reste que generalised focal length)
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
