@@ -18,8 +18,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/Users/sedix/Documents/libs/**",
-                "C/Users/sedix/Documents/libs/opencv/install/include"
+                "C:/Users/sedix/Documents/libs/**"
             ],
             "defines": [
                 "_DEBUG",

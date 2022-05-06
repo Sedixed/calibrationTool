@@ -124,7 +124,7 @@ int ExtractGridCorners(Calib *dataCalib) {
                     return -1;
                 }
             } catch (std::exception& e) {
-                 wxMessageBox("All corners weren't extracted properly : you won't be able to perform calibration.",
+                wxMessageBox("All corners weren't extracted properly : you won't be able to perform calibration.",
                         "Corners extraction", wxICON_ERROR);
                 return -1;
             }

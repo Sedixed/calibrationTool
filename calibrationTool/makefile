@@ -8,6 +8,7 @@ WXL_DIR = libs/wx
 OPENCVL_DIR = libs/opencv
 WXB_DIR = include/wx
 OPENCVB_DIR = include/opencv
+RESOURCE_DIR = resource
 
 # Files
 SRCS = $(SRC_DIR)/*.cpp
@@ -30,7 +31,7 @@ ifeq ($(OS), Windows_NT)
 	CFLAGS += -DWINDOWS
 	LDFLAGS += -mwindows
 	EXEC_NAME := "Calibration Tool.exe"
-	OBJS += $(OBJ_DIR)/rc.o
+	OBJS += $(OBJ_DIR)/resource.o
 	CLEAN_OBJS := /q $(OBJ_DIR)\*.o
 
 # Include path for wxWidgets + path to wx/setup.h (required)
@@ -60,7 +61,7 @@ ifeq ($(OS), Windows_NT)
 # Other OS (only Linux supported)
 else
 	RM := rm
-	EXEC_NAME := app
+	EXEC_NAME := calibrationTool
 
 	CLEAN_OBJS := $(OBJ_DIR)/*.o
 
@@ -86,8 +87,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HD_DIR)/%.hpp
 	$(CC) -c $(WXB) $(OPENCVB) $(CFLAGS) -o $@ $<
 
 # Resource file (windows only)
-$(OBJ_DIR)/rc.o:
-	windres $(WXB) app.rc -o $@
+$(OBJ_DIR)/resource.o:
+	windres $(WXB) $(RESOURCE_DIR)/resource.rc -o $@
 
 clean:
 	$(RM) $(EXEC_NAME) $(CLEAN_OBJS)
