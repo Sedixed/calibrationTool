@@ -26,7 +26,7 @@ File "..\Calibration Tool.exe"
 File "..\docs\user_manual.pdf"
 SetOutPath $INSTDIR\libs
 File /r "..\libs\"
-
+SetOutPath $INSTDIR
 CreateDirectory "$SMPROGRAMS\Calibration Tool"
 CreateShortCut "$DESKTOP\Calibration Tool.lnk" "$INSTDIR\Calibration Tool.exe" 
 CreateShortCut "$SMPROGRAMS\Calibration Tool\Calibration Tool.lnk" "$INSTDIR\Calibration Tool.exe"
