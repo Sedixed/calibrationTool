@@ -74,14 +74,16 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     SetDefaultPreferences();
 
     // todo :
-    // installateur clean
     // version release/debug ?
-    // installateur kinda sus : fonctionne même avec que l'exécutable avec nsis, pas besoin des dll
+    // manuel technique (setup)
 
     // fait :
     // manuel user (reste que generalised focal length)
     // remplacer getwindowproperty par des try/catch (marche pas sur windows)
     // fix d'un bug d'affichage des valeurs à calibResults -> jsp pourquoi mais now it works
+
+    // installateur clean (jcrois)
+
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
@@ -256,7 +258,6 @@ void AppFrame::OnPreferences(wxCommandEvent& evt) {
             wxMessageBox("Error : unknown calibration type.", "Error", wxICON_ERROR);
         }
     }
-    
 }
 
 
