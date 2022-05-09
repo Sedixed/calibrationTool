@@ -7,8 +7,10 @@
     #include <wx/wx.h>
 #endif
 
+
 // Minimal amount of valid images
 #define MIN_VALID_IMAGES 3
+
 
 int Calibration(Calib* dataCalib) {
     // ---------------------------------------
@@ -58,8 +60,8 @@ int Calibration(Calib* dataCalib) {
         // ------------------------------------
         case PERSPECTIVE_TYPE:
         {
-            std::vector<double> perViewError;                              // Error per view vector
-            std::vector<cv::Point3f> newObjPoints;                         // New object points
+            std::vector<double> perViewError;       // Error per view vector
+            std::vector<cv::Point3f> newObjPoints;  // New object points
         
             // Calibration
             try {
@@ -87,12 +89,14 @@ int Calibration(Calib* dataCalib) {
                         dataCalib->IOcalib[i].errorView = perViewError[cpt];
                         ++cpt;
                     } else {
-                        wxMessageBox("Calibration failed : please ensure that the grid corners extraction was correct.", "Calibration", wxICON_ERROR);
+                        wxMessageBox("Calibration failed : please ensure that the grid corners extraction was correct.",
+                            "Calibration", wxICON_ERROR);
                         img.release();
                         return -1;
                     }
                 } catch (std::exception& e) {
-                    wxMessageBox("Calibration failed : please ensure that the grid corners extraction was correct.", "Calibration", wxICON_ERROR);
+                    wxMessageBox("Calibration failed : please ensure that the grid corners extraction was correct.",
+                        "Calibration", wxICON_ERROR);
                     img.release();
                     return -1;
                 }
@@ -135,12 +139,14 @@ int Calibration(Calib* dataCalib) {
                         dataCalib->IOcalib[i].translationMat = tVecs[cpt];
                         ++cpt;
                     } else {
-                        wxMessageBox("Calibration failed : please ensure that the grid corners extraction was correct.", "Calibration", wxICON_ERROR);
+                        wxMessageBox("Calibration failed : please ensure that the grid corners extraction was correct.",
+                            "Calibration", wxICON_ERROR);
                         img.release();
                         return -1;
                     }
                 } catch (std::exception& e) {
-                    wxMessageBox("Calibration failed : please ensure that the grid corners extraction was correct.", "Calibration", wxICON_ERROR);
+                    wxMessageBox("Calibration failed : please ensure that the grid corners extraction was correct.",
+                        "Calibration", wxICON_ERROR);
                     img.release();
                     return -1;
                 }

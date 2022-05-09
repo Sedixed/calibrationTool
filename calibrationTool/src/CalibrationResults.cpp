@@ -3,6 +3,7 @@
 #include <opencv2/ccalib/omnidir.hpp>
 #include <wx/gbsizer.h>
 
+
 // Adapt size for both Linux and Windows widgets sizes
 #ifdef WINDOWS
     #define SIZE wxSize(660, 500)
@@ -32,7 +33,8 @@ int CalibrationResults(Calib *dataCalib, wxWindow* parent) {
             switch(dataCalib->type) {
                 case SPHERICAL_TYPE:
                 {   
-                    cv::omnidir::projectPoints(objPoints, imgPointsOutput, rVec, tVec, cameraMatrix, dataCalib->Xi, dataCalib->distCoeffs);
+                    cv::omnidir::projectPoints(objPoints, imgPointsOutput, rVec, tVec, cameraMatrix,
+                        dataCalib->Xi, dataCalib->distCoeffs);
                     // Error per view calculus
                     double err = cv::norm(cv::Mat(dataCalib->IOcalib[i].CornersCoord2D), cv::Mat(imgPointsOutput), cv::NORM_L2);
                     int n = (int) objPoints.size();
@@ -155,7 +157,6 @@ int CalibrationResults(Calib *dataCalib, wxWindow* parent) {
     }
 
     // Mean error panel
-
     sumBox->Add(new wxStaticText(summaryPanel, wxID_ANY, 
             _("Mean error :")), wxGBPosition(nextRow, 0), wxDefaultSpan,
             wxALL | wxEXPAND | wxALIGN_CENTER_VERTICAL, 8);
@@ -179,7 +180,6 @@ int CalibrationResults(Calib *dataCalib, wxWindow* parent) {
     sumBox->SetSizeHints(summaryPanel);
     summaryPanel->SetSizer(sumBox);
     box->Add(summaryPanel, wxGBPosition(1, 0), wxDefaultSpan, wxLEFT | wxRIGHT | wxEXPAND, 8);
-
 
     // Views
     box->Add(new wxStaticText(panel, wxID_ANY, "Views summary"), wxGBPosition(2, 0), wxDefaultSpan,
@@ -233,6 +233,7 @@ int CalibrationResults(Calib *dataCalib, wxWindow* parent) {
     resultsFrame->Show();
     return 0;
 }
+
 
 double standardDeviation(Calib* dataCalib) {
     double sum = 0;

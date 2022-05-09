@@ -6,6 +6,7 @@
     #include <wx/wx.h>
 #endif
 
+
 #define IMG_NAME "Corners extraction : "
 
 
@@ -40,7 +41,6 @@ int ExtractGridCorners(Calib *dataCalib) {
             cv::cornerSubPix(viewGray, corners, cv::Size(dataCalib->pref.search_window_size, dataCalib->pref.search_window_size),
                                 cv::Size(-1,-1), criteria);
             drawChessboardCorners(src, patternSize, cv::Mat(corners), found, cv::Scalar(0, 0, 255, 0), 0);
-            //cv::drawChessboardCorners(src, patternSize, cv::Mat(corners), found);
             viewGray.release();
 
             // 3D coordinates of the points
@@ -158,24 +158,24 @@ int ExtractGridCorners(Calib *dataCalib) {
     }
     
     int result = wxMessageBox("Was the extraction successful ?", "Corners extraction", wxYES_NO | wxICON_QUESTION);
-        if (result == wxYES) {
-            // Saving corners positions in 2D and 3D
-            for (int i = 0; i < dataCalib->nb_images; ++i) {
-                if (!dataCalib->IOcalib[i].active_image) {
-                    continue;
-                }
-                std::vector<cv::Point2f> corners = allCorners.at(i);               
-                std::vector<cv::Point3f> corners3D = allCorners3D.at(i);
-                dataCalib->IOcalib[i].CornersCoord2D = corners;
-                dataCalib->IOcalib[i].CornersCoord3D = corners3D;
-                dataCalib->IOcalib[i].active_image = true;
-                
+    if (result == wxYES) {
+        // Saving corners positions in 2D and 3D
+        for (int i = 0; i < dataCalib->nb_images; ++i) {
+            if (!dataCalib->IOcalib[i].active_image) {
+                continue;
             }
-        } else {
-            for (int i = 0; i < dataCalib->nb_images; ++i) {
-                dataCalib->IOcalib[i].active_image = false;
-            }
-            return -1;
+            std::vector<cv::Point2f> corners = allCorners.at(i);               
+            std::vector<cv::Point3f> corners3D = allCorners3D.at(i);
+            dataCalib->IOcalib[i].CornersCoord2D = corners;
+            dataCalib->IOcalib[i].CornersCoord3D = corners3D;
+            dataCalib->IOcalib[i].active_image = true;
+            
         }
+    } else {
+        for (int i = 0; i < dataCalib->nb_images; ++i) {
+            dataCalib->IOcalib[i].active_image = false;
+        }
+        return -1;
+    }
     return 0;
 }

@@ -81,7 +81,7 @@ int AbstractPreferences::GenericSetOkState(wxButton* b) {
     if (nbX->GetLineLength(0) == 0 || nbY->GetLineLength(0) == 0 ||
         sizeX->GetLineLength(0) == 0 || sizeY->GetLineLength(0) == 0) {
         b->Enable(false);
-            return -1;
+        return -1;
     }
     return 0;
 }

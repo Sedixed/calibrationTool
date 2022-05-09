@@ -5,7 +5,9 @@
     #include <wx/wx.h>
 #endif
 
+
 #define MOSAIC_TITLE "Loaded images"
+
 
 int Mosaic(cv::Mat images[], int nbImages, int width) {
     if (nbImages <= 0 || images == NULL) {
@@ -81,6 +83,5 @@ int Mosaic(cv::Mat images[], int nbImages, int width) {
     tmp.release();
     render1.release();
     render2.release();
-
     return 0;
 }

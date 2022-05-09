@@ -2,10 +2,9 @@
 #include "../headers/Mosaic.hpp"
 #include <opencv2/opencv.hpp>
 
+
 int LoadImages(Calib* dataCalib, wxWindow* parent) {
     wxString wildcard("Image files (*.bmp;*.tiff;*.jpg;*.jpeg;*.pgm;*.png)|*.bmp;*.tiff;*.jpg;*.jpeg;*.pgm;*.png");
-
-
     wxFileDialog* askImages = new wxFileDialog(NULL, "Load images", "", "", 
                                 wildcard, wxFD_OPEN | wxFD_MULTIPLE);
 

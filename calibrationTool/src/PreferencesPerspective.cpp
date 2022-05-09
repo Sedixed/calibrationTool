@@ -73,7 +73,6 @@ void PreferencesPerspectiveFrame::OnExitOk(wxCommandEvent& evt) {
         dataCalib->intrinsics.at<double>(0, 0) = 0.0;
         dataCalib->intrinsics.at<double>(1, 1) = 0.0;
     }
-
     dataCalib->pref.parameters_flags = flags;
     Close(true);
 }
@@ -117,7 +116,6 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     gv->Enable(allEnabled);
     gv->Show(ignoreFocal);
     fgboxParameters->Add(gv, wxGBPosition(0, 4), wxGBSpan(1, 2), wxTOP | wxRIGHT | wxALIGN_CENTER_VERTICAL, 8);
-
 
     // Principal point 
     fgboxParameters->Add(new wxStaticText(parameters, wxID_ANY, "Principal point :"),
@@ -197,7 +195,6 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
         std::string label = std::to_string(w) + "x" + std::to_string(h);
         wxRadioButton *b = new wxRadioButton(render, Pref::renderId[i], _(label), 
                     wxDefaultPosition, wxDefaultSize, i == 0 ? wxRB_GROUP : 0);
-        
         cv::Size size = dataCalib->pref.render_size;
         if (w == size.width && h == size.height) {
             b->SetValue(true);
@@ -211,7 +208,6 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
     // Calibration pattern properties
     wxFloatingPointValidator<float> valFloat(2, NULL, wxNUM_VAL_ZERO_AS_BLANK);
     valFloat.SetRange(0, 100);
-
     wxIntegerValidator<int> valInt(NULL, wxNUM_VAL_ZERO_AS_BLANK);
     valInt.SetRange(1, 100);
 
@@ -270,25 +266,25 @@ void PreferencesPerspectiveFrame::CreateAndPlaceComponents() {
 void PreferencesPerspectiveFrame::UpdateFlags(wxCommandEvent& evt) {
     switch(evt.GetId()) {
         case Pref::Perspective::ID_FOCAL:
-            {   
-                ignoreFocal = !ignoreFocal;
-                flags ^= cv::CALIB_FIX_FOCAL_LENGTH;
-                flags ^= cv::CALIB_USE_INTRINSIC_GUESS;
-                SetOkState(evt);
-                wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
-                gu->Show(ignoreFocal);
-                wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
-                gv->Show(ignoreFocal);
-                fgboxParameters->SetSizeHints(parameters);
-                panel->Layout();
-                break;
-            }
+        {   
+            ignoreFocal = !ignoreFocal;
+            flags ^= cv::CALIB_FIX_FOCAL_LENGTH;
+            flags ^= cv::CALIB_USE_INTRINSIC_GUESS;
+            SetOkState(evt);
+            wxTextCtrl* gu = (wxTextCtrl*) FindWindowById(GU);
+            gu->Show(ignoreFocal);
+            wxTextCtrl* gv = (wxTextCtrl*) FindWindowById(GV);
+            gv->Show(ignoreFocal);
+            fgboxParameters->SetSizeHints(parameters);
+            panel->Layout();
+            break;
+        }
         case Pref::Perspective::ID_POINT:
-            {   
-                ignorePoint = !ignorePoint;
-                flags ^= cv::CALIB_FIX_PRINCIPAL_POINT;
-                break;
-            }
+        {   
+            ignorePoint = !ignorePoint;
+            flags ^= cv::CALIB_FIX_PRINCIPAL_POINT;
+            break;
+        }
         case Pref::Perspective::ID_K1:
             flags ^= cv::CALIB_FIX_K1;
             break;

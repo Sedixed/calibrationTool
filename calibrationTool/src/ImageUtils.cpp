@@ -1,5 +1,6 @@
 #include "../headers/ImageUtils.hpp"
 
+
 void drawCross(cv::InputOutputArray _image, double x, double y, int size, int type, int thickness, cv::Scalar color) {
     using namespace cv;
 
@@ -7,16 +8,21 @@ void drawCross(cv::InputOutputArray _image, double x, double y, int size, int ty
     Mat image = _image.getMat();
     
     if(type == 0) {
-        line( image, Point((int)(x-size), (int)(y)), Point((int)(x+size), (int)(y)), color, thickness );
-        line( image, Point((int)(x), (int)(y-size)), Point((int)(x), (int)(y+size)), color, thickness );
+        line(image, Point((int) (x - size), (int) y), Point((int) (x + size), (int) y),
+            color, thickness);
+        line(image, Point((int) x, (int) (y - size)), Point((int) x, (int) (y + size)),
+            color, thickness);
     } else {
-        line( image, Point((int)(x-size), (int)(y-size)), Point((int)(x+size), (int)(y+size)), color, thickness, LINE_AA );
-        line( image, Point((int)(x-size), (int)(y+size)), Point((int)(x+size), (int)(y-size)), color, thickness, LINE_AA );
+        line(image, Point((int) (x - size), (int) (y - size)), Point((int) (x + size), 
+            (int) (y + size)), color, thickness, LINE_AA);
+        line(image, Point((int) (x - size), (int) (y + size)), Point((int) (x  +size), 
+            (int) (y - size)), color, thickness, LINE_AA);
     }
 }
 
 
-void drawChessboardCorners(cv::InputOutputArray image, cv::Size patternSize, cv::InputArray _corners, bool patternWasFound, cv::Scalar color, int type) {
+void drawChessboardCorners(cv::InputOutputArray image, cv::Size patternSize, cv::InputArray _corners,
+    bool patternWasFound, cv::Scalar color, int type) {
     using namespace cv;
 
     int t = image.type();
@@ -88,7 +94,6 @@ cv::Rect DerivedROISelector::select(const std::string &windowName, cv::Mat img, 
         // Nothing : the window is closed.
     }
    
-
     while (1) {
         // Exit via button
         // Exception handling necessary for windows as getWindowProperty

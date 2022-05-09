@@ -6,6 +6,7 @@ namespace Btn {
         return new wxButton(parent, id, mainLabels[id]);
     }
 
+
     const std::vector<wxButton*> baseButtons(wxWindow* parent) {
         return std::vector<wxButton*> {
             new wxButton(parent, ID_PERSPECTIVE, mainLabels[ID_PERSPECTIVE]),
@@ -14,6 +15,7 @@ namespace Btn {
             new wxButton(parent, ID_EXIT, mainLabels[ID_EXIT])
         };
     }
+
 
     const std::vector<wxButton*> perspectiveButtons(wxWindow* parent) {
         return std::vector<wxButton*> {
@@ -29,6 +31,7 @@ namespace Btn {
         };
     }
 
+
     const std::vector<wxButton*> sphericalButtons(wxWindow* parent) {
         return std::vector<wxButton*> {
             new wxButton(parent, ID_LOAD_IMG, mainLabels[ID_LOAD_IMG]),
@@ -42,6 +45,7 @@ namespace Btn {
             new wxButton(parent, ID_EXIT, mainLabels[ID_EXIT])
         };
     }
+
 
     const std::vector<wxButton*> preferencesButtons(wxWindow* parent) {
         return std::vector<wxButton*> {
