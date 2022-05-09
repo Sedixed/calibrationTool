@@ -75,10 +75,10 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     // todo :
     // version release/debug ?
-    // manuel technique (setup)
 
     // fait :
     // manuel user (reste que generalised focal length)
+    // technical manual
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
