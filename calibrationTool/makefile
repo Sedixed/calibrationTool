@@ -38,23 +38,23 @@ ifeq ($(OS), Windows_NT)
 #WXB := -I "C:\Users\sedix\Documents\libs\wxWidgets\lib\gcc810_x64_dll\mswud" \
 #	-I "C:\Users\sedix\Documents\libs\wxWidgets\include"
 
-	WXB := -I $(WXB_DIR)
+	WXB ?= -I $(WXB_DIR)
 
 # Lib path for wxWidgets + libraries linked
 #WXL := -L "C:\Users\sedix\Documents\libs\wxWidgets\lib\gcc810_x64_dll"
 
-	WXL := -L $(WXL_DIR) \
+	WXL ?= -L $(WXL_DIR) \
 		-lwxmsw316u_core_gcc810_x64 -lwxbase316u_gcc810_x64
 
 # Include path for openCV
 #OPENCVB := -I "C:\Users\sedix\Documents\libs\opencv\install\include"
 
-	OPENCVB := -I $(OPENCVB_DIR)
+	OPENCVB ?= -I $(OPENCVB_DIR)
 
 # Lib path for openCV  + libraries linked (shared, must be lib dir for static)
 #OPENCVL := -L "C:\Users\sedix\Documents\libs\opencv\install\x64\mingw\bin" 
 
-	OPENCVL := -L $(OPENCVL_DIR) \
+	OPENCVL ?= -L $(OPENCVL_DIR) \
 			-lopencv_highgui455 -lopencv_core455 -lopencv_ccalib455 -lopencv_calib3d455 \
 			-lopencv_imgproc455 -lopencv_imgcodecs455
 
@@ -90,8 +90,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HD_DIR)/%.hpp
 $(OBJ_DIR)/resource.o:
 	windres $(WXB) $(RESOURCE_DIR)/resource.rc -o $@
 
+# Remove the executable and the object files
 clean:
 	$(RM) $(EXEC_NAME) $(CLEAN_OBJS)
 
+# Remove the object files
 clean_objs:
 	$(RM) $(CLEAN_OBJS)

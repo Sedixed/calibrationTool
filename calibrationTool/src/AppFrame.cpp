@@ -79,12 +79,6 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     // fait :
     // manuel user (reste que generalised focal length)
-    // remplacer getwindowproperty par des try/catch (marche pas sur windows)
-    // fix d'un bug d'affichage des valeurs à calibResults -> jsp pourquoi mais now it works
-    // ajout des dll nécessaires pour le cpp (jcrois)
-
-    // installateur clean (jcrois)
-
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);

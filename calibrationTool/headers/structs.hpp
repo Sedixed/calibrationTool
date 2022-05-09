@@ -53,7 +53,7 @@ typedef struct mire {
 typedef struct iocalibration {
 	// Input
 	char image_name[MAX_FILE_NAME] {'\0'};		    // Image path and name
-	bool active_image;		           			    // Is the image useful for calibration ? 0 -> don't use the image
+	bool active_image;		           			    // Is the image useful for calibration ? false -> don't use the image
 
 	// Output
 	std::vector<cv::Point2f> CornersCoord2D;		// 2D coordinates of plane corners
