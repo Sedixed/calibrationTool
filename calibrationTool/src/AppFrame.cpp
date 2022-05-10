@@ -78,7 +78,7 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     // fait :
     // manuel user (reste que generalised focal length)
-    // technical manual
+    // new installer (mui)
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
