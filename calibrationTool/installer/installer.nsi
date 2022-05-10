@@ -10,7 +10,7 @@
 ; Attributes
 Name "Calibration Tool"
 OutFile "Calibration Tool Setup.exe"
-InstallDir "$PROGRAMFILES\Calibration Tool"
+InstallDir "$PROGRAMFILES64\Calibration Tool"
 RequestExecutionLevel admin
 
 ;-------------------------------------------------------------------------------

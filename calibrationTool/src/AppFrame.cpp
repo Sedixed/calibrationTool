@@ -9,7 +9,9 @@
 #include "../headers/CalibrationResults.hpp"
 #include "../headers/Save.hpp"
 #include "../headers/LoadFile.hpp"
+#include <wx/mimetype.h>
 #include <iostream>
+#include <wx/filename.h>
 
 
 // Spacing between two buttons in the base menu
@@ -77,8 +79,9 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // version release/debug ?
 
     // fait :
-    // manuel user (reste que generalised focal length)
+    // manuel user (reste que generalised focal length, voir schémas qu'il a envoyé)
     // new installer (mui)
+    // help permet d'ouvrir le pdf user -> gérer les espaces sous windows car fonctionne pas
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
@@ -94,7 +97,30 @@ void AppFrame::OnExit(wxCommandEvent& evt) {
 
 
 void AppFrame::OnHelp(wxCommandEvent& evt) {
-    wxLogMessage("Camera calibration tool. Please first select either spherical or perspective camera to start.");
+    wxMessageDialog* msgBox = new wxMessageDialog(this, 
+        "Camera calibration tool. Please first select either spherical or perspective camera to start.",
+        "Help", wxHELP | wxICON_INFORMATION);
+    msgBox->SetHelpLabel("View documentation");
+
+    if (msgBox->ShowModal() == wxID_HELP) {
+        wxMimeTypesManager mgr;
+        wxFileType* pdfType = mgr.GetFileTypeFromExtension("pdf");
+        std::string path = std::string(wxGetCwd().mb_str()) + std::string("/docs/user_manual.pdf");
+        //size_t n = path.find(" ");
+        /*while(n != std::string::npos) {
+            path.replace(n, 1, "");
+            n = path.find(" ");
+        }*/
+        const auto command = pdfType->GetOpenCommand(path); 
+        if (command == wxEmptyString) {
+            delete pdfType;
+            const char *errMsg = "Could not open the manual file. Try to open the file from the folder where you installed the software.";
+            wxLogError(errMsg);
+            return;
+        }
+        wxExecute(command);
+        delete pdfType;
+    }
 }
 
 
