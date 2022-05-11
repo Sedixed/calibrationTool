@@ -80,7 +80,6 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     // fait :
     // manuel user (reste que generalised focal length, voir schémas qu'il a envoyé)
-    // new installer (mui)
     // help permet d'ouvrir le pdf user -> gérer les espaces sous windows car fonctionne pas
 
     panel = new wxPanel(this);
@@ -105,13 +104,25 @@ void AppFrame::OnHelp(wxCommandEvent& evt) {
     if (msgBox->ShowModal() == wxID_HELP) {
         wxMimeTypesManager mgr;
         wxFileType* pdfType = mgr.GetFileTypeFromExtension("pdf");
-        std::string path = std::string(wxGetCwd().mb_str()) + std::string("/docs/user_manual.pdf");
-        //size_t n = path.find(" ");
-        /*while(n != std::string::npos) {
-            path.replace(n, 1, "");
-            n = path.find(" ");
-        }*/
-        const auto command = pdfType->GetOpenCommand(path); 
+        wxString path = wxGetCwd();
+        #ifdef WINDOWS
+            path += _("\\docs\\user_manual.pdf");
+        #else
+            path += _("/docs/user_manual.pdf");
+        #endif
+        
+        auto command = pdfType->GetOpenCommand(path);
+        
+        std::string arg = "--single-argument";
+        size_t pos = command.find(arg);
+        
+        if (pos != std::string::npos) {
+            pos += arg.length();
+            if (command[pos + 1] == '\"') {
+                command.erase(pos + 1, 1);
+                command.erase(command.length() - 1, 1);
+            }
+        }
         if (command == wxEmptyString) {
             delete pdfType;
             const char *errMsg = "Could not open the manual file. Try to open the file from the folder where you installed the software.";
