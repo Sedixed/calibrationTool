@@ -76,11 +76,16 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     SetDefaultPreferences();
 
     // todo :
-    // version release/debug ?
+    // version release/debug !
 
     // fait :
     // manuel user (reste que generalised focal length, voir schémas qu'il a envoyé)
-    // help permet d'ouvrir le pdf user -> gérer les espaces sous windows car fonctionne pas
+    // help permet d'ouvrir le pdf user -> espaces gérés
+    // création d'un .deb mais pas giga sûr de l'installation xd
+
+    // on a les versions release/debug :
+    //  windows : installer + sources
+    //  ubuntu : deb + sources
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);

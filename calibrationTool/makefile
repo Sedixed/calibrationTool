@@ -4,11 +4,11 @@ CC = g++
 HD_DIR = headers
 SRC_DIR = src
 OBJ_DIR = obj
-WXL_DIR = libs/wx
-OPENCVL_DIR = libs/opencv
+RESOURCE_DIR = resource
+
 WXB_DIR = include/wx
 OPENCVB_DIR = include/opencv
-RESOURCE_DIR = resource
+
 
 # Files
 SRCS = $(SRC_DIR)/*.cpp
@@ -33,6 +33,8 @@ ifeq ($(OS), Windows_NT)
 	EXEC_NAME := "Calibration Tool.exe"
 	OBJS += $(OBJ_DIR)/resource.o
 	CLEAN_OBJS := /q $(OBJ_DIR)\*.o
+	WXL_DIR := libs/msw/wx
+	OPENCVL_DIR := libs/msw/opencv
 
 # Include path for wxWidgets + path to wx/setup.h (required)
 #WXB := -I "C:\Users\sedix\Documents\libs\wxWidgets\lib\gcc810_x64_dll\mswud" \
@@ -64,6 +66,9 @@ else
 	EXEC_NAME := calibrationTool
 
 	CLEAN_OBJS := $(OBJ_DIR)/*.o
+
+	WXL_DIR := libs/linux/wx
+	OPENCVL_DIR = libs/linux/opencv
 
 # Include path for wxWidgets
 	WXB := `wx-config --cxxflags`
