@@ -11,7 +11,7 @@
 - Type ``calibrationTool`` to run the program
 
 ### Windows
-
+- Extract the archive in any folder
 - Run **Calibration Tool Setup.exe**
 - Follow the installer steps
 - To launch the program, you have two options :
