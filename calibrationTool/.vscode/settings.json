@@ -62,7 +62,8 @@
         "hash_set": "cpp",
         "unordered_set": "cpp",
         "future": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "filesystem": "cpp"
     },
     "editor.detectIndentation": false
 }
