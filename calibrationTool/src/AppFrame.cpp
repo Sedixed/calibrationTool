@@ -105,6 +105,7 @@ void AppFrame::OnHelp(wxCommandEvent& evt) {
         wxMimeTypesManager mgr;
         wxFileType* pdfType = mgr.GetFileTypeFromExtension("pdf");
         wxString path = wxGetCwd();
+        
         #ifdef WINDOWS
             path += _("\\docs\\user_manual.pdf");
         #else
