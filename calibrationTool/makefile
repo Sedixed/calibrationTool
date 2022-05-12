@@ -1,3 +1,8 @@
+# DEBUG or RELEASE : used for Linux OS
+# if RELEASE is set, the path to the documentation will be usr/share/calibrationToolDoc/
+# if DEBUG is set, the path will be docs (from the current directory)
+VERSION_TYPE=RELEASE
+
 CC = g++
 
 # Directories
@@ -14,9 +19,9 @@ OPENCVB_DIR = include/opencv
 SRCS = $(SRC_DIR)/*.cpp
 
 # Objects to be created
-OBJS = $(OBJ_DIR)/ButtonsUtils.o $(OBJ_DIR)/AppFrame.o $(OBJ_DIR)/App.o $(OBJ_DIR)/LoadImages.o \
-	$(OBJ_DIR)/Mosaic.o $(OBJ_DIR)/ExtractGridCorners.o $(OBJ_DIR)/PreferencesPerspective.o \
-	$(OBJ_DIR)/Calibration.o $(OBJ_DIR)/Save.o $(OBJ_DIR)/LoadFile.o \
+OBJS = $(OBJ_DIR)/ButtonsUtils.o $(OBJ_DIR)/AppFrame.o $(OBJ_DIR)/App.o $(OBJ_DIR)/LoadImages.o      \
+	$(OBJ_DIR)/Mosaic.o $(OBJ_DIR)/ExtractGridCorners.o $(OBJ_DIR)/PreferencesPerspective.o          \
+	$(OBJ_DIR)/Calibration.o $(OBJ_DIR)/Save.o $(OBJ_DIR)/LoadFile.o                                 \
 	$(OBJ_DIR)/AbstractPreferences.o $(OBJ_DIR)/PreferencesSpherical.o $(OBJ_DIR)/ShowReprojection.o \
 	$(OBJ_DIR)/CalibrationResults.o $(OBJ_DIR)/ImageUtils.o
 
@@ -64,6 +69,13 @@ ifeq ($(OS), Windows_NT)
 else
 	RM := rm
 	EXEC_NAME := calibrationTool
+
+# Used for the path to documentation
+	ifeq ($(VERSION_TYPE), DEBUG)
+		CFLAGS += -DDEBUG
+	else
+		CFLAGS += -DRELEASE
+	endif
 
 	CLEAN_OBJS := $(OBJ_DIR)/*.o
 
