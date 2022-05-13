@@ -41,8 +41,6 @@ int ExtractGridCorners(Calib *dataCalib) {
             cv::cornerSubPix(viewGray, corners, cv::Size(dataCalib->pref.search_window_size, dataCalib->pref.search_window_size),
                                 cv::Size(-1,-1), criteria);
             drawChessboardCorners(src, patternSize, cv::Mat(corners), found, RED, 0);
-            cv::putText(src, "Zoom by holding left-click and drawing a rectangle, then press enter", 
-                cv::Point(15, 15), cv::FONT_HERSHEY_DUPLEX, 0.4, RED, 1, 8, false);
             viewGray.release();
 
             // 3D coordinates of the points
@@ -66,8 +64,9 @@ int ExtractGridCorners(Calib *dataCalib) {
         }
         allCorners.push_back(corners);
         allCorners3D.push_back(corners3D);
-
-
+        
+        cv::putText(src, "Zoom by holding left-click and drawing a rectangle, then press enter", 
+                cv::Point(15, 15), cv::FONT_HERSHEY_DUPLEX, 0.5, RED, 1, 8, false);
         cv::resize(src, src, dataCalib->pref.render_size, cv::INTER_LINEAR);
         
         std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);

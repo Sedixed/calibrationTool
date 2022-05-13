@@ -76,20 +76,20 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     // fait:
         // top-left corner : msg pour dire qu'on peut zoom sur EGC et SR
         // icone ?
+        // modifier screens du manuel user
 
 
     
     // Ajouter le source des docs (imgs + tex)
-    // doc d'installation complète
-    // maj manuel tech (bin folder for ex)
+        // user : manque .tex et schémas
+        // technical : manque .tex
 
-    // commande à utiliser en c++ pour récup dans une matrice le contenu de Intrinsics
+    // maj manuel tech (tuto complet d'installation)
+
+    // commande à utiliser en c++ pour récup dans une matrice le contenu de Intrinsics (jsp où mettre ça)
     // (c/c de load)
 
-    // modifier screens du manuel user
-    
-    // a remplacer (user): egc, sr
-
+    // maj les pdf
     // maj les executables/releases, installer et package (en dernier tout ça)
 
     panel = new wxPanel(this);
