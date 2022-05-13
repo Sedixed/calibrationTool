@@ -10,9 +10,6 @@
 #include "../headers/Save.hpp"
 #include "../headers/LoadFile.hpp"
 #include <wx/mimetype.h>
-#include <wx/filename.h>
-#include <wx/stdpaths.h>
-#include <iostream>
 
 
 // Spacing between two buttons in the base menu
@@ -120,12 +117,10 @@ void AppFrame::OnHelp(wxCommandEvent& evt) {
             #else // eq. ifdef RELEASE
                 path = wxGetInstallPrefix();
                 path += _("/share/calibrationTool/user_manual.pdf");
-                
             #endif
         #endif
         
         auto command = pdfType->GetOpenCommand(path);
-        wxLogMessage(command);
         std::string arg = "--single-argument";
         size_t pos = command.find(arg);
         
