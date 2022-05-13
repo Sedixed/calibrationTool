@@ -77,18 +77,14 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
         // top-left corner : msg pour dire qu'on peut zoom sur EGC et SR
         // icone ?
         // modifier screens du manuel user
-
-
-    
-    // Ajouter le source des docs (imgs + tex)
-        // user : manque .tex et schémas
-        // technical : manque .tex
-
-    // maj manuel tech (tuto complet d'installation)
+        // maj manuel tech
 
     // commande à utiliser en c++ pour récup dans une matrice le contenu de Intrinsics (jsp où mettre ça)
     // (c/c de load)
 
+    // Ajouter le source des docs
+        // user : manque .tex
+        // technical : manque .tex
     // maj les pdf
     // maj les executables/releases, installer et package (en dernier tout ça)
 
