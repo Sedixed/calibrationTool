@@ -43,25 +43,16 @@ ifeq ($(OS), Windows_NT)
 	CLEAN_OBJS := /q $(OBJ_DIR)\*.o
 
 # Include path for wxWidgets + path to wx/setup.h (required)
-#WXB := -I "C:\Users\sedix\Documents\libs\wxWidgets\lib\gcc810_x64_dll\mswud" \
-#	-I "C:\Users\sedix\Documents\libs\wxWidgets\include"
-
-	WXB := -I $(WXB_DIR) $(WXSETUP_DIR)
+	WXB := -I $(WXB_DIR) -I $(WXSETUP_DIR)
 
 # Lib path for wxWidgets + libraries linked
-#WXL := -L "C:\Users\sedix\Documents\libs\wxWidgets\lib\gcc810_x64_dll"
-
 	WXL := -L $(WXL_DIR) \
 		-lwxmsw316u_core_gcc810_x64 -lwxbase316u_gcc810_x64
 
-# Include path for openCV
-#OPENCVB := -I "C:\Users\sedix\Documents\libs\opencv\install\include"
-
+# Include path for OpenCV
 	OPENCVB := -I $(OPENCVB_DIR)
 
 # Lib path for openCV  + libraries linked (shared, must be lib dir for static)
-#OPENCVL := -L "C:\Users\sedix\Documents\libs\opencv\install\x64\mingw\bin" 
-
 	OPENCVL := -L $(OPENCVL_DIR) \
 			-lopencv_highgui455 -lopencv_core455 -lopencv_ccalib455 -lopencv_calib3d455 \
 			-lopencv_imgproc455 -lopencv_imgcodecs455
