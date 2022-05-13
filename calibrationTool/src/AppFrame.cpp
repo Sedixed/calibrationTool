@@ -73,18 +73,6 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     : wxFrame(NULL, 0, title, pos, size, style) {
     SetDefaultPreferences();
 
-    // fait :
-    // manuel user (reste que generalised focal length, voir schémas qu'il a envoyé)
-
-    // on a les versions release/debug :
-    //  windows : installer + sources
-    //  ubuntu : deb + sources
-
-    // FAIT
-    // idée : ajout de macroconstantes DEBUG / RELEASE pour gérer le path vers la doc sous ubuntu
-    // DEBUG -> va chercher dans docs/
-    // RELEASE -> usr/share/calibrationTool
-
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
     placeButtons(BASE_SPACING);
