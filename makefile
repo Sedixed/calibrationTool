@@ -40,7 +40,7 @@ ifeq ($(OS), Windows_NT)
 	LDFLAGS += -mwindows
 	EXEC_NAME := "Calibration Tool.exe"
 	OBJS += $(OBJ_DIR)/resource.coff
-	CLEAN_OBJS := /q $(OBJ_DIR)\*.o
+	CLEAN_OBJS := /q $(OBJ_DIR)\*.o $(OBJ_DIR)\*.coff
 
 # Include path for wxWidgets + path to wx/setup.h (required)
 	WXB := -I $(WXB_DIR) -I $(WXSETUP_DIR)
@@ -69,7 +69,7 @@ else
 		CFLAGS += -DRELEASE
 	endif
 
-	CLEAN_OBJS := $(OBJ_DIR)/*.o $(OBJ_DIR)/*.coff
+	CLEAN_OBJS := $(OBJ_DIR)/*.o
 
 # Include path for wxWidgets
 	WXB := `wx-config --cxxflags`

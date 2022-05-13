@@ -81,12 +81,13 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     
     // Ajouter le source des docs (imgs + tex)
     // doc d'installation complète
+    // maj manuel tech (bin folder for ex)
 
     // commande à utiliser en c++ pour récup dans une matrice le contenu de Intrinsics
     // (c/c de load)
 
     // modifier screens du manuel user
-    // maj manuel tech (bin folder for ex)
+    
     // a remplacer (user): egc, sr
 
     // maj les executables/releases, installer et package (en dernier tout ça)
