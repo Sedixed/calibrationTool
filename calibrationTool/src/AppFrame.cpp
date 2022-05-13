@@ -73,6 +73,8 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     : wxFrame(NULL, 0, title, pos, size, style) {
     SetDefaultPreferences();
 
+    // modifier manuel tech pour var wx
+
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
     placeButtons(BASE_SPACING);
