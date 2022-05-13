@@ -44,7 +44,8 @@ Section "Calibration Tool" CalibInstall
 	SetOutPath $INSTDIR
 	File "..\Calibration Tool.exe"
     SetOutPath $INSTDIR\docs
-    File /a /r "..\docs\"
+    File "..\docs\user_manual.pdf"
+    File "..\docs\technical_manual.pdf"
     SetOutPath $INSTDIR
     File /r "..\libs\wx\"
     File /r "..\libs\opencv\"
