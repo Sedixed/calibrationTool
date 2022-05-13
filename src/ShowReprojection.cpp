@@ -6,7 +6,7 @@
 #define IMG_NAME "Corners Reprojection :"
 
 #define RED cv::Scalar(0, 0, 255, 0)
-#define BLUE cv::Scalar(255, 0, 0, 0)
+#define GREEN cv::Scalar(0, 255, 0, 0)
 
 
 int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
@@ -65,18 +65,20 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
         // Showing image
         cv::Mat img = cv::imread(dataCalib->IOcalib[i].image_name, cv::IMREAD_COLOR);
 
-        // Base points
-        drawChessboardCorners(img, patternSize, cv::Mat(dataCalib->IOcalib[i].CornersCoord2D), true, BLUE, 0);
+        // Extracted points
+        drawChessboardCorners(img, patternSize, cv::Mat(dataCalib->IOcalib[i].CornersCoord2D), true, GREEN, 0);
         // Recalculated points
         drawChessboardCorners(img, patternSize, cv::Mat(imgPointsOutput), true, RED, 1);
         std::string title = std::string(IMG_NAME) + " " + std::to_string(i + 1);
         cv::setWindowTitle(windowID, title);
         std::string errText = "View error : " + std::to_string(dataCalib->IOcalib[i].errorView);
-        drawCross(img, 25, img.rows - 85, 10, 0, 1, RED);
-        drawCross(img, 25, img.rows - 54, 8, 1, 1, BLUE);
+        drawCross(img, 25, img.rows - 85, 10, 1, 1, RED);
+        drawCross(img, 25, img.rows - 54, 8, 0, 1, GREEN);
         cv::putText(img, errText, cv::Point(15, img.rows - 15), cv::FONT_HERSHEY_DUPLEX, 0.8, RED, 1, 8, false);
         cv::putText(img, "Reprojected points", cv::Point(45, img.rows - 75), cv::FONT_HERSHEY_DUPLEX, 0.8, RED, 1, 8, false);
-        cv::putText(img, "Calculated points",cv::Point(45, img.rows - 45), cv::FONT_HERSHEY_DUPLEX, 0.8, BLUE, 1, 8, false);
+        cv::putText(img, "Extracted points",cv::Point(45, img.rows - 45), cv::FONT_HERSHEY_DUPLEX, 0.8, GREEN, 1, 8, false);
+        cv::putText(img, "Zoom by holding left-click and drawing a rectangle, then press enter", 
+                cv::Point(15, 15), cv::FONT_HERSHEY_DUPLEX, 0.4, RED, 1, 8, false);
         cv::resize(img, img, dataCalib->pref.render_size, cv::INTER_LINEAR);
         // Zoom functionality
         cv::Rect r = ::selectROI(windowID, img, false, false);

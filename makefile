@@ -39,7 +39,7 @@ ifeq ($(OS), Windows_NT)
 	CFLAGS += -DWINDOWS
 	LDFLAGS += -mwindows
 	EXEC_NAME := "Calibration Tool.exe"
-	OBJS += $(OBJ_DIR)/resource.o
+	OBJS += $(OBJ_DIR)/resource.coff
 	CLEAN_OBJS := /q $(OBJ_DIR)\*.o
 
 # Include path for wxWidgets + path to wx/setup.h (required)
@@ -69,7 +69,7 @@ else
 		CFLAGS += -DRELEASE
 	endif
 
-	CLEAN_OBJS := $(OBJ_DIR)/*.o
+	CLEAN_OBJS := $(OBJ_DIR)/*.o $(OBJ_DIR)/*.coff
 
 # Include path for wxWidgets
 	WXB := `wx-config --cxxflags`
@@ -93,8 +93,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HD_DIR)/%.hpp
 	$(CC) -c $(WXB) $(OPENCVB) $(CFLAGS) -o $@ $<
 
 # Resource file (windows only)
-$(OBJ_DIR)/resource.o:
-	windres $(WXB) $(RESOURCE_DIR)/resource.rc -o $@
+$(OBJ_DIR)/resource.coff:
+	windres $(WXB) --input-format=rc --input=$(RESOURCE_DIR)/resource.rc --output-format=coff --output=$@
 
 # Removes the executable and the object files
 clean:

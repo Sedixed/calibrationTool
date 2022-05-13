@@ -8,7 +8,7 @@
 
 
 #define IMG_NAME "Corners extraction : "
-
+#define RED cv::Scalar(0, 0, 255, 0)
 
 int ExtractGridCorners(Calib *dataCalib) {
     std::vector<std::vector<cv::Point2f>> allCorners;
@@ -40,7 +40,9 @@ int ExtractGridCorners(Calib *dataCalib) {
             cv::cvtColor(src, viewGray, cv::COLOR_BGR2GRAY);
             cv::cornerSubPix(viewGray, corners, cv::Size(dataCalib->pref.search_window_size, dataCalib->pref.search_window_size),
                                 cv::Size(-1,-1), criteria);
-            drawChessboardCorners(src, patternSize, cv::Mat(corners), found, cv::Scalar(0, 0, 255, 0), 0);
+            drawChessboardCorners(src, patternSize, cv::Mat(corners), found, RED, 0);
+            cv::putText(src, "Zoom by holding left-click and drawing a rectangle, then press enter", 
+                cv::Point(15, 15), cv::FONT_HERSHEY_DUPLEX, 0.4, RED, 1, 8, false);
             viewGray.release();
 
             // 3D coordinates of the points
