@@ -41,7 +41,7 @@ int ShowReprojection(Calib *dataCalib, wxWindow* parent) {
                 // Error per view calculus
                 double err = cv::norm(cv::Mat(dataCalib->IOcalib[i].CornersCoord2D), cv::Mat(imgPointsOutput), cv::NORM_L2);
                 int n = (int) objPoints.size();
-                dataCalib->IOcalib[i].errorView = (float) std::sqrt(err * err / n);
+                dataCalib->IOcalib[i].errorView = (float) (err / n);
                 break;
             }
             default:

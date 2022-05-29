@@ -79,12 +79,13 @@ AppFrame::AppFrame(const wxString& title, const wxPoint& pos, const wxSize& size
         // modifier screens du manuel user
         // maj manuel tech
         // Ajouter le source des docs (probablement à maj cet aprem)
+        // maj les pdf
+        // maj les executables/releases, installer et package (en dernier tout ça)
 
     // commande à utiliser en c++ pour récup dans une matrice le contenu de Intrinsics (jsp où mettre ça)
     // (c/c de load)
 
-    // maj les pdf
-    // maj les executables/releases, installer et package (en dernier tout ça)
+    
 
     panel = new wxPanel(this);
     buttons = Btn::baseButtons(panel);
